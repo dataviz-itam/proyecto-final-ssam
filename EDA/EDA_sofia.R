@@ -79,24 +79,37 @@ sapply(data_2021, function(x) sum(is.na(x)) / length(x)) * 100
 sapply(data_2024, function(x) sum(is.na(x)) / length(x)) * 100
 sapply(data_2022, function(x) sum(is.na(x)) / length(x)) * 100
 
-# Full join 
-temp_data_21_22 <- full_join(data_2021, data_2022, by = "person_id", suffix = c(".2021", ".2022"))
-combined_data <- full_join(temp_data_21_22, data_2024, by = "person_id", suffix = c(".prev", ".2024"))
+library(dplyr)
+library(knitr)
+library(kableExtra)
 
-# Glimpse
-glimpse(combined_data)
+# Calcular los porcentajes de NA para cada conjunto de datos
+na_2021 <- sapply(data_2021, function(x) sum(is.na(x)) / length(x) * 100)
+na_2024 <- sapply(data_2024, function(x) sum(is.na(x)) / length(x) * 100)
+na_2022 <- sapply(data_2022, function(x) sum(is.na(x)) / length(x) * 100)
 
-# Columns 
-colnames(combined_data)
+# Convertir a dataframes
+na_df_2021 <- data.frame(Column = names(na_2021), `2021` = na_2021)
+na_df_2024 <- data.frame(Column = names(na_2024), `2024` = na_2024)
+na_df_2022 <- data.frame(Column = names(na_2022), `2022` = na_2022)
 
-# Table
-example_data <- head(combined_data, 10)
+# Hacer join de los dataframes para comparar
+na_comparison_df <- reduce(list(na_df_2021, na_df_2022, na_df_2024), full_join, by = "Column")
 
 # Crear la tabla con kable y personalizarla con kableExtra
-pretty_table <- kable(example_data, "html", booktabs = TRUE) %>%
+pretty_na_table <- kable(na_comparison_df, format = "html", booktabs = TRUE, caption = "Percentage of NA Values by Year and Column") %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = F) %>%
-  column_spec(1, bold = T, color = "red") %>%
-  scroll_box(width = "100%", height = "500px")
+  row_spec(0, bold = TRUE, background = "#D3D3D3")  # Resaltar el encabezado de la tabla
 
-# NA values %
-sapply(combined_data, function(x) sum(is.na(x)) / length(x)) * 100
+# Mostrar la tabla
+pretty_na_table
+
+# Identificar columnas comunes
+# Identificar columnas comunes usando reduce e intersect
+common_columns <- list(data_2021, data_2024, data_2022) %>%
+  lapply(names) %>%
+  reduce(intersect)
+
+# Imprimir las columnas comunes
+print(common_columns)
+
