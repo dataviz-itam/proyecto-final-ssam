@@ -1,0 +1,136 @@
+---
+title: "EDA_sara"
+format: html
+editor: source
+---
+
+# EDA
+
+## Bibliotecas
+
+```{r message=FALSE}
+library(networkD3)
+library(tidyverse)
+```
+
+## Leer datos
+
+```{r}
+elecciones_2021 <- read.csv("./../data/Elecciones MX 2021 - Captura - TODOS.csv") %>% filter(!is.null(person_id))
+elecciones_2024 <- read.csv("./../data/Elecciones MX 2024 - Captura - Captura.csv") %>% filter(!is.null(person_id))
+elecciones_2022 <- read.csv("./../data/Gobernantes MX 2022 - Captura - TODOS.csv") %>% filter(!is.null(person_id)) %>% filter(person_id!="NA")
+```
+
+## Revisar variables
+
+```{r}
+glimpse(elecciones_2021)
+unique(elecciones_2021$role_type)
+# unique(elecciones_2021$contest)
+```
+
+```{r}
+glimpse(elecciones_2022)
+unique(elecciones_2022$role_type)
+```
+
+
+```{r}
+# elecciones_2021 %>% filter(!is.null(person_id))
+glimpse(elecciones_2024)
+unique(elecciones_2024$role_type)
+# unique(elecciones_2021$contest)
+```
+
+
+```{r}
+candidatos_2021_2024 <- 
+  merge(x = elecciones_2021, y = elecciones_2022, by = "person_id", suffixes = c("_2021", "_2022")) %>% 
+  merge(y = elecciones_2024, by = "person_id", suffixes = c("", "_2024"))
+
+#%>% select(full_name.x, abbreviation.x, contest.x, abbreviation.y, contest.y)
+```
+
+
+```{r}
+glimpse(candidatos_2021_2024)
+
+candidatos_2021_2024 %>% 
+  select(person_id, full_name_2021, abbreviation_2021, contest_2021, abbreviation_2022, contest_2022, abbreviation, contest) %>% 
+  arrange(person_id)
+```
+
+```{r}
+sankey <- candidatos_2021_2024 %>% 
+  select(person_id, full_name_2021, abbreviation_2021, contest_2021, abbreviation_2022, contest_2022, abbreviation, contest) %>% 
+  mutate(abbreviation_2021=paste0(toupper(abbreviation_2021),"_2021"),
+         abbreviation_2022=paste0(toupper(abbreviation_2022),"_2022"),
+         abbreviation=paste0(toupper(abbreviation),"_2024")) %>% 
+  mutate(brinco2022 = paste(abbreviation_2021, abbreviation_2022),
+         brinco2024 = paste(abbreviation_2022, abbreviation)) %>% 
+  arrange(brinco2022)
+
+unique(sankey$abbreviation_2021)
+unique(sankey$abbreviation_2022)
+
+sankey %>% group_by(brinco2022) %>% summarise(n())
+sankey %>% group_by(brinco2024) %>% summarise(n())
+```
+
+
+```{r}
+links <- data.frame(
+  anio_2021=c("MC_2021", "MORENA_2021", "PAN_2021", "PRD_2021", "PRI_2021", "PT_2021", "PVEM_2021", "MC_2022", "MORENA_2022", "MORENA_2022", "MORENA_2022", "MORENA_2022", "MORENA_2022", "PAN_2022"   , "PAN_2022", "PAN_2022", "PAN_2022", "PRD_2022", "PRD_2022", "PRD_2022", "PRD_2022", "PRI_2022", "PRI_2022", "PRI_2022", "PRI_2022" , "PT_2022"    , "PT_2022", "PT_2022"  , "PVEM_2022", "PVEM_2022"),
+  cambios=  c("MC_2022", "MORENA_2022", "PAN_2022", "PRD_2022", "PRI_2022", "PT_2022", "PVEM_2022", "MC_2024", "C5_2024"    , "MC_2024"    , "MORENA_2024", "PT_2024"    , "PVEM_2024"  , "MORENA_2024", "PAN_2024",    "PRD_2024", "PRI_2024", "MC_2024" , "PAN_2024", "PRD_2024", "PRI_2024", "MC_2024" , "PAN_2024", "PRI_2024", "PVEM_2024", "MORENA_2024", "PT_2024", "PVEM_2024", "PAN_2024",  "PVEM_2024"),
+  num =     c(5,57,38,5,20,13,13,  5,1,1,42,7,6,1,35,1,1,  2,1,1,1,1,1,17,1,5,3,  5,2,11)
+)
+```
+
+
+
+
+```{r}
+# A connection data frame is a list of flows with intensity for each flow
+# links <- data.frame(
+#   source=c("group_A","group_A", "group_B", "group_C", "group_C", "group_E"), 
+#   target=c("group_C","group_D", "group_E", "group_F", "group_G", "group_H"), 
+#   value=c(2,3, 2, 3, 1, 3)
+#   )
+ 
+# From these flows we need to create a node data frame: it lists every entities involved in the flow
+nodes <- data.frame(
+  name=c(as.character(links$anio_2021), 
+  as.character(links$cambios)) %>% unique()
+)
+ 
+# With networkD3, connection must be provided using id, not using real name like in the links dataframe.. So we need to reformat it.
+links$IDsource <- match(links$anio_2021, nodes$name)-1 
+links$IDtarget <- match(links$cambios, nodes$name)-1
+ 
+# Make the Network
+p <- sankeyNetwork(Links = links, Nodes = nodes,
+              Source = "IDsource", Target = "IDtarget",
+              Value = "num", NodeID = "name", 
+              sinksRight=FALSE)
+p
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
