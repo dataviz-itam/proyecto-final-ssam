@@ -114,7 +114,7 @@ common_columns <- list(data_2021, data_2024, data_2022) %>%
 print(common_columns)
 
 
-#Data cleaning
+#Data cleaning (WIP)
 
 data_2021 %>% colnames()
 
