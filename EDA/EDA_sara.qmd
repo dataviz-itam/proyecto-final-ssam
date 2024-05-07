@@ -311,11 +311,11 @@ p
 ```
 
 
-# Primer sankey
+# otro sankey
 
 ```{r}
 candidatos_2021y2024 <- 
-  merge(x = elecciones_2021, y = elecciones_2022, by = "person_id", suffixes = c("_2021", "_2024"))
+  merge(x = elecciones_2021, y = elecciones_2024, by = "person_id", suffixes = c("_2021", "_2024"))
 ```
 
 
@@ -336,4 +336,56 @@ unique(sankey$abbreviation_2021)
 sankey %>% group_by(brinco2024) %>% summarise(n())
 ```
 
-este no vale la pena, solo brinco 1
+
+```{r}
+links <- data.frame(
+  anio_2021=c("C1_2021", "FXM_2021", "FXM_2021", "FXM_2021", "FXM_2021", "FXM_2021", "MC_2021", "MC_2021", "MC_2021", "MORENA_2021", 
+              "MORENA_2021", "MORENA_2021", "MORENA_2021", "MORENA_2021", "MORENA_2021", "PANAL_2021", "PAN_2021", "PAN_2021", "PAN_2021", "PAN_2021",
+              "PAN_2021", "PAN_2021", "PESOL_2021", "PRD_2021", "PRD_2021", "PRD_2021", "PRD_2021", "PRD_2021", "PRI_2021", "PRI_2021", 
+              "PRI_2021", "PRI_2021", "PRI_2021", "PRI_2021", "PT_2021", "PT_2021", "PT_2021", "PT_2021", "PVEM_2021", "PVEM_2021", 
+              "PVEM_2021", "RSP_2021", "RSP_2021"),
+  cambios=  c("MC_2024", "MC_2024", "PAN_2024", "PRD_2024", "PT_2024", "PVEM_2024", "MC_2024", "PAN_2024", "PRD_2024", "C5_2024",
+              "MC_2024", "MORENA_2024"    , "PQS_2024"  , "PT_2024", "PVEM_2024",    "MC_2024", "MC_2024", "MORENA_2024" , "PAN_2024", "PRD_2024",
+              "PRI_2024", "PVEM_2024" , "MC_2024", "MC_2024", "PAN_2024", "PRD_2024", "PRI_2024", "PVEM_2024", "MC_2024", "MORENA_2024",  
+              "PAN_2024", "PRD_2024", "PRI_2024", "PVEM_2024", "MC_2024", "MORENA_2024", "PT_2024", "PVEM_2024", "MC_2024", "PAN_2024", 
+              "PVEM_2024", "PAN_2024", "PT_2024"),
+  num =     c(2,1,1,1,2,1,23,6,1,1,     1,58,1,10,10,1,1,2,43,2,     3,1,1,4,1,4,4,1,2,2,     2,1,33,1,1,9,6,5,1,2,    14,1,1)
+)
+```
+
+
+
+```{r}
+# From these flows we need to create a node data frame: it lists every entities involved in the flow
+nodes <- data.frame(
+  name=c(as.character(links$anio_2021), 
+  as.character(links$cambios)) %>% unique()
+)
+ 
+# With networkD3, connection must be provided using id, not using real name like in the links dataframe.. So we need to reformat it.
+links$IDsource <- match(links$anio_2021, nodes$name)-1 
+links$IDtarget <- match(links$cambios, nodes$name)-1
+ 
+# Make the Network
+p <- sankeyNetwork(Links = links, Nodes = nodes,
+              Source = "IDsource", Target = "IDtarget",
+              Value = "num", NodeID = "name", 
+              sinksRight=FALSE)
+p
+
+```
+
+
+# otras ideas
+
+esta relacionado el cargo con el nivel de estudios
+
+esta relacionada el partido con el nivel de estudios
+
+lugar con partido
+
+periodico, palabras, candidatos
+
+periodico, palabras, debate
+
+
