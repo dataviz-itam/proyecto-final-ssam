@@ -65,6 +65,8 @@ elecciones_2024 %>% filter(gender=="")
 
 **Se ha diversificado, hubo alguna ley o cuota de género??**
 
+**Porqué hay pocas mujeres en 2024???**
+
 **Los 8 que están vacío no parecen tener género indefinido, porqué no tienen género???**
 
 
@@ -118,13 +120,17 @@ elecciones_2024 %>% filter(role_type=="headOfGovernment")
 
 **ojo, solo la ultima tabla tiene la variable party**
 ```{r}
+
+elecciones_2021 <- elecciones_2021 %>%
+  mutate(abbreviation = toupper(abbreviation))
 elecciones_2021 %>% group_by(abbreviation) %>%  summarise(n=n()) %>% arrange(desc(abbreviation))
 
+elecciones_2022 <- elecciones_2022 %>%
+  mutate(abbreviation = toupper(abbreviation))
 elecciones_2022 %>% group_by(abbreviation) %>%  summarise(n=n()) %>% arrange(desc(abbreviation))
 
-# elecciones_2024 <- elecciones_2024 %>% 
-#   mutate(dead_or_alive = ifelse(dead_or_alive == "ALIVE" | dead_or_alive == "alive" | dead_or_alive == "Alive" | dead_or_alive == "Alive ", "Vivo", dead_or_alive))
-
+elecciones_2024 <- elecciones_2024 %>%
+  mutate(abbreviation = toupper(abbreviation))
 elecciones_2024 %>% group_by(abbreviation) %>%  summarise(n=n()) %>% arrange(desc(abbreviation))
 ```
 
@@ -169,6 +175,41 @@ elecciones_2024 %>% group_by(last_degree_of_studies) %>%  summarise(n=n()) %>% a
 ```
 
 **Los vacíos son primaria incompleta??? o no dijeron qué?**
+
+
+
+```{r}
+elecciones_2021 %>%
+  ggplot(aes(x = last_degree_of_studies)) +
+  geom_bar(fill = "skyblue", color = "black") +
+  labs(title = "Distribution of Last Degrees of Studies",
+       x = "Last Degree of Studies",
+       y = "Count")+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+
+```{r}
+elecciones_2022 %>%
+  ggplot(aes(x = last_degree_of_studies)) +
+  geom_bar(fill = "skyblue", color = "black") +
+  labs(title = "Distribution of Last Degrees of Studies",
+       x = "Last Degree of Studies",
+       y = "Count")+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+```{r}
+elecciones_2024 %>%
+  ggplot(aes(x = last_degree_of_studies)) +
+  geom_bar(fill = "skyblue", color = "black") +
+  labs(title = "Distribution of Last Degrees of Studies",
+       x = "Last Degree of Studies",
+       y = "Count")+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+
 
 # profesion
 
@@ -380,7 +421,74 @@ p
 
 esta relacionado el cargo con el nivel de estudios
 
+
+```{r}
+ggplot(elecciones_2021, aes(x=role_type, fill=last_degree_of_studies)) +
+  geom_bar(position = "dodge")+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+```{r}
+ggplot(elecciones_2022, aes(x=role_type, fill=last_degree_of_studies)) +
+  geom_bar(position = "dodge")+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+```{r}
+ggplot(elecciones_2024, aes(x=role_type, fill=last_degree_of_studies)) +
+  geom_bar(position = "dodge") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+genero vs partido
+
+```{r}
+elecciones_2021 %>% 
+  ggplot(aes(x=gender, fill=abbreviation)) +
+  geom_bar(position = "dodge")+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+```{r}
+elecciones_2022 %>% 
+  ggplot(aes(x=gender, fill=abbreviation)) +
+  geom_bar(position = "dodge")+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+```{r}
+elecciones_2024 %>% 
+  ggplot(aes(x=gender, fill=abbreviation)) +
+  geom_bar(position = "dodge")+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+**Porque esta disparidad en 2024??**
+
+
 esta relacionada el partido con el nivel de estudios
+
+```{r}
+elecciones_2021 %>% 
+  ggplot(aes(x=last_degree_of_studies, fill=abbreviation)) +
+  geom_bar(position = "dodge")+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+sexo con grado
+
+```{r}
+elecciones_2021 %>% 
+  ggplot(aes(x=gender, fill=last_degree_of_studies)) +
+  geom_bar(position = "dodge")+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+```{r}
+elecciones_2021 %>% 
+  ggplot(aes(x=state, fill=abbreviation)) +
+  geom_bar(position = "dodge")+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
 
 lugar con partido
 
