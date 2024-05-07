@@ -309,3 +309,31 @@ p <- sankeyNetwork(Links = links, Nodes = nodes,
 p
 
 ```
+
+
+# Primer sankey
+
+```{r}
+candidatos_2021y2024 <- 
+  merge(x = elecciones_2021, y = elecciones_2022, by = "person_id", suffixes = c("_2021", "_2024"))
+```
+
+
+
+```{r}
+sankey <- candidatos_2021y2024 %>% 
+  select(person_id, full_name_2021, abbreviation_2021, contest_2021, abbreviation_2024, contest_2024) %>% 
+  mutate(abbreviation_2021=paste0(toupper(abbreviation_2021),"_2021"),
+         # abbreviation_2022=paste0(toupper(abbreviation_2022),"_2022"),
+         abbreviation_2024=paste0(toupper(abbreviation_2024),"_2024")) %>% 
+  mutate(brinco2024 = paste(abbreviation_2021, abbreviation_2024)) %>% 
+  arrange(brinco2024)
+
+unique(sankey$abbreviation_2021)
+# unique(sankey$abbreviation_2022)
+
+# sankey %>% group_by(brinco2022) %>% summarise(n())
+sankey %>% group_by(brinco2024) %>% summarise(n())
+```
+
+este no vale la pena, solo brinco 1
