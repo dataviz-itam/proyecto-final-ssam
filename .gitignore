@@ -1,6 +1,9 @@
 # Aqui se pueden agregar otros si quieren
 
 ######## Para cosas de R ########
+# R project file
+*.Rproj
+
 # History files
 .Rhistory
 .Rapp.history
