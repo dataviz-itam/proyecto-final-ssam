@@ -16,8 +16,8 @@ library(tidyverse)
 ## Leer datos
 
 ```{r}
-elecciones_2021 <- read.csv("./../data/Elecciones MX 2021 - Captura - TODOS.csv") %>% filter(!is.null(person_id))
-elecciones_2024 <- read.csv("./../data/Elecciones MX 2024 - Captura - Captura.csv") %>% filter(!is.null(person_id))
+elecciones_2021 <- read.csv("./../data/Elecciones MX 2021 - Captura - TODOS.csv") %>% filter(!is.null(person_id)) %>% filter(person_id!="NA")
+elecciones_2024 <- read.csv("./../data/Elecciones MX 2024 - Captura - Captura.csv") %>% filter(!is.null(person_id)) %>% filter(person_id!="NA")
 elecciones_2022 <- read.csv("./../data/Gobernantes MX 2022 - Captura - TODOS.csv") %>% filter(!is.null(person_id)) %>% filter(person_id!="NA")
 ```
 
@@ -25,22 +25,213 @@ elecciones_2022 <- read.csv("./../data/Gobernantes MX 2022 - Captura - TODOS.csv
 
 ```{r}
 glimpse(elecciones_2021)
-unique(elecciones_2021$role_type)
+# unique(elecciones_2021$role_type)
 # unique(elecciones_2021$contest)
 ```
 
 ```{r}
 glimpse(elecciones_2022)
-unique(elecciones_2022$role_type)
+# unique(elecciones_2022$role_type)
 ```
 
 
 ```{r}
 # elecciones_2021 %>% filter(!is.null(person_id))
 glimpse(elecciones_2024)
-unique(elecciones_2024$role_type)
+# unique(elecciones_2024$role_type)
 # unique(elecciones_2021$contest)
 ```
+
+
+**ojo hay varios person_id y role_type**
+
+# Por genero
+
+```{r}
+elecciones_2021 %>% group_by(gender) %>%  summarise(cantidad=n()) %>% 
+  mutate(porcentaje=cantidad/nrow(elecciones_2021)*100)
+
+elecciones_2022 %>% group_by(gender) %>%  summarise(cantidad=n()) %>% 
+  mutate(porcentaje=cantidad/nrow(elecciones_2022)*100)
+
+elecciones_2024 <- elecciones_2024 %>% 
+  mutate(gender = ifelse(gender == "F ", "F", gender))
+
+elecciones_2024 %>% group_by(gender) %>%  summarise(cantidad=n()) %>% 
+  mutate(porcentaje=cantidad/nrow(elecciones_2021)*100)
+
+elecciones_2024 %>% filter(gender=="")
+```
+
+**Se ha diversificado, hubo alguna ley o cuota de género??**
+
+**Los 8 que están vacío no parecen tener género indefinido, porqué no tienen género???**
+
+
+
+# Vivo o muerto
+
+```{r}
+elecciones_2021 %>% group_by(dead_or_alive) %>%  summarise(n())
+
+elecciones_2022 %>% group_by(dead_or_alive) %>%  summarise(n())
+
+elecciones_2024 <- elecciones_2024 %>% 
+  mutate(dead_or_alive = ifelse(dead_or_alive == "ALIVE" | dead_or_alive == "alive" | dead_or_alive == "Alive" | dead_or_alive == "Alive ", "Vivo", dead_or_alive))
+
+elecciones_2024 %>% group_by(dead_or_alive) %>%  summarise(n())
+```
+
+**Porqué hay tantos sin estatus de Vivo o Muerto??**
+
+# Cargo
+
+```{r}
+elecciones_2021 %>% group_by(role_type) %>%  summarise(n())
+
+elecciones_2022 <- elecciones_2022 %>%
+  mutate(role_type = ifelse(role_type == "governmentOfficer\n", "governmentOfficer", role_type))
+elecciones_2022 %>% group_by(role_type) %>%  summarise(n())
+
+elecciones_2024 <- elecciones_2024 %>%
+  mutate(role_type = ifelse(role_type == "deputyHeadOfGovernment", "headOfGovernment", role_type))
+elecciones_2024 %>% group_by(role_type) %>%  summarise(n())
+
+elecciones_2022 %>% filter(role_type=="headOfGovernment")
+elecciones_2024 %>% filter(role_type=="headOfGovernment")
+
+```
+
+**FALTA CAMBIARLO A ESPAÑOL**
+**Porqué está AMLO en el 2022 para presidente?????**
+
+# cargo completo
+
+```{r}
+# FALTA DIVIDIR ESTA EN VARIAS COLUMNAS DE CARGO Y LUGAR
+
+# unique(elecciones_2022$contest)
+```
+
+
+# Partido
+
+**ojo, solo la ultima tabla tiene la variable party**
+```{r}
+elecciones_2021 %>% group_by(abbreviation) %>%  summarise(n=n()) %>% arrange(desc(abbreviation))
+
+elecciones_2022 %>% group_by(abbreviation) %>%  summarise(n=n()) %>% arrange(desc(abbreviation))
+
+# elecciones_2024 <- elecciones_2024 %>% 
+#   mutate(dead_or_alive = ifelse(dead_or_alive == "ALIVE" | dead_or_alive == "alive" | dead_or_alive == "Alive" | dead_or_alive == "Alive ", "Vivo", dead_or_alive))
+
+elecciones_2024 %>% group_by(abbreviation) %>%  summarise(n=n()) %>% arrange(desc(abbreviation))
+```
+
+**Son muchos partidos pensar cómo agruparlos, y porque son tantos???**
+
+**FALTA MUCHA LIMPIEZA**
+
+
+# Coalición
+
+```{r}
+elecciones_2021 %>% group_by(coalition) %>%  summarise(n=n()) %>% arrange(desc(n))
+
+elecciones_2022 %>% group_by(coalition) %>%  summarise(n=n()) %>% arrange(desc(n))
+
+# elecciones_2024 <- elecciones_2024 %>% 
+#   mutate(dead_or_alive = ifelse(dead_or_alive == "ALIVE" | dead_or_alive == "alive" | dead_or_alive == "Alive" | dead_or_alive == "Alive ", "Vivo", dead_or_alive))
+
+elecciones_2024 %>% group_by(coalition) %>%  summarise(n=n()) %>% arrange(desc(n))
+```
+
+**También muchas de estas se pueden agrupar???? o no??**
+
+# nivel de estudios
+
+```{r}
+elecciones_2021 %>% group_by(last_degree_of_studies) %>%  summarise(n=n()) %>% arrange(desc(n))
+
+elecciones_2022 <- elecciones_2022 %>%
+  mutate(last_degree_of_studies = ifelse(last_degree_of_studies == "master Degree", "Master Degree", last_degree_of_studies))
+elecciones_2022 %>% group_by(last_degree_of_studies) %>%  summarise(n=n()) %>% arrange(desc(n))
+
+elecciones_2024 <- elecciones_2024 %>%
+  mutate(last_degree_of_studies = ifelse(last_degree_of_studies == "MASTER DEGREE", "Master Degree", last_degree_of_studies)) %>% 
+  mutate(last_degree_of_studies = ifelse(last_degree_of_studies == "BACHELOR’S DEGREE", "Bachelor’s Degree", last_degree_of_studies)) %>% 
+  mutate(last_degree_of_studies = ifelse(last_degree_of_studies == "HIGH SCHOOL", "High School", last_degree_of_studies)) %>% 
+  mutate(last_degree_of_studies = ifelse(last_degree_of_studies == "ELEMENTARY", "Elementary", last_degree_of_studies)) %>% 
+  mutate(last_degree_of_studies = ifelse(last_degree_of_studies == "PHD DEGREE", "PhD Degree", last_degree_of_studies)) %>% 
+  mutate(last_degree_of_studies = ifelse(last_degree_of_studies == "ASSOCIATE DEGREE", "Associate Degree", last_degree_of_studies)) %>% 
+  mutate(last_degree_of_studies = ifelse(last_degree_of_studies == "UNIVERSITY 1ST PROFESSIONAL DEGREE", "University 1st Professional Degree", last_degree_of_studies)) 
+elecciones_2024 %>% group_by(last_degree_of_studies) %>%  summarise(n=n()) %>% arrange(desc(n))
+```
+
+**Los vacíos son primaria incompleta??? o no dijeron qué?**
+
+# profesion
+
+```{r}
+elecciones_2021 %>% group_by(profession_1) %>%  summarise(n=n()) %>% arrange(desc(n))
+
+elecciones_2022 %>% group_by(profession_1) %>%  summarise(n=n()) %>% arrange(desc(n))
+
+elecciones_2024 %>% group_by(profession_1) %>%  summarise(n=n()) %>% arrange(desc(n))
+```
+
+```{r}
+elecciones_2021 %>% group_by(profession_2) %>%  summarise(n=n()) %>% arrange(desc(n))
+
+elecciones_2022 %>% group_by(profession_2) %>%  summarise(n=n()) %>% arrange(desc(n))
+
+elecciones_2024 %>% group_by(profession_2) %>%  summarise(n=n()) %>% arrange(desc(n))
+```
+
+
+```{r}
+elecciones_2021 %>% group_by(profession_3) %>%  summarise(n=n()) %>% arrange(desc(n))
+
+elecciones_2022 %>% group_by(profession_3) %>%  summarise(n=n()) %>% arrange(desc(n))
+
+elecciones_2024 %>% group_by(profession_3) %>%  summarise(n=n()) %>% arrange(desc(n))
+```
+
+```{r}
+elecciones_2021 %>% group_by(profession_4) %>%  summarise(n=n()) %>% arrange(desc(n))
+
+elecciones_2022 %>% group_by(profession_4) %>%  summarise(n=n()) %>% arrange(desc(n))
+
+elecciones_2024 %>% group_by(profession_4) %>%  summarise(n=n()) %>% arrange(desc(n))
+```
+
+```{r}
+elecciones_2021 %>% group_by(profession_5) %>%  summarise(n=n()) %>% arrange(desc(n))
+
+elecciones_2022 %>% group_by(profession_5) %>%  summarise(n=n()) %>% arrange(desc(n))
+
+elecciones_2024 %>% group_by(profession_5) %>%  summarise(n=n()) %>% arrange(desc(n))
+```
+
+```{r}
+elecciones_2021 %>% group_by(profession_6) %>%  summarise(n=n()) %>% arrange(desc(n))
+
+elecciones_2022 %>% group_by(profession_6) %>%  summarise(n=n()) %>% arrange(desc(n))
+
+elecciones_2024 %>% group_by(profession_6) %>%  summarise(n=n()) %>% arrange(desc(n))
+```
+
+**Idealmente pasar todo esto de las profesiones a onehot encoding**
+
+
+
+
+
+
+
+
+
+# Merge todos
 
 
 ```{r}
@@ -59,6 +250,11 @@ candidatos_2021_2024 %>%
   select(person_id, full_name_2021, abbreviation_2021, contest_2021, abbreviation_2022, contest_2022, abbreviation, contest) %>% 
   arrange(person_id)
 ```
+
+
+# Primer sankey
+
+
 
 ```{r}
 sankey <- candidatos_2021_2024 %>% 
@@ -87,8 +283,6 @@ links <- data.frame(
 ```
 
 
-
-
 ```{r}
 # A connection data frame is a list of flows with intensity for each flow
 # links <- data.frame(
@@ -115,22 +309,3 @@ p <- sankeyNetwork(Links = links, Nodes = nodes,
 p
 
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
