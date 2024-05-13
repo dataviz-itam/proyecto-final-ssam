@@ -1,0 +1,1633 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.450">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>EDA_sara</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="EDA_sara_files/libs/clipboard/clipboard.min.js"></script>
+<script src="EDA_sara_files/libs/quarto-html/quarto.js"></script>
+<script src="EDA_sara_files/libs/quarto-html/popper.min.js"></script>
+<script src="EDA_sara_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="EDA_sara_files/libs/quarto-html/anchor.min.js"></script>
+<link href="EDA_sara_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="EDA_sara_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="EDA_sara_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="EDA_sara_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="EDA_sara_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="EDA_sara_files/libs/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet">
+<script src="EDA_sara_files/libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<script src="EDA_sara_files/libs/d3-4.5.0/d3.min.js"></script>
+<script src="EDA_sara_files/libs/sankey-1/sankey.js"></script>
+<script src="EDA_sara_files/libs/sankeyNetwork-binding-0.4/sankeyNetwork.js"></script>
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">EDA_sara</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<section id="eda" class="level1">
+<h1>EDA</h1>
+<section id="bibliotecas" class="level2">
+<h2 class="anchored" data-anchor-id="bibliotecas">Bibliotecas</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(networkD3)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="leer-datos" class="level2">
+<h2 class="anchored" data-anchor-id="leer-datos">Leer datos</h2>
+</section>
+<section id="revisar-variables" class="level2">
+<h2 class="anchored" data-anchor-id="revisar-variables">Revisar variables</h2>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 3,255
+Columns: 37
+$ person_id              &lt;int&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, …
+$ role_type              &lt;chr&gt; "governmentOfficer", "governmentOfficer", "gove…
+$ contest                &lt;chr&gt; "Gubernatura de BAJA CALIFORNIA", "Gubernatura …
+$ first_name             &lt;chr&gt; "Marina del Pilar", "Francisco Alcibiades", "Ma…
+$ last_name              &lt;chr&gt; "Ávila Olmeda", "Garcia Lizardi", "Jones Garay"…
+$ full_name              &lt;chr&gt; "Marina del Pilar Ávila Olmeda", "Francisco Alc…
+$ nickname               &lt;chr&gt; "", "", "Lupita Jones", "", "", "", "", "", "Pa…
+$ abbreviation           &lt;chr&gt; "Morena", "MC", "PAN", "PBCal", "PES", "RSP", "…
+$ coalition              &lt;chr&gt; "Juntos hacemos historia en Baja California", "…
+$ state                  &lt;chr&gt; "Baja California", "Baja California", "Baja Cal…
+$ area                   &lt;chr&gt; "", "", "", "", "", "", "", "", "", "", "", "",…
+$ membership_type        &lt;chr&gt; "campaigning_politician", "campaigning_politici…
+$ start_date             &lt;chr&gt; "2021-04-04", "2021-04-04", "2021-04-04", "2021…
+$ end_date               &lt;chr&gt; "2021-06-02", "2021-06-02", "2021-06-02", "2021…
+$ is_substitute          &lt;chr&gt; "No", "No", "No", "No", "No", "No", "No", "No",…
+$ is_titular             &lt;chr&gt; "TRUE", "VERDADERO", "TRUE", "VERDADERO", "TRUE…
+$ date_birth             &lt;chr&gt; "1985-09-19", "1941-12-17", "1967-09-06", "", "…
+$ gender                 &lt;chr&gt; "F", "M", "F", "M", "M", "F", "M", "M", "M", "F…
+$ dead_or_alive          &lt;chr&gt; "Vivo", "Vivo", "Vivo", "Vivo", "Vivo", "Vivo",…
+$ last_degree_of_studies &lt;chr&gt; "Master Degree", "Bachelor´s Degree", "Master D…
+$ profession_1           &lt;chr&gt; "abogada, servidor público, docente", "servidor…
+$ profession_2           &lt;chr&gt; "Law", "Public administration", "Arts, multidis…
+$ profession_3           &lt;chr&gt; "Public administration", "Business administrati…
+$ profession_4           &lt;chr&gt; "Educational planning and evaluation", "Politic…
+$ profession_5           &lt;chr&gt; "", "Initial education", "", "", "", "", "", "S…
+$ profession_6           &lt;chr&gt; "", "", "", "", "", "", "", "", "", "", "", "",…
+$ Website                &lt;chr&gt; "https://www.marinadelpilar.mx", "", "", "https…
+$ URL_FB_page            &lt;chr&gt; "https://www.facebook.com/MarinadelpilarBc", "h…
+$ URL_FB_profile         &lt;chr&gt; "", "", "", "", "", "https://www.facebook.com/v…
+$ URL_IG                 &lt;chr&gt; "https://www.instagram.com/marinadelpilar_ao", …
+$ URL_TW                 &lt;chr&gt; "https://www.twitter.com/MarinadelPilar", "", "…
+$ URL_others             &lt;chr&gt; "https://www.youtube.com/c/MarinadelPilar", "",…
+$ URL_photo              &lt;chr&gt; "http://sil.gobernacion.gob.mx/Archivos/Fotos/9…
+$ source_of_truth        &lt;chr&gt; "", "", "", "", "", "", "", "", "", "", "", "",…
+$ ACTUALIZADO            &lt;lgl&gt; FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE…
+$ REVISADO               &lt;lgl&gt; FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE…
+$ Observaciones          &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "governmentOfficer"   "executiveCouncil"    "legislatorLowerBody"</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(elecciones_2022)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 1,212
+Columns: 34
+$ person_id              &lt;int&gt; 1, 8, 18, 25, 36, 51, 52, 62, 66, 77, 89, 94, 1…
+$ role_type              &lt;chr&gt; "governmentOfficer", "governmentOfficer", "gove…
+$ contest                &lt;chr&gt; "Gubernatura de BAJA CALIFORNIA", "Gubernatura …
+$ first_name             &lt;chr&gt; "Marina del Pilar", "Víctor Manuel", "Layda Ele…
+$ last_name              &lt;chr&gt; "Ávila Olmeda", "Castro Cosío", "Sansores San R…
+$ full_name              &lt;chr&gt; "Marina del Pilar Ávila Olmeda", "Víctor Manuel…
+$ nickname               &lt;chr&gt; "", "", "", "Maru Campos", "", "", "Dr. Miguel …
+$ abbreviation           &lt;chr&gt; "Morena", "Morena", "PT", "PAN", "Morena", "PAN…
+$ coalition              &lt;chr&gt; "Juntos hacemos historia en Baja California", "…
+$ state                  &lt;chr&gt; "Baja California", "Baja California Sur", "Camp…
+$ area                   &lt;chr&gt; "", "", "", "", "", "", "", "", "", "", "", "",…
+$ membership_type        &lt;chr&gt; "officeholder", "officeholder", "officeholder",…
+$ start_date             &lt;chr&gt; "2021-11-01", "2021-09-10", "2021-09-16", "2021…
+$ end_date               &lt;chr&gt; "2027-10-31", "2027-09-09", "2027-09-15", "2027…
+$ is_substitute          &lt;chr&gt; "No", "No", "No", "No", "No", "No", "No", "No",…
+$ is_titular             &lt;chr&gt; "TRUE", "TRUE", "TRUE", "TRUE", "TRUE", "TRUE",…
+$ date_birth             &lt;chr&gt; "1985-09-19", "1955-06-14", "1945-08-07", "1975…
+$ gender                 &lt;chr&gt; "F", "M", "F", "F", "F", "F", "M", "M", "M", "M…
+$ dead_or_alive          &lt;chr&gt; "Vivo", "Vivo", "Vivo", "Vivo", "Vivo", "Vivo",…
+$ last_degree_of_studies &lt;chr&gt; "Master Degree", "Bachelor´s Degree", "Master D…
+$ profession_1           &lt;chr&gt; "abogada, servidor público, docente", "docente,…
+$ profession_2           &lt;chr&gt; "Law", "Educational counseling and guidance", "…
+$ profession_3           &lt;chr&gt; "Public administration", "Political Sciences", …
+$ profession_4           &lt;chr&gt; "Educational planning and evaluation", "Public …
+$ profession_5           &lt;chr&gt; "", "Social work and care", "", "", "", "", "",…
+$ profession_6           &lt;chr&gt; "", "", "", "", "", "", "", "", "", "", "", "Co…
+$ Website                &lt;chr&gt; "", "https://www.victorcastro.mx", "", "", "", …
+$ URL_FB_page            &lt;chr&gt; "https://www.facebook.com/MarinadelpilarBc", "h…
+$ URL_FB_profile         &lt;chr&gt; "", "", "", "", "", "", "", "", "", "", "", "",…
+$ URL_IG                 &lt;chr&gt; "https://www.instagram.com/marinadelpilar_ao", …
+$ URL_TW                 &lt;chr&gt; "https://www.twitter.com/MarinadelPilar", "http…
+$ URL_others             &lt;chr&gt; "https://www.youtube.com/c/MarinadelPilar", "ht…
+$ URL_photo              &lt;chr&gt; "http://sil.gobernacion.gob.mx/Archivos/Fotos/9…
+$ source_of_truth        &lt;chr&gt; "", "", "", "", "", "", "", "", "", "", "", "ht…</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(elecciones_2022<span class="sc">$</span>role_type)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "governmentOfficer"   "legislatorUpperBody" "executiveCouncil"   
+[4] "legislatorLowerBody" "regionalLegislator"  "headOfGovernment"   
+[7] "governmentOfficer\n"</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 2,660
+Columns: 48
+$ person_id              &lt;int&gt; 12, 30, 32, 34, 40, 46, 53, 61, 106, 160, 244, …
+$ role_type              &lt;chr&gt; "legislatorLowerBody", "legislatorUpperBody", "…
+$ contest                &lt;chr&gt; "Diputación del Distrito Federal 1 de BAJA CALI…
+$ first_name             &lt;chr&gt; "Gabriel", "Juan Carlos", "Mely", "Virgilio", "…
+$ last_name              &lt;chr&gt; "Andrade Leyva", "Loera de la Rosa", "Romero Ce…
+$ full_name              &lt;chr&gt; "Gabriel Andrade Leyva", "Juan Carlos Loera De …
+$ nickname               &lt;chr&gt; "", "Juan Carlos Loera", "Mely Romero Celis", "…
+$ party                  &lt;chr&gt; "Movimiento Ciudadano", "Movimiento de Regenera…
+$ abbreviation           &lt;chr&gt; "MC", "Morena", "PRI", "PVEM", "MC", "MC", "MC"…
+$ coalition              &lt;chr&gt; "", "Sigamos Haciendo Historia", "Fuerza Y Cora…
+$ state                  &lt;chr&gt; "Baja California Sur", "Chihuahua", "Colima", "…
+$ area                   &lt;chr&gt; "1", "", "", "", "", "", "", "3", "", "", "2", …
+$ membership_type        &lt;chr&gt; "campaigning_politician", "campaigning_politici…
+$ start_date             &lt;chr&gt; "2024-03-01", "2024-03-01", "2024-03-01", "2024…
+$ end_date               &lt;chr&gt; "2024-05-29", "2024-05-29", "2024-05-29", "2024…
+$ is_substitute          &lt;lgl&gt; FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE…
+$ is_titular             &lt;lgl&gt; TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,…
+$ date_birth             &lt;chr&gt; "", "1969-04-27", "1977-09-12", "1972-01-21", "…
+$ gender                 &lt;chr&gt; "M", "M", "M", "M", "M", "M", "M", "M", "M", "M…
+$ dead_or_alive          &lt;chr&gt; "Vivo", "Vivo", "Vivo", "Vivo", "Vivo", "Vivo",…
+$ last_degree_of_studies &lt;chr&gt; "Master Degree", "Master Degree", "Master Degre…
+$ profession_1           &lt;chr&gt; "ingeniero civil, docente", "empresario, delega…
+$ profession_2           &lt;chr&gt; "Construction and civil engineering", "Business…
+$ profession_3           &lt;chr&gt; "Educational counseling and guidance", "Politic…
+$ profession_4           &lt;chr&gt; "", "Industrial, mechanical and metallurgical e…
+$ profession_5           &lt;chr&gt; "", "", "", "", "", "Political Sciences", "", "…
+$ profession_6           &lt;chr&gt; "", "", "", "", "", "", "", "", "", "", "", "",…
+$ Website                &lt;chr&gt; "", "https://www.juancarlosloera.mx", "", "http…
+$ URL_FB_page            &lt;chr&gt; "", "https://www.facebook.com/JuanCarlosLoerade…
+$ URL_FB_profile         &lt;chr&gt; "", "", "https://www.facebook.com/MelyRomeroC",…
+$ URL_IG                 &lt;chr&gt; "https://www.instagram.com/andradeleyva", "http…
+$ URL_TW                 &lt;chr&gt; "https://www.twitter.com/GAL280306", "https://w…
+$ URL_others             &lt;chr&gt; "https://www.linkedin.com/in/gabriel-andrade-le…
+$ URL_photo              &lt;chr&gt; "https://scontent.fmex10-2.fna.fbcdn.net/v/t1.6…
+$ source_of_truth        &lt;chr&gt; "", "", "", "", "https://sitllxi.diputados.gob.…
+$ NOTAS                  &lt;chr&gt; "", "", "", "", "", "No se encuentra en el SIL"…
+$ X.1                    &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…
+$ person_id.y            &lt;int&gt; 12, 30, 32, 34, 40, 46, 53, 61, 106, 160, 244, …
+$ role_type.y            &lt;chr&gt; "governmentofficer", "governmentofficer", "gove…
+$ seq                    &lt;int&gt; 308, 15, 54, 12, 186, 194, 198, 898, 102, 181, …
+$ seq_nueva              &lt;int&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, …
+$ person_id_viejo        &lt;int&gt; 12, 30, 32, 34, 40, 46, 53, 61, 106, 160, 244, …
+$ former_candidate       &lt;lgl&gt; TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,…
+$ capturista             &lt;chr&gt; "Tec", "Tec", "Tec", "Tec", "Tec", "Tec", "Tec"…
+$ X                      &lt;chr&gt; "", "", "", "", "", "", "", "", "", "", "", "",…
+$ ids_antes.imp          &lt;int&gt; 12, 30, 32, 34, 40, 46, 53, 61, 106, 160, 244, …
+$ person_id_30abr        &lt;int&gt; 12, 30, 32, 34, 40, 46, 53, 61, 106, 160, 244, …
+$ se.va.a.fb             &lt;chr&gt; "#REF!", "#REF!", "#REF!", "#REF!", "#REF!", "#…</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "legislatorLowerBody"    "legislatorUpperBody"    "deputyHeadOfGovernment"
+[4] "governmentOfficer"      "executiveCouncil"      </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 151
+Columns: 117
+$ person_id                   &lt;int&gt; 120, 128, 131, 144, 160, 184, 194, 215, 22…
+$ role_type_2021              &lt;chr&gt; "executiveCouncil", "executiveCouncil", "e…
+$ contest_2021                &lt;chr&gt; "Alcaldia de ÁLVARO OBREGÓN", "Alcaldia de…
+$ first_name_2021             &lt;chr&gt; "Lía", "Margarita", "Santiago", "José Giov…
+$ last_name_2021              &lt;chr&gt; "Limón García", "Saldaña Hernández", "Tabo…
+$ full_name_2021              &lt;chr&gt; "Lía Limón García", "Margarita Saldaña Her…
+$ nickname_2021               &lt;chr&gt; "", "", "", "", "", "", "", "Bere", "", ""…
+$ abbreviation_2021           &lt;chr&gt; "PVEM", "PAN", "PAN", "PRD", "PRD", "Moren…
+$ coalition_2021              &lt;chr&gt; "Va por México", "Va por México", "", "Va …
+$ state_2021                  &lt;chr&gt; "Ciudad de México", "Ciudad de México", "C…
+$ area_2021                   &lt;chr&gt; "Álvaro Obregón", "Azcapotzalco", "Benito …
+$ membership_type_2021        &lt;chr&gt; "campaigning_politician", "campaigning_pol…
+$ start_date_2021             &lt;chr&gt; "2021-04-04", "2021-04-04", "2021-04-04", …
+$ end_date_2021               &lt;chr&gt; "2021-06-02", "2021-06-02", "2021-06-02", …
+$ is_substitute_2021          &lt;chr&gt; "No", "No", "No", "No", "No", "No", "No", …
+$ is_titular_2021             &lt;chr&gt; "TRUE", "TRUE", "TRUE", "TRUE", "TRUE", "T…
+$ date_birth_2021             &lt;chr&gt; "1973-04-14", "1964-02-19", "1985-10-14", …
+$ gender_2021                 &lt;chr&gt; "F", "F", "M", "M", "F", "F", "M", "F", "F…
+$ dead_or_alive_2021          &lt;chr&gt; "Vivo", "Vivo", "Vivo", "Vivo", "Vivo", "V…
+$ last_degree_of_studies_2021 &lt;chr&gt; "Master Degree", "Bachelor´s Degree", "Mas…
+$ profession_1_2021           &lt;chr&gt; "", "", "abogado, consejero regional y nac…
+$ profession_2_2021           &lt;chr&gt; "Law", "Arts, multidisciplinary or general…
+$ profession_3_2021           &lt;chr&gt; "Educational sciences, multidisciplinary o…
+$ profession_4_2021           &lt;chr&gt; "Political Sciences", "", "", "", "Social …
+$ profession_5_2021           &lt;chr&gt; "", "", "", "", "", "", "", "", "", "", ""…
+$ profession_6_2021           &lt;chr&gt; "", "", "", "", "", "", "", "", "", "", ""…
+$ Website_2021                &lt;chr&gt; "", "https://www.margaritasaldana.com", "h…
+$ URL_FB_page_2021            &lt;chr&gt; "https://www.facebook.com/lialimong", "htt…
+$ URL_FB_profile_2021         &lt;chr&gt; "https://www.facebook.com/lia.l.garcia.5",…
+$ URL_IG_2021                 &lt;chr&gt; "https://www.instagram.com/lialimon", "htt…
+$ URL_TW_2021                 &lt;chr&gt; "", "https://www.twitter.com/margaretSalda…
+$ URL_others_2021             &lt;chr&gt; "", "margarita.saldanahdz@gmail.com", "", …
+$ URL_photo_2021              &lt;chr&gt; "http://sil.gobernacion.gob.mx/Archivos/Fo…
+$ source_of_truth_2021        &lt;chr&gt; "", "", "", "", "", "", "", "", "", "", ""…
+$ ACTUALIZADO                 &lt;lgl&gt; FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, TR…
+$ REVISADO                    &lt;lgl&gt; FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, TR…
+$ Observaciones               &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…
+$ role_type_2022              &lt;chr&gt; "executiveCouncil", "executiveCouncil", "e…
+$ contest_2022                &lt;chr&gt; "Alcaldia de ÁLVARO OBREGÓN", "Alcaldia de…
+$ first_name_2022             &lt;chr&gt; "Lía", "Margarita", "Santiago", "José Giov…
+$ last_name_2022              &lt;chr&gt; "Limón García", "Saldaña Hernández", "Tabo…
+$ full_name_2022              &lt;chr&gt; "Lía Limón García", "Margarita Saldaña Her…
+$ nickname_2022               &lt;chr&gt; "", "", "", "", "", "", "", "Bere", "", ""…
+$ abbreviation_2022           &lt;chr&gt; "PVEM", "PAN", "PAN", "PRD", "PRD", "Moren…
+$ coalition_2022              &lt;chr&gt; "Va por México", "Va por México", "", "Va …
+$ state_2022                  &lt;chr&gt; "Ciudad de México", "Ciudad de México", "C…
+$ area_2022                   &lt;chr&gt; "Álvaro Obregón", "Azcapotzalco", "Benito …
+$ membership_type_2022        &lt;chr&gt; "officeholder", "officeholder", "officehol…
+$ start_date_2022             &lt;chr&gt; "2021-10-01", "2021-10-01", "2021-10-01", …
+$ end_date_2022               &lt;chr&gt; "2024-09-30", "2024-09-30", "2024-09-30", …
+$ is_substitute_2022          &lt;chr&gt; "No", "No", "No", "No", "No", "No", "No", …
+$ is_titular_2022             &lt;chr&gt; "TRUE", "TRUE", "TRUE", "TRUE", "TRUE", "T…
+$ date_birth_2022             &lt;chr&gt; "1973-04-14", "1964-02-19", "1985-10-14", …
+$ gender_2022                 &lt;chr&gt; "F", "F", "M", "M", "F", "F", "M", "F", "F…
+$ dead_or_alive_2022          &lt;chr&gt; "Vivo", "Vivo", "Vivo", "Vivo", "Vivo", "V…
+$ last_degree_of_studies_2022 &lt;chr&gt; "Master Degree", "Bachelor´s Degree", "Mas…
+$ profession_1_2022           &lt;chr&gt; "", "", "abogado, consejero regional y nac…
+$ profession_2_2022           &lt;chr&gt; "Law", "Arts, multidisciplinary or general…
+$ profession_3_2022           &lt;chr&gt; "Educational sciences, multidisciplinary o…
+$ profession_4_2022           &lt;chr&gt; "Political Sciences", "", "", "", "Social …
+$ profession_5_2022           &lt;chr&gt; "", "", "", "", "", "", "", "", "", "", ""…
+$ profession_6_2022           &lt;chr&gt; "", "", "", "", "", "", "", "", "", "", ""…
+$ Website_2022                &lt;chr&gt; "", "", "", "https://giovanigutierrez.mx",…
+$ URL_FB_page_2022            &lt;chr&gt; "https://www.facebook.com/lialimong", "htt…
+$ URL_FB_profile_2022         &lt;chr&gt; "https://www.facebook.com/lia.l.garcia.5",…
+$ URL_IG_2022                 &lt;chr&gt; "https://www.instagram.com/lialimon", "htt…
+$ URL_TW_2022                 &lt;chr&gt; "", "https://www.twitter.com/margaretSalda…
+$ URL_others_2022             &lt;chr&gt; "", "margarita.saldanahdz@gmail.com", "", …
+$ URL_photo_2022              &lt;chr&gt; "http://sil.gobernacion.gob.mx/Archivos/Fo…
+$ source_of_truth_2022        &lt;chr&gt; "", "", "", "", "", "", "", "", "", "", ""…
+$ role_type                   &lt;chr&gt; "executiveCouncil", "executiveCouncil", "e…
+$ contest                     &lt;chr&gt; "Alcaldia de ÁLVARO OBREGÓN", "Alcaldia de…
+$ first_name                  &lt;chr&gt; "Lía ", "Margarita ", "Santiago ", "José G…
+$ last_name                   &lt;chr&gt; "Limón García", "Saldaña Hernández", "Tabo…
+$ full_name                   &lt;chr&gt; "Lía Limón García", "Margarita Saldaña Her…
+$ nickname                    &lt;chr&gt; "", "", "", "", "Sandra Cuevas", "", "", "…
+$ party                       &lt;chr&gt; "Partido Acción Nacional", "Partido Acción…
+$ abbreviation                &lt;chr&gt; "PAN", "PAN", "PAN", "PAN", "MC", "Morena"…
+$ coalition                   &lt;chr&gt; "Va X la Ciudad de México", "Va X la Ciuda…
+$ state                       &lt;chr&gt; "Ciudad de México", "Ciudad de México", "C…
+$ area                        &lt;chr&gt; "Álvaro Obregón", "Azcapotzalco", "", "Coy…
+$ membership_type             &lt;chr&gt; "campaigning_politician", "campaigning_pol…
+$ start_date                  &lt;chr&gt; "2024-03-31", "2024-03-31", "2024-03-01", …
+$ end_date                    &lt;chr&gt; "2024-05-29", "2024-05-29", "2024-05-29", …
+$ is_substitute               &lt;lgl&gt; FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, …
+$ is_titular                  &lt;lgl&gt; TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, …
+$ date_birth                  &lt;chr&gt; "1973-04-14", "1964-02-19", "1985-10-14", …
+$ gender                      &lt;chr&gt; "M", "M", "M", "M", "M", "M", "M", "M", "M…
+$ dead_or_alive               &lt;chr&gt; "Vivo", "Vivo", "Vivo", "Vivo", "Vivo", "V…
+$ last_degree_of_studies      &lt;chr&gt; "Master Degree", "Master Degree", "Master …
+$ profession_1                &lt;chr&gt; "Derecho, Relaciones internacionales", "De…
+$ profession_2                &lt;chr&gt; "Law", "Law", "Law", "Business administrat…
+$ profession_3                &lt;chr&gt; "", "", "Political Sciences", "", "Arts, m…
+$ profession_4                &lt;chr&gt; "", "", "", "", "Social work and care", ""…
+$ profession_5                &lt;chr&gt; "", "", "", "", "", "", "", "", "", "", ""…
+$ profession_6                &lt;chr&gt; "", "", "", "", "", "", "", "", "", "", ""…
+$ Website                     &lt;chr&gt; "", "", "", "", "https://sandracuevas.mx/"…
+$ URL_FB_page                 &lt;chr&gt; "https://www.facebook.com/lialimong", "htt…
+$ URL_FB_profile              &lt;chr&gt; "", "", "", "", "", "", "", "", "", "", ""…
+$ URL_IG                      &lt;chr&gt; "https://www.instagram.com/lialimon", "htt…
+$ URL_TW                      &lt;chr&gt; "", "https://twitter.com/MargaretSaldana",…
+$ URL_others                  &lt;chr&gt; "", "contacto@margaritasaldana.com", "http…
+$ URL_photo                   &lt;chr&gt; "http://sil.gobernacion.gob.mx/Archivos/Fo…
+$ source_of_truth             &lt;chr&gt; "", "", "http://sil.gobernacion.gob.mx/Lib…
+$ NOTAS                       &lt;chr&gt; "", "", "", "", "", "", "", "", "", "", ""…
+$ X.1                         &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…
+$ person_id.y                 &lt;int&gt; NA, NA, NA, NA, 160, NA, NA, NA, NA, NA, N…
+$ role_type.y                 &lt;chr&gt; "", "", "", "", "executivecouncil", "", ""…
+$ seq                         &lt;int&gt; NA, NA, NA, NA, 181, NA, NA, NA, NA, NA, 4…
+$ seq_nueva                   &lt;int&gt; NA, NA, NA, NA, 10, NA, NA, NA, NA, NA, 56…
+$ person_id_viejo             &lt;int&gt; NA, NA, NA, NA, 160, NA, NA, NA, NA, NA, 3…
+$ former_candidate            &lt;lgl&gt; NA, NA, NA, NA, TRUE, NA, NA, NA, NA, NA, …
+$ capturista                  &lt;chr&gt; "", "", "", "", "Tec", "", "", "", "", "",…
+$ X                           &lt;chr&gt; "", "", "", "", "", "", "", "", "", "", ""…
+$ ids_antes.imp               &lt;int&gt; NA, NA, NA, NA, 160, NA, NA, NA, NA, NA, 4…
+$ person_id_30abr             &lt;int&gt; 120, 5494, 131, 144, 160, 184, 194, 215, 2…
+$ se.va.a.fb                  &lt;chr&gt; "#REF!", "#REF!", "#REF!", "#REF!", "#REF!…</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    person_id                         full_name_2021 abbreviation_2021
+1         120                       Lía Limón García              PVEM
+2         128            Margarita Saldaña Hernández               PAN
+3         131               Santiago Taboada Cortina               PAN
+4         144         José Giovani Gutiérrez Aguilar               PRD
+5         160           Sandra Xantall Cuevas Nieves               PRD
+6         184            Clara Marina Brugada Molina            Morena
+7         194                 Mauricio Tabe Echartea               PAN
+8         215    Araceli Berenice Hernández Calderón            Morena
+9         226        Alfa Eliana González Magallanes               PRD
+10        230                   Evelyn Parra Álvarez            Morena
+11        238                José Carlos Acosta Ruiz            Morena
+12        244                  Monica Becerra Moreno               PAN
+13        245           Paulo Gonzalo Martinez Lopez               PAN
+14        286         Julieta Andrea Ramirez Padilla            Morena
+15        287            Socorro Irma Andazola Gomez            Morena
+16        288               Evangelina Moreno Guerra            Morena
+17        323                 Fausto Gallardo Garcia              PVEM
+18        372                Alfredo Vazquez Vazquez            Morena
+19        373                   Joaquin Zebadua Alva            Morena
+20        434              Luis Armando Melgar Bravo              PVEM
+21        454              Daniel Murguia Lardizabal            Morena
+22        486       Daniela Soraya Alvarez Hernandez               PAN
+23        490         Teresita De Jesus Vargas Meraz            Morena
+24        497                      Lilia Aguilar Gil                PT
+25        556                     Aleida Alavez Ruiz            Morena
+26        640                 Karla Ayala Villalobos               PRI
+27        641        Diana Maria Teresa Lara Carreon               PAN
+28        645 Margarita Ester Zavala Gomez Del Campo               PAN
+29        650           Luis Alberto Mendoza Acevedo               PAN
+30        651                 Xavier Gonzalez Zirion               PRI
+31        652                      Jorge Triana Tena               PAN
+32        658     Gabriel Ricardo Quadri De La Torre               PAN
+33        659           Hector Saul Tellez Hernandez               PAN
+34        661        Gabriela Georgina Jimenez Godoy            MORENA
+35        670               Ana Karina Rojo Pimentel                PT
+36        683                    Yerico Abramo Masso               PRI
+37        686                   Jaime Bueno Zertuche               PRI
+38        725        Brigido Ramiro Moreno Hernández                PT
+39        726         Francisco Javier Borrego Adame            Morena
+40        733                 Riult Rivera Gutierrez               PAN
+41        754      Gina Gerardina Campuzano Gonzalez               PAN
+42        777               Fernando Torres Graciano               PAN
+43        779              Ector Jaime Ramirez Barba               PAN
+44        783                      Sarai Nuñez Ceron               PAN
+45        784              Esther Mandujano Tinajero               PAN
+46        901              Araceli Ocampo Manzanares            Morena
+47        919                 Carlos Sanchez Barrios            Morena
+48        940           Sandra Simey Olvera Bautista            Morena
+49        960              Sayonara Vargas Rodriguez               PRI
+50       1037              Manuel Jesus Herrera Vega                MC
+51       1044               Sergio Barrera Sepulveda                MC
+52       1086                  Bruno Blancas Mercado            Morena
+53       1088        Maria Del Rocio Corona Nakamura              PVEM
+54       1096         Antonio De Jesus Ramirez Ramos              PVEM
+55       1304   Maria Teresa Castell De Oro Palacios               PAN
+56       1311                Dionicia Vazquez Garcia                PT
+57       1323      Roberto Angel Dominguez Rodriguez            Morena
+58       1324              Juan Angel Bautista Bravo            Morena
+59       1406        Claudia Gabriela Olvera Higuera               PAN
+60       1408              Ana Lilia Herrera Anzaldo               PRI
+61       1412                 Jazmin Jaimes Albarran               PRI
+62       1413               Alan Castellanos Ramirez               PRI
+63       1415                Sue Ellen Bernal Bolnik               PRI
+64       1419               Ali Sayuri Nuñez Meneses              PVEM
+65       1420                  Armando Corona Arvizu            MORENA
+66       1426          Cesar Agustin Hernandez Perez            MORENA
+67       1427          Luis Enrique Martinez Ventura                PT
+68       1429         Arturo Roberto Hernandez Tapia            MORENA
+69       1461                    Leonel Godoy Rangel            Morena
+70       1468         Carlos Alberto Manzo Rodriguez            Morena
+71       1502                 Rodrigo Sanchez Zepeda               PAN
+72       1507            Roberto Carlos Lopez Garcia               PRI
+73       1512            Mary Carmen Bernal Martinez                PT
+74       1529          Miguel Pavel Jarero Velazquez            Morena
+75       1530          Jorge Armando Ortiz Rodriguez                PT
+76       1539                  Jasmine Maria Bugarin              PVEM
+77       1607          Andres Mauricio Cantu Ramirez               PRI
+78       1613          Juan Francisco Espinoza Eguia               PRI
+79       1614           Karina Marlen Barron Perales               PRI
+80       1678                       Irma Juan Carlos            Morena
+81       1691                Margarita Garcia Garcia                PT
+82       1692                   Azael Santiago Chepi            Morena
+83       1694          Angel Benjamin Robles Montoya                PT
+84       1765               Ana Teresa Aranda Orozco               PAN
+85       1766        Marco Humberto Aguilar Coronado               PAN
+86       1767           Carolina Beauregard Martinez               PAN
+87       1768             Mario Gerardo Riestra Piña               PAN
+88       1773            Fatima Almendra Cruz Pelaez              PVEM
+89       1777             Alejandro Carvajal Hidalgo            Morena
+90       1823           Juan Luis Carrillo Soberanis              PVEM
+91       1824          Alma Anahi Gonzalez Hernandez            Morena
+92       1827              Juan Manuel Navarro Muñiz              PVEM
+93       1868         Gilberto Hernandez Villafuerte              PVEM
+94       1887               Olegaria Carrazco Macias            Morena
+95       1912              Ana Elizabeth Ayala Leyva            Morena
+96       1913        Jesus Fernando Garcia Hernandez                PT
+97       1915                Merary Villegas Sanchez            Morena
+98       1920   Manuel De Jesus Baldenebro Arredondo            Morena
+99       1943          Lorenia Iveth Valles Sampedro            Morena
+100      1954     Heriberto Marcelo Aguilar Castillo            Morena
+101      2021            Oscar De Jesus Almaraz Smer               PAN
+102      2094           Jose Alejandro Aguilar Lopez                PT
+103      2095              Irma Yordana Garay Loredo                PT
+104      2150           Monica Herrera Villavicencio            Morena
+105      2205          Jose Francisco Yunes Zorrilla               PRI
+106      2208          Maria Josefina Gamboa Torales               PAN
+107      2219                  Rosa Hernandez Espejo            Morena
+108      2221                 Claudia Tello Espinosa            Morena
+109      2225  Dulce Maria Corina Villegas Guarneros            Morena
+110      2228                    Paola Tenorio Adame            Morena
+111      2243          Rommel Aghmed Pacheco Marrufo               PAN
+112      2284             Miguel Angel Varela Pinedo               PAN
+113      2289                 Alfredo Femat Bañuelos                PT
+114      2381            Mariela Gutierrez Escalante            Morena
+115      2416            Luis Donaldo Colosio Riojas                MC
+116      2452                    Juanita Guerra Mena            Morena
+117      2511                 Jesus Estrada Ferreiro            Morena
+118      2515     Enrique Francisco Galindo Ceballos               PRD
+119      2550               Leonardo Montañez Castro               PAN
+120      2556 Antonio Francisco Astiazaran Gutierrez               PRI
+121      2563          Marco Antonio Bonilla Mendoza               PAN
+122      2669                   Eduardo Rivera Perez               PAN
+123      2682              Jesus Pablo Lemus Navarro                MC
+124      2719         Elia Margarita Moreno González               PRI
+125      2729          Biby Karen Rabelo De la Torre                MC
+126      2733                   Jorge Miranda Castro              PVEM
+127      2743       Norma Alicia Bustamante Martínez            Morena
+128      2767             Jorge Carlos Ramírez Marín               PRI
+129      2769           Verónica Noemí Camino Farjat            Morena
+130      2778            Milena Paola Quiroga Romero            Morena
+131      2938            Carlos Javier Lamarque Cano            Morena
+132      3049                     Saul Monreal Avila            Morena
+133      3062             Alejandra Gutiérrez Campos               PAN
+134      3093                  Armando Ayala Robles             Morena
+135      3125        Lorena Del Carmen Alfaro Garcia               PAN
+136      3153             Griselda Martínez Martínez            Morena
+137      3161        Ignacio Benjamin Campos Equihua            Morena
+138      3201          Felipe Fernando Macias Olvera               PAN
+139      3204              Ricardo Villarreal Garcia               PAN
+140      3205             Pedro David Ortega Fonseca            Morena
+141      3209            Annia Sarahi Gomez Cardenas               PAN
+142      3210                    Pedro Garza Treviño               PAN
+143      3217           Luis Gerardo Quijano Morales               PRI
+144      3233        Luis Fernando Vilchis Contreras            Morena
+145      3237        María Del Rocío Banquells Núñez               PRD
+146      3240                Carolina Dávila Ramírez               PRI
+147      3247                Marcela Guerra Castillo               PRI
+148      3251             Cuauhtémoc Ochoa Fernández            Morena
+149      3253           Olga Juliana Elizondo Guerra            Morena
+150      3254         María del Carmen Pinete Vargas              PVEM
+151      3255      Claudia Alejandra Hernández Sáenz            Morena
+                                                             contest_2021
+1                                              Alcaldia de ÁLVARO OBREGÓN
+2                                                Alcaldia de AZCAPOTZALCO
+3                                               Alcaldia de BENITO JUÁREZ
+4                                                    Alcaldia de COYOACÁN
+5                                                  Alcaldia de CUAUHTÉMOC
+6                                                  Alcaldia de IZTAPALAPA
+7                                              Alcaldia de MIGUEL HIDALGO
+8                                                     Alcaldia de TLÁHUAC
+9                                                     Alcaldia de TLALPAN
+10                                        Alcaldia de VENUSTIANO CARRANZA
+11                                                 Alcaldia de XOCHIMILCO
+12                    Diputación del Distrito Federal 2 de AGUASCALIENTES
+13                    Diputación del Distrito Federal 3 de AGUASCALIENTES
+14                   Diputación del Distrito Federal 2 de BAJA CALIFORNIA
+15                   Diputación del Distrito Federal 4 de BAJA CALIFORNIA
+16                   Diputación del Distrito Federal 5 de BAJA CALIFORNIA
+17                   Diputación del Distrito Federal 8 de BAJA CALIFORNIA
+18                           Diputación del Distrito Federal 3 de CHIAPAS
+19                           Diputación del Distrito Federal 4 de CHIAPAS
+20                          Diputación del Distrito Federal 13 de CHIAPAS
+21                         Diputación del Distrito Federal 1 de CHIHUAHUA
+22                         Diputación del Distrito Federal 4 de CHIHUAHUA
+23                         Diputación del Distrito Federal 2 de CHIHUAHUA
+24                         Diputación del Distrito Federal 3 de CHIHUAHUA
+25                 Diputación del Distrito Federal 19 de CIUDAD DE MÉXICO
+26                  Diputación del Distrito Federal 5 de CIUDAD DE MÉXICO
+27                  Diputación del Distrito Federal 6 de CIUDAD DE MÉXICO
+28                 Diputación del Distrito Federal 10 de CIUDAD DE MÉXICO
+29                 Diputación del Distrito Federal 15 de CIUDAD DE MÉXICO
+30                 Diputación del Distrito Federal 16 de CIUDAD DE MÉXICO
+31                 Diputación del Distrito Federal 17 de CIUDAD DE MÉXICO
+32                 Diputación del Distrito Federal 23 de CIUDAD DE MÉXICO
+33                 Diputación del Distrito Federal 24 de CIUDAD DE MÉXICO
+34                  Diputación del Distrito Federal 3 de CIUDAD DE MÉXICO
+35                 Diputación del Distrito Federal 20 de CIUDAD DE MÉXICO
+36              Diputación del Distrito Federal 4 de COAHUILA DE ZARAGOZA
+37              Diputación del Distrito Federal 7 de COAHUILA DE ZARAGOZA
+38              Diputación del Distrito Federal 1 de COAHUILA DE ZARAGOZA
+39              Diputación del Distrito Federal 2 de COAHUILA DE ZARAGOZA
+40                            Diputación del Distrito Federal 1 de COLIMA
+41                           Diputación del Distrito Federal 4 de DURANGO
+42                        Diputación del Distrito Federal 3 de GUANAJUATO
+43                        Diputación del Distrito Federal 5 de GUANAJUATO
+44                       Diputación del Distrito Federal 12 de GUANAJUATO
+45                       Diputación del Distrito Federal 14 de GUANAJUATO
+46                          Diputación del Distrito Federal 2 de GUERRERO
+47                          Diputación del Distrito Federal 7 de GUERRERO
+48                           Diputación del Distrito Federal 3 de HIDALGO
+49                           Diputación del Distrito Federal 1 de HIDALGO
+50                           Diputación del Distrito Federal 6 de JALISCO
+51                          Diputación del Distrito Federal 13 de JALISCO
+52                           Diputación del Distrito Federal 5 de JALISCO
+53                           Diputación del Distrito Federal 9 de JALISCO
+54                          Diputación del Distrito Federal 17 de JALISCO
+55                 Diputación del Distrito Federal 34 de ESTADO DE MÉXICO
+56                  Diputación del Distrito Federal 2 de ESTADO DE MÉXICO
+57                 Diputación del Distrito Federal 28 de ESTADO DE MÉXICO
+58                 Diputación del Distrito Federal 31 de ESTADO DE MÉXICO
+59                 Diputación del Distrito Federal 24 de ESTADO DE MÉXICO
+60                 Diputación del Distrito Federal 27 de ESTADO DE MÉXICO
+61                 Diputación del Distrito Federal 36 de ESTADO DE MÉXICO
+62                 Diputación del Distrito Federal 39 de ESTADO DE MÉXICO
+63                 Diputación del Distrito Federal 41 de ESTADO DE MÉXICO
+64                  Diputación del Distrito Federal 6 de ESTADO DE MÉXICO
+65                 Diputación del Distrito Federal 12 de ESTADO DE MÉXICO
+66                 Diputación del Distrito Federal 30 de ESTADO DE MÉXICO
+67                 Diputación del Distrito Federal 32 de ESTADO DE MÉXICO
+68                 Diputación del Distrito Federal 35 de ESTADO DE MÉXICO
+69               Diputación del Distrito Federal 1 de MICHOACÁN DE OCAMPO
+70               Diputación del Distrito Federal 9 de MICHOACÁN DE OCAMPO
+71               Diputación del Distrito Federal 4 de MICHOACÁN DE OCAMPO
+72               Diputación del Distrito Federal 8 de MICHOACÁN DE OCAMPO
+73               Diputación del Distrito Federal 3 de MICHOACÁN DE OCAMPO
+74                           Diputación del Distrito Federal 1 de NAYARIT
+75                           Diputación del Distrito Federal 3 de NAYARIT
+76                           Diputación del Distrito Federal 2 de NAYARIT
+77                        Diputación del Distrito Federal 2 de NUEVO LEÓN
+78                        Diputación del Distrito Federal 9 de NUEVO LEÓN
+79                       Diputación del Distrito Federal 10 de NUEVO LEÓN
+80                            Diputación del Distrito Federal 2 de OAXACA
+81                            Diputación del Distrito Federal 3 de OAXACA
+82                            Diputación del Distrito Federal 4 de OAXACA
+83                            Diputación del Distrito Federal 8 de OAXACA
+84                            Diputación del Distrito Federal 9 de PUEBLA
+85                           Diputación del Distrito Federal 10 de PUEBLA
+86                           Diputación del Distrito Federal 11 de PUEBLA
+87                           Diputación del Distrito Federal 12 de PUEBLA
+88                            Diputación del Distrito Federal 2 de PUEBLA
+89                            Diputación del Distrito Federal 6 de PUEBLA
+90                      Diputación del Distrito Federal 1 de QUINTANA ROO
+91                      Diputación del Distrito Federal 2 de QUINTANA ROO
+92                   Diputación del Distrito Federal 2 de SAN LUIS POTOSÍ
+93                   Diputación del Distrito Federal 6 de SAN LUIS POTOSÍ
+94                           Diputación del Distrito Federal 6 de SINALOA
+95                           Diputación del Distrito Federal 2 de SINALOA
+96                           Diputación del Distrito Federal 3 de SINALOA
+97                           Diputación del Distrito Federal 7 de SINALOA
+98                            Diputación del Distrito Federal 1 de SONORA
+99                            Diputación del Distrito Federal 3 de SONORA
+100                           Diputación del Distrito Federal 4 de SONORA
+101                       Diputación del Distrito Federal 5 de TAMAULIPAS
+102                         Diputación del Distrito Federal 1 de TLAXCALA
+103                         Diputación del Distrito Federal 2 de TLAXCALA
+104  Diputación del Distrito Federal 7 de VERACRUZ DE IGNACIO DE LA LLAVE
+105  Diputación del Distrito Federal 9 de VERACRUZ DE IGNACIO DE LA LLAVE
+106 Diputación del Distrito Federal 12 de VERACRUZ DE IGNACIO DE LA LLAVE
+107  Diputación del Distrito Federal 4 de VERACRUZ DE IGNACIO DE LA LLAVE
+108  Diputación del Distrito Federal 8 de VERACRUZ DE IGNACIO DE LA LLAVE
+109 Diputación del Distrito Federal 15 de VERACRUZ DE IGNACIO DE LA LLAVE
+110 Diputación del Distrito Federal 19 de VERACRUZ DE IGNACIO DE LA LLAVE
+111                          Diputación del Distrito Federal 3 de YUCATÁN
+112                        Diputación del Distrito Federal 2 de ZACATECAS
+113                        Diputación del Distrito Federal 3 de ZACATECAS
+114                                  Presidencia del municipio de TECÁMAC
+115                                Presidencia del municipio de MONTERREY
+116                          Diputación del Distrito Federal 3 de MORELOS
+117                                 Presidencia del municipio de CULIACÁN
+118                          Presidencia del municipio de SAN LUIS POTOSÍ
+119                           Presidencia del municipio de AGUASCALIENTES
+120                               Presidencia del municipio de HERMOSILLO
+121                                Presidencia del municipio de CHIHUAHUA
+122                                   Presidencia del municipio de PUEBLA
+123                              Presidencia del municipio de GUADALAJARA
+124                                   Presidencia del municipio de COLIMA
+125                                 Presidencia del municipio de CAMPECHE
+126                                Presidencia del municipio de ZACATECAS
+127                                 Presidencia del municipio de MEXICALI
+128                                   Presidencia del municipio de MÉRIDA
+129                                   Presidencia del municipio de MÉRIDA
+130                                   Presidencia del municipio de LA PAZ
+131                                   Presidencia del municipio de CAJEME
+132                                Presidencia del municipio de FRESNILLO
+133                                     Presidencia del municipio de LEÓN
+134                                 Presidencia del municipio de ENSENADA
+135                                 Presidencia del municipio de IRAPUATO
+136                               Presidencia del municipio de MANZANILLO
+137                                  Presidencia del municipio de URUAPAN
+138                        Diputación del Distrito Federal 4 de QUERÉTARO
+139                       Diputación del Distrito Federal 2 de GUANAJUATO
+140                      Diputación del Distrito Federal 10 de GUANAJUATO
+141                       Diputación del Distrito Federal 6 de NUEVO LEÓN
+142                      Diputación del Distrito Federal 11 de NUEVO LEÓN
+143                                    Alcaldia de LA MAGDALENA CONTRERAS
+144                      Presidencia del municipio de ECATEPEC DE MORELOS
+145                Diputación del Distrito Federal 14 de CIUDAD DE MÉXICO
+146                        Diputación del Distrito Federal 4 de ZACATECAS
+147                       Diputación del Distrito Federal 5 de NUEVO LEÓN
+148                          Diputación del Distrito Federal 5 de HIDALGO
+149                         Diputación del Distrito Federal 2 de TLAXCALA
+150  Diputación del Distrito Federal 2 de VERACRUZ DE IGNACIO DE LA LLAVE
+151                       Diputación del Distrito Federal 9 de TAMAULIPAS
+    abbreviation_2022
+1                PVEM
+2                 PAN
+3                 PAN
+4                 PRD
+5                 PRD
+6              Morena
+7                 PAN
+8              Morena
+9                 PRD
+10             Morena
+11             Morena
+12                PAN
+13                PAN
+14             Morena
+15             Morena
+16             Morena
+17               PVEM
+18             Morena
+19             Morena
+20               PVEM
+21             Morena
+22                PAN
+23             Morena
+24                 PT
+25             Morena
+26                PRI
+27                PAN
+28                PAN
+29                PAN
+30                PRI
+31                PAN
+32                PAN
+33                PAN
+34             MORENA
+35                 PT
+36                PRI
+37                PRI
+38                 PT
+39             Morena
+40                PAN
+41                PAN
+42                PAN
+43                PAN
+44                PAN
+45                PAN
+46             Morena
+47             Morena
+48             Morena
+49                PRI
+50                 MC
+51                 MC
+52             Morena
+53               PVEM
+54               PVEM
+55                PAN
+56                 PT
+57             Morena
+58             Morena
+59                PAN
+60                PRI
+61                PRI
+62                PRI
+63                PRI
+64               PVEM
+65             MORENA
+66             MORENA
+67                 PT
+68             MORENA
+69             Morena
+70             Morena
+71                PAN
+72                PRI
+73                 PT
+74             Morena
+75                 PT
+76               PVEM
+77                PRI
+78                PRI
+79                PRI
+80             Morena
+81                 PT
+82             Morena
+83                 PT
+84                PAN
+85                PAN
+86                PAN
+87                PAN
+88               PVEM
+89             Morena
+90               PVEM
+91             Morena
+92               PVEM
+93               PVEM
+94             Morena
+95             Morena
+96                 PT
+97             Morena
+98             Morena
+99             Morena
+100            Morena
+101               PAN
+102                PT
+103                PT
+104            Morena
+105               PRI
+106               PAN
+107            Morena
+108            Morena
+109            Morena
+110            Morena
+111               PAN
+112               PAN
+113                PT
+114            Morena
+115                MC
+116            Morena
+117            Morena
+118               PRD
+119               PAN
+120               PRI
+121               PAN
+122               PAN
+123                MC
+124               PRI
+125                MC
+126              PVEM
+127            Morena
+128               PRI
+129            Morena
+130            Morena
+131            Morena
+132            Morena
+133               PAN
+134            Morena
+135               PAN
+136            Morena
+137            Morena
+138               PAN
+139               PAN
+140            Morena
+141               PAN
+142               PAN
+143               PRI
+144            Morena
+145               PRD
+146               PRI
+147               PRI
+148            Morena
+149            Morena
+150              PVEM
+151            Morena
+                                                             contest_2022
+1                                              Alcaldia de ÁLVARO OBREGÓN
+2                                                Alcaldia de AZCAPOTZALCO
+3                                               Alcaldia de BENITO JUÁREZ
+4                                                    Alcaldia de COYOACÁN
+5                                                  Alcaldia de CUAUHTÉMOC
+6                                                  Alcaldia de IZTAPALAPA
+7                                              Alcaldia de MIGUEL HIDALGO
+8                                                     Alcaldia de TLÁHUAC
+9                                                     Alcaldia de TLALPAN
+10                                        Alcaldia de VENUSTIANO CARRANZA
+11                                                 Alcaldia de XOCHIMILCO
+12                    Diputación del Distrito Federal 2 de AGUASCALIENTES
+13                    Diputación del Distrito Federal 3 de AGUASCALIENTES
+14                   Diputación del Distrito Federal 2 de BAJA CALIFORNIA
+15                   Diputación del Distrito Federal 4 de BAJA CALIFORNIA
+16                   Diputación del Distrito Federal 5 de BAJA CALIFORNIA
+17                   Diputación del Distrito Federal 8 de BAJA CALIFORNIA
+18                           Diputación del Distrito Federal 3 de CHIAPAS
+19                           Diputación del Distrito Federal 4 de CHIAPAS
+20                          Diputación del Distrito Federal 13 de CHIAPAS
+21                         Diputación del Distrito Federal 1 de CHIHUAHUA
+22                         Diputación del Distrito Federal 4 de CHIHUAHUA
+23                         Diputación del Distrito Federal 2 de CHIHUAHUA
+24                         Diputación del Distrito Federal 3 de CHIHUAHUA
+25                 Diputación del Distrito Federal 19 de CIUDAD DE MÉXICO
+26                  Diputación del Distrito Federal 5 de CIUDAD DE MÉXICO
+27                  Diputación del Distrito Federal 6 de CIUDAD DE MÉXICO
+28                 Diputación del Distrito Federal 10 de CIUDAD DE MÉXICO
+29                 Diputación del Distrito Federal 15 de CIUDAD DE MÉXICO
+30                 Diputación del Distrito Federal 16 de CIUDAD DE MÉXICO
+31                 Diputación del Distrito Federal 17 de CIUDAD DE MÉXICO
+32                 Diputación del Distrito Federal 23 de CIUDAD DE MÉXICO
+33                 Diputación del Distrito Federal 24 de CIUDAD DE MÉXICO
+34                  Diputación del Distrito Federal 3 de CIUDAD DE MÉXICO
+35                 Diputación del Distrito Federal 20 de CIUDAD DE MÉXICO
+36              Diputación del Distrito Federal 4 de COAHUILA DE ZARAGOZA
+37              Diputación del Distrito Federal 7 de COAHUILA DE ZARAGOZA
+38              Diputación del Distrito Federal 1 de COAHUILA DE ZARAGOZA
+39              Diputación del Distrito Federal 2 de COAHUILA DE ZARAGOZA
+40                            Diputación del Distrito Federal 1 de COLIMA
+41                           Diputación del Distrito Federal 4 de DURANGO
+42                        Diputación del Distrito Federal 3 de GUANAJUATO
+43                        Diputación del Distrito Federal 5 de GUANAJUATO
+44                       Diputación del Distrito Federal 12 de GUANAJUATO
+45                       Diputación del Distrito Federal 14 de GUANAJUATO
+46                          Diputación del Distrito Federal 2 de GUERRERO
+47                          Diputación del Distrito Federal 7 de GUERRERO
+48                           Diputación del Distrito Federal 3 de HIDALGO
+49                           Diputación del Distrito Federal 1 de HIDALGO
+50                           Diputación del Distrito Federal 6 de JALISCO
+51                          Diputación del Distrito Federal 13 de JALISCO
+52                           Diputación del Distrito Federal 5 de JALISCO
+53                           Diputación del Distrito Federal 9 de JALISCO
+54                          Diputación del Distrito Federal 17 de JALISCO
+55                 Diputación del Distrito Federal 34 de ESTADO DE MÉXICO
+56                  Diputación del Distrito Federal 2 de ESTADO DE MÉXICO
+57                 Diputación del Distrito Federal 28 de ESTADO DE MÉXICO
+58                 Diputación del Distrito Federal 31 de ESTADO DE MÉXICO
+59                 Diputación del Distrito Federal 24 de ESTADO DE MÉXICO
+60                 Diputación del Distrito Federal 27 de ESTADO DE MÉXICO
+61                 Diputación del Distrito Federal 36 de ESTADO DE MÉXICO
+62                 Diputación del Distrito Federal 39 de ESTADO DE MÉXICO
+63                 Diputación del Distrito Federal 41 de ESTADO DE MÉXICO
+64                  Diputación del Distrito Federal 6 de ESTADO DE MÉXICO
+65                 Diputación del Distrito Federal 12 de ESTADO DE MÉXICO
+66                 Diputación del Distrito Federal 30 de ESTADO DE MÉXICO
+67                 Diputación del Distrito Federal 32 de ESTADO DE MÉXICO
+68                 Diputación del Distrito Federal 35 de ESTADO DE MÉXICO
+69               Diputación del Distrito Federal 1 de MICHOACÁN DE OCAMPO
+70               Diputación del Distrito Federal 9 de MICHOACÁN DE OCAMPO
+71               Diputación del Distrito Federal 4 de MICHOACÁN DE OCAMPO
+72               Diputación del Distrito Federal 8 de MICHOACÁN DE OCAMPO
+73               Diputación del Distrito Federal 3 de MICHOACÁN DE OCAMPO
+74                           Diputación del Distrito Federal 1 de NAYARIT
+75                           Diputación del Distrito Federal 3 de NAYARIT
+76                           Diputación del Distrito Federal 2 de NAYARIT
+77                        Diputación del Distrito Federal 2 de NUEVO LEÓN
+78                        Diputación del Distrito Federal 9 de NUEVO LEÓN
+79                       Diputación del Distrito Federal 10 de NUEVO LEÓN
+80                            Diputación del Distrito Federal 2 de OAXACA
+81                            Diputación del Distrito Federal 3 de OAXACA
+82                            Diputación del Distrito Federal 4 de OAXACA
+83                            Diputación del Distrito Federal 8 de OAXACA
+84                            Diputación del Distrito Federal 9 de PUEBLA
+85                           Diputación del Distrito Federal 10 de PUEBLA
+86                           Diputación del Distrito Federal 11 de PUEBLA
+87                           Diputación del Distrito Federal 12 de PUEBLA
+88                            Diputación del Distrito Federal 2 de PUEBLA
+89                            Diputación del Distrito Federal 6 de PUEBLA
+90                      Diputación del Distrito Federal 1 de QUINTANA ROO
+91                      Diputación del Distrito Federal 2 de QUINTANA ROO
+92                   Diputación del Distrito Federal 2 de SAN LUIS POTOSÍ
+93                   Diputación del Distrito Federal 6 de SAN LUIS POTOSÍ
+94                           Diputación del Distrito Federal 6 de SINALOA
+95                           Diputación del Distrito Federal 2 de SINALOA
+96                           Diputación del Distrito Federal 3 de SINALOA
+97                           Diputación del Distrito Federal 7 de SINALOA
+98                            Diputación del Distrito Federal 1 de SONORA
+99                            Diputación del Distrito Federal 3 de SONORA
+100                           Diputación del Distrito Federal 4 de SONORA
+101                       Diputación del Distrito Federal 5 de TAMAULIPAS
+102                         Diputación del Distrito Federal 1 de TLAXCALA
+103                         Diputación del Distrito Federal 2 de TLAXCALA
+104  Diputación del Distrito Federal 7 de VERACRUZ DE IGNACIO DE LA LLAVE
+105  Diputación del Distrito Federal 9 de VERACRUZ DE IGNACIO DE LA LLAVE
+106 Diputación del Distrito Federal 12 de VERACRUZ DE IGNACIO DE LA LLAVE
+107  Diputación del Distrito Federal 4 de VERACRUZ DE IGNACIO DE LA LLAVE
+108  Diputación del Distrito Federal 8 de VERACRUZ DE IGNACIO DE LA LLAVE
+109 Diputación del Distrito Federal 15 de VERACRUZ DE IGNACIO DE LA LLAVE
+110 Diputación del Distrito Federal 19 de VERACRUZ DE IGNACIO DE LA LLAVE
+111                          Diputación del Distrito Federal 3 de YUCATÁN
+112                        Diputación del Distrito Federal 2 de ZACATECAS
+113                        Diputación del Distrito Federal 3 de ZACATECAS
+114                                  Presidencia del municipio de TECÁMAC
+115                                Presidencia del municipio de MONTERREY
+116                          Diputación del Distrito Federal 3 de MORELOS
+117                                 Presidencia del municipio de CULIACÁN
+118                          Presidencia del municipio de SAN LUIS POTOSÍ
+119                           Presidencia del municipio de AGUASCALIENTES
+120                               Presidencia del municipio de HERMOSILLO
+121                                Presidencia del municipio de CHIHUAHUA
+122                                   Presidencia del municipio de PUEBLA
+123                              Presidencia del municipio de GUADALAJARA
+124                                   Presidencia del municipio de COLIMA
+125                                 Presidencia del municipio de CAMPECHE
+126                                Presidencia del municipio de ZACATECAS
+127                                 Presidencia del municipio de MEXICALI
+128                                                  Senaduría de YUCATÁN
+129                                                  Senaduría de YUCATÁN
+130                                   Presidencia del municipio de LA PAZ
+131                                   Presidencia del municipio de CAJEME
+132                                Presidencia del municipio de FRESNILLO
+133                                     Presidencia del municipio de LEÓN
+134                                 Presidencia del municipio de ENSENADA
+135                                 Presidencia del municipio de IRAPUATO
+136                               Presidencia del municipio de MANZANILLO
+137                                  Presidencia del municipio de URUAPAN
+138                        Diputación del Distrito Federal 4 de QUERÉTARO
+139                       Diputación del Distrito Federal 2 de GUANAJUATO
+140                      Diputación del Distrito Federal 10 de GUANAJUATO
+141                       Diputación del Distrito Federal 6 de NUEVO LEÓN
+142                      Diputación del Distrito Federal 11 de NUEVO LEÓN
+143                                    Alcaldia de LA MAGDALENA CONTRERAS
+144                      Presidencia del municipio de ECATEPEC DE MORELOS
+145                Diputación del Distrito Federal 14 de CIUDAD DE MÉXICO
+146                        Diputación del Distrito Federal 4 de ZACATECAS
+147                       Diputación del Distrito Federal 5 de NUEVO LEÓN
+148                          Diputación del Distrito Federal 5 de HIDALGO
+149                       Diputación del Distrito Federal 2 de TAMAULIPAS
+150  Diputación del Distrito Federal 2 de VERACRUZ DE IGNACIO DE LA LLAVE
+151                       Diputación del Distrito Federal 9 de TAMAULIPAS
+    abbreviation
+1            PAN
+2            PAN
+3            PAN
+4            PAN
+5             MC
+6         Morena
+7            PAN
+8         Morena
+9            PRD
+10        Morena
+11        MORENA
+12           PAN
+13           PAN
+14        Morena
+15        Morena
+16        Morena
+17          PVEM
+18            PT
+19        MORENA
+20          PVEM
+21        MORENA
+22           PAN
+23          PVEM
+24        MORENA
+25        Morena
+26           PRI
+27           PAN
+28           PAN
+29           PAN
+30           PRI
+31           PAN
+32           PAN
+33           PAN
+34        MORENA
+35          PVEM
+36           PRI
+37           PRI
+38        MORENA
+39        MORENA
+40           PAN
+41           PAN
+42           PAN
+43           PAN
+44           PAN
+45           PAN
+46        MORENA
+47          PVEM
+48        Morena
+49           PRI
+50            MC
+51            MC
+52        Morena
+53          PVEM
+54          PVEM
+55           PAN
+56            PT
+57            PT
+58        Morena
+59           PAN
+60           PRI
+61           PRI
+62           PRI
+63           PRI
+64           PAN
+65          PVEM
+66        MORENA
+67          PVEM
+68          PVEM
+69        Morena
+70            C5
+71           PAN
+72           PRI
+73          PVEM
+74        MORENA
+75            PT
+76          PVEM
+77           PRI
+78           PRI
+79           PRI
+80            PT
+81          PVEM
+82        Morena
+83            PT
+84           PAN
+85           PAN
+86           PAN
+87           PAN
+88          PVEM
+89            PT
+90          PVEM
+91        MORENA
+92          PVEM
+93          PVEM
+94        Morena
+95        Morena
+96        MORENA
+97        MORENA
+98          PVEM
+99        Morena
+100       Morena
+101          PRI
+102         PVEM
+103       MORENA
+104       MORENA
+105          PRI
+106          PAN
+107       MORENA
+108       MORENA
+109           PT
+110           PT
+111       Morena
+112          PAN
+113       MORENA
+114       MORENA
+115           MC
+116         PVEM
+117           PT
+118          PRI
+119          PAN
+120          PAN
+121          PRD
+122          PAN
+123           MC
+124           MC
+125           MC
+126         PVEM
+127       Morena
+128         PVEM
+129       Morena
+130       Morena
+131       Morena
+132       MORENA
+133          PAN
+134       Morena
+135          PAN
+136           MC
+137       Morena
+138          PAN
+139          PAN
+140       Morena
+141          PAN
+142          PAN
+143          PRI
+144       MORENA
+145           MC
+146          PRI
+147          PRI
+148       Morena
+149       MORENA
+150         PVEM
+151       MORENA
+                                                                  contest
+1                                              Alcaldia de ÁLVARO OBREGÓN
+2                                                Alcaldia de AZCAPOTZALCO
+3                                         Gubernatura de CIUDAD DE MÉXICO
+4                                                    Alcaldia de COYOACÁN
+5                                           Senaduría de CIUDAD DE MÉXICO
+6                                         Gubernatura de CIUDAD DE MÉXICO
+7                                              Alcaldia de MIGUEL HIDALGO
+8                                                     Alcaldia de TLÁHUAC
+9                                                     Alcaldia de TLALPAN
+10                                        Alcaldia de VENUSTIANO CARRANZA
+11                 Diputación del Distrito Federal 22 de CIUDAD DE MÉXICO
+12                    Diputación del Distrito Federal 2 de AGUASCALIENTES
+13                    Diputación del Distrito Federal 3 de AGUASCALIENTES
+14                                           Senaduría de BAJA CALIFORNIA
+15                   Diputación del Distrito Federal 4 de BAJA CALIFORNIA
+16                   Diputación del Distrito Federal 5 de BAJA CALIFORNIA
+17                   Diputación del Distrito Federal 8 de BAJA CALIFORNIA
+18                           Diputación del Distrito Federal 3 de CHIAPAS
+19                           Diputación del Distrito Federal 4 de CHIAPAS
+20                                                   Senaduría de CHIAPAS
+21                         Diputación del Distrito Federal 1 de CHIHUAHUA
+22                                                 Senaduría de CHIHUAHUA
+23                         Diputación del Distrito Federal 2 de CHIHUAHUA
+24                         Diputación del Distrito Federal 3 de CHIHUAHUA
+25                                                 Alcaldia de IZTAPALAPA
+26                  Diputación del Distrito Federal 6 de CIUDAD DE MÉXICO
+27                                          Senaduría de CIUDAD DE MÉXICO
+28                 Diputación del Distrito Federal 16 de CIUDAD DE MÉXICO
+29                                              Alcaldia de BENITO JUÁREZ
+30                 Diputación del Distrito Federal 17 de CIUDAD DE MÉXICO
+31                  Diputación del Distrito Federal 8 de CIUDAD DE MÉXICO
+32                 Diputación del Distrito Federal 19 de CIUDAD DE MÉXICO
+33                  Diputación del Distrito Federal 3 de CIUDAD DE MÉXICO
+34                 Diputación del Distrito Federal 20 de CIUDAD DE MÉXICO
+35                 Diputación del Distrito Federal 20 de CIUDAD DE MÉXICO
+36              Diputación del Distrito Federal 4 de COAHUILA DE ZARAGOZA
+37              Diputación del Distrito Federal 7 de COAHUILA DE ZARAGOZA
+38              Diputación del Distrito Federal 1 de COAHUILA DE ZARAGOZA
+39              Diputación del Distrito Federal 2 de COAHUILA DE ZARAGOZA
+40                                    Presidencia del municipio de COLIMA
+41                                                   Senaduría de DURANGO
+42                        Diputación del Distrito Federal 3 de GUANAJUATO
+43                        Diputación del Distrito Federal 5 de GUANAJUATO
+44                       Diputación del Distrito Federal 12 de GUANAJUATO
+45                       Diputación del Distrito Federal 14 de GUANAJUATO
+46                          Diputación del Distrito Federal 6 de GUERRERO
+47                          Diputación del Distrito Federal 7 de GUERRERO
+48                                                   Senaduría de HIDALGO
+49                           Diputación del Distrito Federal 1 de HIDALGO
+50                           Diputación del Distrito Federal 6 de JALISCO
+51                          Diputación del Distrito Federal 10 de JALISCO
+52                           Diputación del Distrito Federal 5 de JALISCO
+53                                                   Senaduría de JALISCO
+54                          Diputación del Distrito Federal 17 de JALISCO
+55                 Diputación del Distrito Federal 34 de ESTADO DE MÉXICO
+56                  Diputación del Distrito Federal 2 de ESTADO DE MÉXICO
+57                 Diputación del Distrito Federal 28 de ESTADO DE MÉXICO
+58                 Diputación del Distrito Federal 31 de ESTADO DE MÉXICO
+59                 Diputación del Distrito Federal 24 de ESTADO DE MÉXICO
+60                              Senaduría por representación proporcional
+61                 Diputación del Distrito Federal 36 de ESTADO DE MÉXICO
+62                 Diputación del Distrito Federal 39 de ESTADO DE MÉXICO
+63                 Diputación del Distrito Federal 20 de ESTADO DE MÉXICO
+64                  Diputación del Distrito Federal 6 de ESTADO DE MÉXICO
+65                 Diputación del Distrito Federal 12 de ESTADO DE MÉXICO
+66                 Diputación del Distrito Federal 30 de ESTADO DE MÉXICO
+67                 Diputación del Distrito Federal 32 de ESTADO DE MÉXICO
+68                 Diputación del Distrito Federal 35 de ESTADO DE MÉXICO
+69               Diputación del Distrito Federal 1 de MICHOACÁN DE OCAMPO
+70                                   Presidencia del municipio de URUAPAN
+71               Diputación del Distrito Federal 4 de MICHOACÁN DE OCAMPO
+72               Diputación del Distrito Federal 8 de MICHOACÁN DE OCAMPO
+73               Diputación del Distrito Federal 3 de MICHOACÁN DE OCAMPO
+74                                                   Senaduría de NAYARIT
+75                           Diputación del Distrito Federal 3 de NAYARIT
+76                                                   Senaduría de NAYARIT
+77                        Diputación del Distrito Federal 2 de NUEVO LEÓN
+78                        Diputación del Distrito Federal 9 de NUEVO LEÓN
+79                                                Senaduría de NUEVO LEÓN
+80                            Diputación del Distrito Federal 2 de OAXACA
+81                            Diputación del Distrito Federal 3 de OAXACA
+82     Diputación por representación proporcional de la circuscripción  3
+83                                                    Senaduría de OAXACA
+84                                                    Senaduría de PUEBLA
+85                           Diputación del Distrito Federal 10 de PUEBLA
+86                           Diputación del Distrito Federal 12 de PUEBLA
+87                                    Presidencia del municipio de PUEBLA
+88                            Diputación del Distrito Federal 2 de PUEBLA
+89                            Diputación del Distrito Federal 6 de PUEBLA
+90                      Diputación del Distrito Federal 1 de QUINTANA ROO
+91                                              Senaduría de QUINTANA ROO
+92               Presidencia del municipio de SOLEDAD DE GRACIANO SÁNCHEZ
+93                                           Senaduría de SAN LUIS POTOSÍ
+94                           Diputación del Distrito Federal 6 de SINALOA
+95                           Diputación del Distrito Federal 2 de SINALOA
+96                           Diputación del Distrito Federal 3 de SINALOA
+97                           Diputación del Distrito Federal 7 de SINALOA
+98                            Diputación del Distrito Federal 1 de SONORA
+99                                                    Senaduría de SONORA
+100                                                   Senaduría de SONORA
+101                                 Presidencia del municipio de VICTORIA
+102                         Diputación del Distrito Federal 1 de TLAXCALA
+103                         Diputación del Distrito Federal 3 de TLAXCALA
+104  Diputación del Distrito Federal 7 de VERACRUZ DE IGNACIO DE LA LLAVE
+105                        Gubernatura de VERACRUZ DE IGNACIO DE LA LLAVE
+106  Diputación del Distrito Federal 4 de VERACRUZ DE IGNACIO DE LA LLAVE
+107 Diputación del Distrito Federal 12 de VERACRUZ DE IGNACIO DE LA LLAVE
+108                          Senaduría de VERACRUZ DE IGNACIO DE LA LLAVE
+109 Diputación del Distrito Federal 15 de VERACRUZ DE IGNACIO DE LA LLAVE
+110 Diputación del Distrito Federal 19 de VERACRUZ DE IGNACIO DE LA LLAVE
+111                                   Presidencia del municipio de MÉRIDA
+112                                Presidencia del municipio de ZACATECAS
+113                        Diputación del Distrito Federal 3 de ZACATECAS
+114                                         Senaduría de ESTADO DE MÉXICO
+115                                               Senaduría de NUEVO LEÓN
+116                                                  Senaduría de MORELOS
+117                                                  Senaduría de SINALOA
+118                          Presidencia del municipio de SAN LUIS POTOSÍ
+119                           Presidencia del municipio de AGUASCALIENTES
+120                               Presidencia del municipio de HERMOSILLO
+121                                Presidencia del municipio de CHIHUAHUA
+122                                                 Gubernatura de PUEBLA
+123                                                Gubernatura de JALISCO
+124                                   Presidencia del municipio de COLIMA
+125                                 Presidencia del municipio de CAMPECHE
+126                                Presidencia del municipio de ZACATECAS
+127                                 Presidencia del municipio de MEXICALI
+128                                                  Senaduría de YUCATÁN
+129                                                  Senaduría de YUCATÁN
+130                                   Presidencia del municipio de LA PAZ
+131                                   Presidencia del municipio de CAJEME
+132                                                Senaduría de ZACATECAS
+133                                     Presidencia del municipio de LEÓN
+134                                          Senaduría de BAJA CALIFORNIA
+135                                 Presidencia del municipio de IRAPUATO
+136                                                   Senaduría de COLIMA
+137                                  Presidencia del municipio de URUAPAN
+138                                Presidencia del municipio de QUERÉTARO
+139                       Diputación del Distrito Federal 2 de GUANAJUATO
+140                             Senaduría por representación proporcional
+141                       Diputación del Distrito Federal 6 de NUEVO LEÓN
+142                      Diputación del Distrito Federal 11 de NUEVO LEÓN
+143                                    Alcaldia de LA MAGDALENA CONTRERAS
+144                Diputación del Distrito Federal 10 de ESTADO DE MÉXICO
+145    Diputación por representación proporcional de la circuscripción  4
+146                        Diputación del Distrito Federal 4 de ZACATECAS
+147    Diputación por representación proporcional de la circuscripción  2
+148                                                  Senaduría de HIDALGO
+149                       Diputación del Distrito Federal 7 de TAMAULIPAS
+150  Diputación del Distrito Federal 1 de VERACRUZ DE IGNACIO DE LA LLAVE
+151                       Diputación del Distrito Federal 2 de TAMAULIPAS</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>sankey <span class="ot">&lt;-</span> candidatos_2021_2024 <span class="sc">%&gt;%</span> </span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(person_id, full_name_2021, abbreviation_2021, contest_2021, abbreviation_2022, contest_2022, abbreviation, contest) <span class="sc">%&gt;%</span> </span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">abbreviation_2021=</span><span class="fu">paste0</span>(<span class="fu">toupper</span>(abbreviation_2021),<span class="st">"_2021"</span>),</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">abbreviation_2022=</span><span class="fu">paste0</span>(<span class="fu">toupper</span>(abbreviation_2022),<span class="st">"_2022"</span>),</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">abbreviation=</span><span class="fu">paste0</span>(<span class="fu">toupper</span>(abbreviation),<span class="st">"_2024"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">brinco2022 =</span> <span class="fu">paste</span>(abbreviation_2021, abbreviation_2022),</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">brinco2024 =</span> <span class="fu">paste</span>(abbreviation_2022, abbreviation)) <span class="sc">%&gt;%</span> </span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(brinco2022)</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(sankey<span class="sc">$</span>abbreviation_2021)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "MC_2021"     "MORENA_2021" "PAN_2021"    "PRD_2021"    "PRI_2021"   
+[6] "PT_2021"     "PVEM_2021"  </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(sankey<span class="sc">$</span>abbreviation_2022)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "MC_2022"     "MORENA_2022" "PAN_2022"    "PRD_2022"    "PRI_2022"   
+[6] "PT_2022"     "PVEM_2022"  </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>sankey <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(brinco2022) <span class="sc">%&gt;%</span> <span class="fu">summarise</span>(<span class="fu">n</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 7 × 2
+  brinco2022              `n()`
+  &lt;chr&gt;                   &lt;int&gt;
+1 MC_2021 MC_2022             5
+2 MORENA_2021 MORENA_2022    57
+3 PAN_2021 PAN_2022          38
+4 PRD_2021 PRD_2022           5
+5 PRI_2021 PRI_2022          20
+6 PT_2021 PT_2022            13
+7 PVEM_2021 PVEM_2022        13</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>sankey <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(brinco2024) <span class="sc">%&gt;%</span> <span class="fu">summarise</span>(<span class="fu">n</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 23 × 2
+   brinco2024              `n()`
+   &lt;chr&gt;                   &lt;int&gt;
+ 1 MC_2022 MC_2024             5
+ 2 MORENA_2022 C5_2024         1
+ 3 MORENA_2022 MC_2024         1
+ 4 MORENA_2022 MORENA_2024    42
+ 5 MORENA_2022 PT_2024         7
+ 6 MORENA_2022 PVEM_2024       6
+ 7 PAN_2022 MORENA_2024        1
+ 8 PAN_2022 PAN_2024          35
+ 9 PAN_2022 PRD_2024           1
+10 PAN_2022 PRI_2024           1
+# ℹ 13 more rows</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>links <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">anio_2021=</span><span class="fu">c</span>(<span class="st">"MC_2021"</span>, <span class="st">"MORENA_2021"</span>, <span class="st">"PAN_2021"</span>, <span class="st">"PRD_2021"</span>, <span class="st">"PRI_2021"</span>, <span class="st">"PT_2021"</span>, <span class="st">"PVEM_2021"</span>, <span class="st">"MC_2022"</span>, <span class="st">"MORENA_2022"</span>, <span class="st">"MORENA_2022"</span>, <span class="st">"MORENA_2022"</span>, <span class="st">"MORENA_2022"</span>, <span class="st">"MORENA_2022"</span>, <span class="st">"PAN_2022"</span>   , <span class="st">"PAN_2022"</span>, <span class="st">"PAN_2022"</span>, <span class="st">"PAN_2022"</span>, <span class="st">"PRD_2022"</span>, <span class="st">"PRD_2022"</span>, <span class="st">"PRD_2022"</span>, <span class="st">"PRD_2022"</span>, <span class="st">"PRI_2022"</span>, <span class="st">"PRI_2022"</span>, <span class="st">"PRI_2022"</span>, <span class="st">"PRI_2022"</span> , <span class="st">"PT_2022"</span>    , <span class="st">"PT_2022"</span>, <span class="st">"PT_2022"</span>  , <span class="st">"PVEM_2022"</span>, <span class="st">"PVEM_2022"</span>),</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios=</span>  <span class="fu">c</span>(<span class="st">"MC_2022"</span>, <span class="st">"MORENA_2022"</span>, <span class="st">"PAN_2022"</span>, <span class="st">"PRD_2022"</span>, <span class="st">"PRI_2022"</span>, <span class="st">"PT_2022"</span>, <span class="st">"PVEM_2022"</span>, <span class="st">"MC_2024"</span>, <span class="st">"C5_2024"</span>    , <span class="st">"MC_2024"</span>    , <span class="st">"MORENA_2024"</span>, <span class="st">"PT_2024"</span>    , <span class="st">"PVEM_2024"</span>  , <span class="st">"MORENA_2024"</span>, <span class="st">"PAN_2024"</span>,    <span class="st">"PRD_2024"</span>, <span class="st">"PRI_2024"</span>, <span class="st">"MC_2024"</span> , <span class="st">"PAN_2024"</span>, <span class="st">"PRD_2024"</span>, <span class="st">"PRI_2024"</span>, <span class="st">"MC_2024"</span> , <span class="st">"PAN_2024"</span>, <span class="st">"PRI_2024"</span>, <span class="st">"PVEM_2024"</span>, <span class="st">"MORENA_2024"</span>, <span class="st">"PT_2024"</span>, <span class="st">"PVEM_2024"</span>, <span class="st">"PAN_2024"</span>,  <span class="st">"PVEM_2024"</span>),</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">num =</span>     <span class="fu">c</span>(<span class="dv">5</span>,<span class="dv">57</span>,<span class="dv">38</span>,<span class="dv">5</span>,<span class="dv">20</span>,<span class="dv">13</span>,<span class="dv">13</span>,  <span class="dv">5</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">42</span>,<span class="dv">7</span>,<span class="dv">6</span>,<span class="dv">1</span>,<span class="dv">35</span>,<span class="dv">1</span>,<span class="dv">1</span>,  <span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">17</span>,<span class="dv">1</span>,<span class="dv">5</span>,<span class="dv">3</span>,  <span class="dv">5</span>,<span class="dv">2</span>,<span class="dv">11</span>)</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># A connection data frame is a list of flows with intensity for each flow</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="co"># links &lt;- data.frame(</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   source=c("group_A","group_A", "group_B", "group_C", "group_C", "group_E"), </span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   target=c("group_C","group_D", "group_E", "group_F", "group_G", "group_H"), </span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="co">#   value=c(2,3, 2, 3, 1, 3)</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="co">#   )</span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a><span class="co"># From these flows we need to create a node data frame: it lists every entities involved in the flow</span></span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>nodes <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">name=</span><span class="fu">c</span>(<span class="fu">as.character</span>(links<span class="sc">$</span>anio_2021), </span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.character</span>(links<span class="sc">$</span>cambios)) <span class="sc">%&gt;%</span> <span class="fu">unique</span>()</span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a><span class="co"># With networkD3, connection must be provided using id, not using real name like in the links dataframe.. So we need to reformat it.</span></span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>links<span class="sc">$</span>IDsource <span class="ot">&lt;-</span> <span class="fu">match</span>(links<span class="sc">$</span>anio_2021, nodes<span class="sc">$</span>name)<span class="sc">-</span><span class="dv">1</span> </span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>links<span class="sc">$</span>IDtarget <span class="ot">&lt;-</span> <span class="fu">match</span>(links<span class="sc">$</span>cambios, nodes<span class="sc">$</span>name)<span class="sc">-</span><span class="dv">1</span></span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Make the Network</span></span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">sankeyNetwork</span>(<span class="at">Links =</span> links, <span class="at">Nodes =</span> nodes,</span>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>              <span class="at">Source =</span> <span class="st">"IDsource"</span>, <span class="at">Target =</span> <span class="st">"IDtarget"</span>,</span>
+<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>              <span class="at">Value =</span> <span class="st">"num"</span>, <span class="at">NodeID =</span> <span class="st">"name"</span>, </span>
+<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>              <span class="at">sinksRight=</span><span class="cn">FALSE</span>)</span>
+<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>p</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="sankeyNetwork html-widget html-fill-item" id="htmlwidget-1fcbbda2e3654e0e5ebd" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-1fcbbda2e3654e0e5ebd">{"x":{"links":{"source":[0,1,2,3,4,5,6,7,8,8,8,8,8,9,9,9,9,10,10,10,10,11,11,11,11,12,12,12,13,13],"target":[7,8,9,10,11,12,13,14,15,14,16,17,18,16,19,20,21,14,19,20,21,14,19,21,18,16,17,18,19,18],"value":[5,57,38,5,20,13,13,5,1,1,42,7,6,1,35,1,1,2,1,1,1,1,1,17,1,5,3,5,2,11]},"nodes":{"name":["MC_2021","MORENA_2021","PAN_2021","PRD_2021","PRI_2021","PT_2021","PVEM_2021","MC_2022","MORENA_2022","PAN_2022","PRD_2022","PRI_2022","PT_2022","PVEM_2022","MC_2024","C5_2024","MORENA_2024","PT_2024","PVEM_2024","PAN_2024","PRD_2024","PRI_2024"],"group":["MC_2021","MORENA_2021","PAN_2021","PRD_2021","PRI_2021","PT_2021","PVEM_2021","MC_2022","MORENA_2022","PAN_2022","PRD_2022","PRI_2022","PT_2022","PVEM_2022","MC_2024","C5_2024","MORENA_2024","PT_2024","PVEM_2024","PAN_2024","PRD_2024","PRI_2024"]},"options":{"NodeID":"name","NodeGroup":"name","LinkGroup":null,"colourScale":"d3.scaleOrdinal(d3.schemeCategory20);","fontSize":7,"fontFamily":null,"nodeWidth":15,"nodePadding":10,"units":"","margin":{"top":null,"right":null,"bottom":null,"left":null},"iterations":32,"sinksRight":false}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
