@@ -17,6 +17,10 @@ data_2021 %>% glimpse()
 data_2024 %>% glimpse()
 data_2022 %>% glimpse()
 
+# Rows
+nrow(data_2021)
+nrow(data_2022)
+nrow(data_2024)
 
 # Columns
 data_2021 %>% colnames()
@@ -57,7 +61,7 @@ data_2024 %>%
     coord_flip() +
     labs(title = "Distribución de Roles", x = "Roles", y = "Conteo")
 
-# Comparar el número de roles entre diferentes años
+# Comparing roles
 roles_2021 <- data_2021 %>% count(role_type)
 roles_2024 <- data_2024 %>% count(role_type)
 roles_2022 <- data_2022 %>% count(role_type)
@@ -79,24 +83,39 @@ sapply(data_2021, function(x) sum(is.na(x)) / length(x)) * 100
 sapply(data_2024, function(x) sum(is.na(x)) / length(x)) * 100
 sapply(data_2022, function(x) sum(is.na(x)) / length(x)) * 100
 
-# Full join 
-temp_data_21_22 <- full_join(data_2021, data_2022, by = "person_id", suffix = c(".2021", ".2022"))
-combined_data <- full_join(temp_data_21_22, data_2024, by = "person_id", suffix = c(".prev", ".2024"))
+library(dplyr)
+library(knitr)
+library(kableExtra)
 
-# Glimpse
-glimpse(combined_data)
+# Calculating the percentage of NA values for each column
+na_2021 <- sapply(data_2021, function(x) sum(is.na(x)) / length(x) * 100)
+na_2024 <- sapply(data_2024, function(x) sum(is.na(x)) / length(x) * 100)
+na_2022 <- sapply(data_2022, function(x) sum(is.na(x)) / length(x) * 100)
 
-# Columns 
-colnames(combined_data)
+# Convert the results to data frames
+na_df_2021 <- data.frame(Column = names(na_2021), `2021` = na_2021)
+na_df_2024 <- data.frame(Column = names(na_2024), `2024` = na_2024)
+na_df_2022 <- data.frame(Column = names(na_2022), `2022` = na_2022)
 
-# Table
-example_data <- head(combined_data, 10)
+# Join the data frames 
+na_comparison_df <- reduce(list(na_df_2021, na_df_2022, na_df_2024), full_join, by = "Column")
 
-# Crear la tabla con kable y personalizarla con kableExtra
-pretty_table <- kable(example_data, "html", booktabs = TRUE) %>%
+# Print the table
+pretty_na_table <- kable(na_comparison_df, format = "html", booktabs = TRUE, caption = "Percentage of NA Values by Year and Column") %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = F) %>%
-  column_spec(1, bold = T, color = "red") %>%
-  scroll_box(width = "100%", height = "500px")
+  row_spec(0, bold = TRUE, background = "#D3D3D3")  # Resaltar el encabezado de la tabla
 
-# NA values %
-sapply(combined_data, function(x) sum(is.na(x)) / length(x)) * 100
+pretty_na_table
+
+# Identify common columns
+common_columns <- list(data_2021, data_2024, data_2022) %>%
+  lapply(names) %>%
+  reduce(intersect)
+print(common_columns)
+
+
+#Data cleaning (WIP)
+
+data_2021 %>% colnames()
+
+data_2021$full_name %>% str_replace_all(" ", "_") %>% str_to_lower() %>% str_replace_all("á", "a") %>% str_replace_all("é", "e") %>% str_replace_all("í", "i") %>% str_replace_all("ó", "o") %>% str_replace_all("ú", "u") %>% str_replace_all("ñ", "n") %>% str_replace_all("ü", "u")
