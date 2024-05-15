@@ -4,6 +4,9 @@
 library(tidyverse)
 library(knitr)
 library(kableExtra)
+library(ggplot2)
+library(plotly)
+library(mice)
 
 
 # Data
@@ -119,3 +122,134 @@ print(common_columns)
 data_2021 %>% colnames()
 
 data_2021$full_name %>% str_replace_all(" ", "_") %>% str_to_lower() %>% str_replace_all("á", "a") %>% str_replace_all("é", "e") %>% str_replace_all("í", "i") %>% str_replace_all("ó", "o") %>% str_replace_all("ú", "u") %>% str_replace_all("ñ", "n") %>% str_replace_all("ü", "u")
+
+
+# Function to summarize both numerical and categorical data
+summarize_data <- function(data) {
+  num_summary <- data %>% select_if(is.numeric) %>% summary()
+  cat_summary <- data %>% select_if(is.factor) %>% sapply(table)
+  list(Numerical = num_summary, Categorical = cat_summary)
+}
+
+summarize_data(data_2021)
+summarize_data(data_2022)
+summarize_data(data_2024)
+
+
+# Create the ggplot object separately
+plot_gg <- data_2021 %>% 
+  count(role_type) %>% 
+  ggplot(aes(x = role_type, y = n, fill = role_type)) +
+  geom_col() +
+  coord_flip() +
+  labs(title = "Distribución de Roles", x = "Roles", y = "Conteo")
+
+# Convert ggplot object to an interactive plotly object
+ggplotly(plot_gg)
+
+# Normalize the 'full_name' column
+data_2021$full_name <- data_2021$full_name %>% 
+  str_replace_all(" ", "_") %>% 
+  str_to_lower() %>% 
+  str_replace_all("[áàäâã]", "a") %>% 
+  str_replace_all("[éèëê]", "e") %>% 
+  str_replace_all("[íìïî]", "i") %>% 
+  str_replace_all("[óòöôõ]", "o") %>% 
+  str_replace_all("[úùüû]", "u") %>% 
+  str_replace_all("ñ", "n")
+
+# Normalize the 'full_name' column
+data_2022$full_name <- data_2022$full_name %>% 
+  str_replace_all(" ", "_") %>% 
+  str_to_lower() %>% 
+  str_replace_all("[áàäâã]", "a") %>% 
+  str_replace_all("[éèëê]", "e") %>% 
+  str_replace_all("[íìïî]", "i") %>% 
+  str_replace_all("[óòöôõ]", "o") %>% 
+  str_replace_all("[úùüû]", "u") %>% 
+  str_replace_all("ñ", "n")
+
+# Normalize the 'full_name' column
+data_2024$full_name <- data_2024$full_name %>% 
+  str_replace_all(" ", "_") %>% 
+  str_to_lower() %>% 
+  str_replace_all("[áàäâã]", "a") %>% 
+  str_replace_all("[éèëê]", "e") %>% 
+  str_replace_all("[íìïî]", "i") %>% 
+  str_replace_all("[óòöôõ]", "o") %>% 
+  str_replace_all("[úùüû]", "u") %>% 
+  str_replace_all("ñ", "n")
+
+#columns 
+data_2021 %>% colnames()
+data_2022 %>% colnames()
+data_2024 %>% colnames()
+
+# Group and count by area and gender
+gender_distribution_by_level <- data_2021 %>%
+  group_by(area, gender) %>%
+  summarise(count = n(), .groups = 'drop')
+
+# Group and count by area and last degree of studies
+education_distribution_by_level <- data_2021 %>%
+  group_by(area, last_degree_of_studies) %>%
+  summarise(count = n(), .groups = 'drop')
+
+# Plotting gender distribution by level (area)
+gender_distribution_by_level %>%
+  ggplot(aes(x = area, y = count, fill = gender)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Gender Distribution by Level", x = "Level", y = "Count") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Plotting education level distribution by level (area)
+education_distribution_by_level %>%
+  ggplot(aes(x = area, y = count, fill = last_degree_of_studies)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Education Level Distribution by Level", x = "Level", y = "Count") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Role type distribution by area and gender
+role_gender_area <- data_2021 %>%
+  group_by(area, role_type, gender) %>%
+  summarise(count = n(), .groups = 'drop')
+
+# Plotting role type distribution by area and gender
+role_gender_area %>%
+  ggplot(aes(x = role_type, y = count, fill = gender)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  facet_wrap(~area) +
+  labs(title = "Role Type Distribution by Area and Gender", x = "Role Type", y = "Count") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Cross-tabulation of gender and last degree of studies by area
+ctab_gender_education <- table(data_2021$area, data_2021$gender, data_2021$last_degree_of_studies)
+
+# Heatmap of the cross-tabulation
+library(ggplot2)
+library(reshape2)
+
+# Melt the table for heatmap
+melted_ctab <- melt(ctab_gender_education)
+colnames(melted_ctab) <- c("Area", "Gender", "Education", "Count")
+
+# Heatmap plot
+ggplot(melted_ctab, aes(x = Gender, y = Education, fill = Count)) +
+  geom_tile() +
+  facet_wrap(~Area) +
+  scale_fill_gradient(low = "white", high = "steelblue") +
+  labs(title = "Heatmap of Gender and Education by Area", x = "Gender", y = "Education") +
+  theme_minimal()
+
+# Simple network visualization
+library(igraph)
+
+# Example graph data (adjust to actual relationships in your data)
+edges <- data.frame(from = sample(data_2021$role_type, 20, replace = TRUE),
+                    to = sample(data_2021$role_type, 20, replace = TRUE))
+
+graph <- graph_from_data_frame(edges)
+plot(graph, vertex.size = 10, vertex.label.cex = 0.8, edge.arrow.size = 0.5)
