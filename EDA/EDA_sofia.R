@@ -253,3 +253,7 @@ edges <- data.frame(from = sample(data_2021$role_type, 20, replace = TRUE),
 
 graph <- graph_from_data_frame(edges)
 plot(graph, vertex.size = 10, vertex.label.cex = 0.8, edge.arrow.size = 0.5)
+
+
+# Sankey for political parties
+library(networkD3)
