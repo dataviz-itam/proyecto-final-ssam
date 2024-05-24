@@ -27,15 +27,9 @@ export const sankeyChart = ({
   nodeStrokeWidth, // width of stroke around node rects, in pixels
   nodeStrokeOpacity, // opacity of stroke around node rects
   nodeStrokeLinejoin, // line join for stroke around node rects
-  linkSource = ({
-    source
-  }) => source, // given d in links, returns a node identifier string
-  linkTarget = ({
-    target
-  }) => target, // given d in links, returns a node identifier string
-  linkValue = ({
-    value
-  }) => value, // given d in links, returns the quantitative value
+  linkSource = ({ source }) => source, // given d in links, returns a node identifier string
+  linkTarget = ({ target }) => target, // given d in links, returns a node identifier string
+  linkValue = ({ value }) => value, // given d in links, returns the quantitative value
   linkPath = d3.sankeyLinkHorizontal(), // given d in (computed) links, returns the SVG path
   linkTitle = d => `${d.source.id} → ${d.target.id}\n${format(d.value)}`, // given d in (computed) links
   linkColor = 'source-target', // source, target, source-target, or static color
@@ -54,27 +48,19 @@ export const sankeyChart = ({
     left: d3.sankeyLeft,
     right: d3.sankeyRight,
     center: d3.sankeyCenter
-  } [nodeAlign] ?? d3.sankeyJustify;
+  }[nodeAlign] ?? d3.sankeyJustify;
 
   // Compute values.
   const LS = d3.map(links, linkSource).map(intern);
   const LT = d3.map(links, linkTarget).map(intern);
   const LV = d3.map(links, linkValue);
-  if (nodes === undefined) nodes = Array.from(d3.union(LS, LT), id => ({
-    id
-  }));
+  if (nodes === undefined) nodes = Array.from(d3.union(LS, LT), id => ({ id }));
   const N = d3.map(nodes, nodeId).map(intern);
   const G = nodeGroup == null ? null : d3.map(nodes, nodeGroup).map(intern);
 
   // Replace the input nodes and links with mutable objects for the simulation.
-  nodes = d3.map(nodes, (_, i) => ({
-    id: N[i]
-  }));
-  links = d3.map(links, (_, i) => ({
-    source: LS[i],
-    target: LT[i],
-    value: LV[i]
-  }));
+  nodes = d3.map(nodes, (_, i) => ({ id: N[i] }));
+  links = d3.map(links, (_, i) => ({ source: LS[i], target: LT[i], value: LV[i] }));
 
   // Ignore a group-based linkColor option if no groups are specified.
   if (!G && ['source', 'target', 'source-target'].includes(linkColor)) linkColor = 'currentColor';
@@ -82,22 +68,27 @@ export const sankeyChart = ({
   // Compute default domains.
   if (G && nodeGroups === undefined) nodeGroups = G;
 
-  // Construct the scales.
-  const color = nodeGroup == null ? null : d3.scaleOrdinal(nodeGroups, colors);
+  // Define a custom color scale with 21 colors
+  const colorScale = d3.scaleOrdinal()
+    .domain(nodes.map(d => d.id)) // Use node ids as the domain
+    .range([
+      '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd',
+      '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf',
+      '#393b79', '#637939', '#8c6d31', '#843c39', '#7b4173',
+      '#5254a3', '#8ca252', '#bd9e39', '#ad494a', '#a55194',
+      '#6b6ecf'
+    ]); // 21 custom colors
 
   // Compute the Sankey layout.
   d3.sankey()
-    .nodeId(({
-      index: i
-    }) => N[i])
+    .nodeId(({ index: i }) => N[i])
     .nodeAlign(nodeAlign)
     .nodeWidth(nodeWidth)
     .nodePadding(nodePadding)
     .extent([
       [marginLeft, marginTop],
       [width - marginRight, height - marginBottom]
-    ])
-    ({
+    ])({
       nodes,
       links
     });
@@ -129,14 +120,10 @@ export const sankeyChart = ({
     .attr('x', d => d.x0)
     .attr('y', d => d.y0)
     .attr('height', d => d.y1 - d.y0)
-    .attr('width', d => d.x1 - d.x0);
+    .attr('width', d => d.x1 - d.x0)
+    .attr('fill', d => colorScale(d.id)); // Use the custom color scale for node colors
 
-  if (G) node.attr('fill', ({
-    index: i
-  }) => color(G[i]));
-  if (Tt) node.append('title').text(({
-    index: i
-  }) => Tt[i]);
+  if (Tt) node.append('title').text(({ index: i }) => Tt[i]);
 
   const link = svg.append('g')
     .attr('fill', 'none')
@@ -153,63 +140,45 @@ export const sankeyChart = ({
     .attr('x2', d => d.target.x0)
     .call(gradient => gradient.append('stop')
       .attr('offset', '0%')
-      .attr('stop-color', ({
-        source: {
-          index: i
-        }
-      }) => color(G[i])))
+      .attr('stop-color', ({ source: { index: i } }) => colorScale(G[i])))
     .call(gradient => gradient.append('stop')
       .attr('offset', '100%')
-      .attr('stop-color', ({
-        target: {
-          index: i
-        }
-      }) => color(G[i])));
+      .attr('stop-color', ({ target: { index: i } }) => colorScale(G[i])));
 
   link.append('path')
     .attr('d', linkPath)
-    .attr('stroke', linkColor === 'source-target' ? ({
-        index: i
-      }) => `url(#${uid}-link-${i})` :
-      linkColor === 'source' ? ({
-        source: {
-          index: i
-        }
-      }) => color(G[i]) :
-      linkColor === 'target' ? ({
-        target: {
-          index: i
-        }
-      }) => color(G[i]) :
+    .attr('stroke', linkColor === 'source-target' ? ({ index: i }) => `url(#${uid}-link-${i})` :
+      linkColor === 'source' ? ({ source: { index: i } }) => colorScale(G[i]) :
+      linkColor === 'target' ? ({ target: { index: i } }) => colorScale(G[i]) :
       linkColor)
-    .attr('stroke-width', ({
-      width
-    }) => Math.max(1, width))
-    .call(Lt ? path => path.append('title').text(({
-      index: i
-    }) => Lt[i]) : () => {});
+    .attr('stroke-width', ({ width }) => Math.max(1, width))
+    .call(Lt ? path => path.append('title').text(({ index: i }) => Lt[i]) : () => {});
 
-  if (Tl) svg.append('g')
-    .attr('font-family', 'sans-serif')
-    .attr('font-size', 10)
-    .selectAll('text')
-    .data(nodes)
-    .join('text')
-    .attr('x', d => d.x0 < width / 2 ? d.x1 + nodeLabelPadding : d.x0 - nodeLabelPadding)
-    .attr('y', d => (d.y1 + d.y0) / 2)
-    .attr('dy', '0.35em')
-    .attr('text-anchor', d => d.x0 < width / 2 ? 'start' : 'end')
-    .text(({
-      index: i
-    }) => Tl[i]);
+  if (Tl)
+    svg
+      .append("g")
+      .attr("font-family", "sans-serif")
+      .attr("font-size", 10)
+      .selectAll("text")
+      .data(nodes)
+      .join("text")
+      .attr("x", (d) =>
+        d.x0 < width / 2 ? d.x1 + nodeLabelPadding : d.x0 - nodeLabelPadding
+      )
+      .attr("y", (d) => (d.y1 + d.y0) / 2)
+      .attr("dy", "0.35em")
+      .attr("text-anchor", (d) => (d.x0 < width / 2 ? "start" : "end"))
+      .text(({ index: i }) => Tl[i]);
 
   function intern(value) {
-    return value !== null && typeof value === 'object' ? value.valueOf() : value;
+    return value !== null && typeof value === "object"
+      ? value.valueOf()
+      : value;
   }
 
   return Object.assign(svg.node(), {
     scales: {
-      color
-    }
+      color: colorScale,
+    },
   });
 }
