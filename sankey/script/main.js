@@ -5,7 +5,7 @@ import {
   sankeyChart
 } from './chart.js';
 
-const energy = await d3.csv('./data/energy.csv', d3.autoType);
+const energy = await d3.csv('./data/partidos.csv', d3.autoType);
 
 const linkColorOptions = new Map([
   ['static', '#aaa'],

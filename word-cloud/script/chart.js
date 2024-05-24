@@ -17,9 +17,9 @@ export const wordCloud = (text, {
   marginLeft = 0, // left margin, in pixels
   width = 640, // outer width, in pixels
   height = 400, // outer height, in pixels
-  maxWords = 250, // maximum number of words to extract from the text
+  maxWords = 20000, // maximum number of words to extract from the text
   fontFamily = "sans-serif", // font family
-  fontScale = 15, // base font size
+  fontScale = 4, // base font size
   padding = 0, // amount of padding between the words (in pixels)
   rotate = 0, // a constant or function to rotate the words
   invalidation = new Promise((resolve, reject) => {
@@ -28,47 +28,57 @@ export const wordCloud = (text, {
     }, 60000)
   }) // when this promise resolves, stop the simulation
 } = {}) => {
-  const words = typeof text === "string" ? text.split(/\W+/g) : Array.from(text);
+  const words =
+    typeof text === "string" ? text.split(/\W+/g) : Array.from(text); // split the text into words
 
-  const data = d3.rollups(words, size, w => w)
-    .sort(([, a], [, b]) => d3.descending(a, b))
-    .slice(0, maxWords)
+  debugger;
+
+  const data = d3
+    .rollups(words, size, (w) => w) // count the words
+    .sort(([, a], [, b]) => d3.descending(a, b)) // sort by frequency
+    .slice(0, maxWords) // keep only the most frequent words
     .map(([key, size]) => ({
       text: word(key),
-      size
+      size,
     }));
 
-  const svg = d3.create('svg')
-    .attr('id', svgId)
+  debugger;
+
+  const svg = d3
+    .create("svg")
+    .attr("id", svgId)
     .attr("viewBox", [0, 0, width, height])
     .attr("width", width)
     .attr("font-family", fontFamily)
     .attr("text-anchor", "middle")
     .attr("style", "max-width: 100%; height: auto; height: intrinsic;");
 
-  const g = svg.append("g").attr("transform", `translate(${marginLeft},${marginTop})`);
+  const g = svg
+    .append("g")
+    .attr("transform", `translate(${marginLeft},${marginTop})`);
 
-  const cloud = d3.layout.cloud()
+  // Generate random colors
+  const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+  const cloud = d3.layout
+    .cloud()
     .size([width - marginLeft - marginRight, height - marginTop - marginBottom])
     .words(data)
     .padding(padding)
     .rotate(rotate)
     .font(fontFamily)
-    .fontSize(d => Math.sqrt(d.size) * fontScale)
-    .on("word", ({
-      size,
-      x,
-      y,
-      rotate,
-      text
-    }) => {
+    .fontSize((d) => Math.sqrt(d.size) * fontScale)
+    .on("word", ({ size, x, y, rotate, text }) => {
       g.append("text")
         .attr("font-size", size)
         .attr("transform", `translate(${x},${y}) rotate(${rotate})`)
+        .style("fill", () => color(text)) // Assign color based on the text
         .text(text);
     });
 
+  debugger;
+
   cloud.start();
-  invalidation && invalidation.then(() => cloud.stop());
+  invalidation && invalidation.then(() => cloud.stop()); // stop the simulation when the invalidation promise resolves
   return svg.node();
 }
