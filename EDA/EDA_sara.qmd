@@ -20,9 +20,9 @@ library(udpipe)
 
 ```{r}
 elecciones_2021 <- read.csv("./../data/Elecciones MX 2021 - Captura - TODOS.csv") %>% filter(!is.null(person_id)) %>% filter(person_id!="NA")
-elecciones_2024 <- read.csv("./../data/Elecciones MX 2024 - Captura - Captura.csv") %>% filter(!is.null(person_id)) %>% filter(person_id!="NA")
+# elecciones_2024 <- read.csv("./../data/Elecciones MX 2024 - Captura - Captura.csv") %>% filter(!is.null(person_id)) %>% filter(person_id!="NA")
+elecciones_2024 <- read.csv("./../data/24may/Elecciones MX 2024 - Captura - Captura.csv") %>% filter(!is.null(person_id)) %>% filter(person_id!="NA")
 elecciones_2022 <- read.csv("./../data/Gobernantes MX 2022 - Captura - TODOS.csv") %>% filter(!is.null(person_id)) %>% filter(person_id!="NA")
-
 elecciones_2024 %>% filter(state=="Ciudad de México") %>% select(gender, full_name)
 ```
 
@@ -415,8 +415,18 @@ sankey <- candidatos_2021y2024 %>%
 unique(sankey$abbreviation_2021)
 # unique(sankey$abbreviation_2022)
 
-# sankey %>% group_by(brinco2022) %>% summarise(n())
-sankey %>% group_by(brinco2024) %>% summarise(n())
+sankey_bueno<-sankey %>% group_by(brinco2024) %>% summarise(value=n())
+sankey_bueno<-sankey_bueno %>% 
+  separate(col = brinco2024, into = c("source","target"), sep = " ") %>% 
+  separate(col = source, into = c("source","anio_inicio"), sep = "_") %>% 
+  separate(col = target, into = c("target","anio_fin"), sep = "_") %>% 
+  select(source, target, value) %>% 
+  mutate(target=paste0(target," "))
+
+write.csv(sankey_bueno, "./../sankey/data/partidos.csv", row.names=FALSE)
+# source, target, value
+
+sankey_bueno
 ```
 
 

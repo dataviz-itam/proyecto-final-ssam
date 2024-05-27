@@ -810,6 +810,7 @@ library(dplyr)
 library(tidyr)
 library(purrr)
 
+# Create the expanded words tibble
 words_expanded <- tidy_prof_21 %>%
   group_by(word) %>%
   summarise(n = n()) %>%
@@ -819,13 +820,53 @@ words_expanded <- tidy_prof_21 %>%
   unnest(word) %>%
   select(word) # Retain only the 'word' column
 
-words_expanded
+# Convert the tibble to a character vector
+words_vector <- words_expanded$word
+
+# Concatenate the words with commas
+words_string <- paste(words_vector, collapse = ",")
+
+# Write the concatenated string to a file
+writeLines(words_string, "outfile.txt")
+
+
+```
+
+
+
+
+
+
+
+
+
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(purrr)
+
+# Create the expanded words tibble
+words_expanded <- tidy_prof_21 %>%
+  group_by(word) %>%
+  summarise(n = n()) %>%
+  arrange(desc(n)) %>% 
+  filter(n > 100) %>%
+  ungroup() %>%
+  mutate(word = map2(word, n, ~rep(.x, .y))) %>%
+  unnest(word) %>%
+  select(word) # Retain only the 'word' column
 
 # Convert the tibble to a character vector
 words_vector <- words_expanded$word
 
-# Write the words to a file, each word on a new line
-writeLines(words_vector, "./../word-cloud/data/palabras2021.txt")
+# Concatenate the words with commas
+words_string <- paste(words_vector, collapse = ", ")
+
+# Write the concatenated string to a file
+writeLines(words_string, "./../word-cloud/data/palabras2021.txt")
+
+
 ```
 
 
