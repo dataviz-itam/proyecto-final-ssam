@@ -63,4 +63,19 @@ elecciones_2024_coalition %>% colnames()
 elecciones_2024_contest %>% colnames()
 elecciones_2024_role %>% colnames()
 
+# Summary
+summary(elecciones_2024_district_types)
+summary(elecciones_2024_gender)
+summary(elecciones_2024_profession)
+summary(elecciones_2024_role_types)
+summary(elecciones_2024_studies)
+summary(elecciones_2024_party)
+summary(elecciones_2024_area)
+summary(elecciones_2024_chamber)
+summary(elecciones_2024_coalition)
+summary(elecciones_2024_contest)
+summary(elecciones_2024_role)
 
+
+elecciones_2024_profession %>% colnames()
+elecciones_2024_profession %>% head()
