@@ -39,7 +39,7 @@ Para desarrollar estas visualizaciones, utilizamos las siguientes herramientas:
   -
   -
   
-## Conclusiones
+## Conclusiones -- Narrativa 
 1. **Resumen de Hallazgos**
 2. **Implicaciones Políticas**
 3. **Líneas Futuras de Investigación**
