@@ -58,7 +58,7 @@ export const wordCloud = (text, {
     .attr("transform", `translate(${marginLeft},${marginTop})`);
 
   // Generate random colors
-  const color = d3.scaleOrdinal(d3.schemeCategory10);
+  const color = d3.scaleOrdinal(d3.schemeRdYlGn[9]);
 
   const cloud = d3.layout
     .cloud()

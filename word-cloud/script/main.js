@@ -39,8 +39,8 @@ debugger;
 
 const chart2 = wordCloud(words, {
   svgId: 'word-cloud-2',
-  width: 1200,
-  height: 500
+  width: 1500,
+  height: 800
 })
 
 d3.select('body').append(() => chart2);

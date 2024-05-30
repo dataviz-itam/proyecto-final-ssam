@@ -587,18 +587,18 @@ tidy_prof_21 %>%
 
 
 ```{r}
-# tidy_prof_21 <-tidy_prof_21 %>%
-#   mutate(word = ifelse(word == "bachilleraro" | word == "bachilleres", "bachillerato", word)) %>%
-#   mutate(word = ifelse(word == "baja" | word == "bajos", "bajo", word)) %>%
-#   mutate(word = ifelse(word == "banamex" | word == "banca" | word == "bancaria" | word == "bancarios" | word == "bancomer" | word == "bank" | word == "banorte" | word == "banquera" | word == "banquero" | word == "bancario" | word == "banrural" | word == "bbva", "banco", word)) %>%
-#   mutate(word = ifelse(word == "becario" | word == "becas", "beca", word)) %>%
-#   mutate(word = ifelse(word == "bellas" | word == "bellaza", "belleza", word)) %>%
-#   mutate(word = ifelse(word == "biologa" | word == "biologo" | word == "bióloga" | word == "bioquímico", "biología", word)) %>% 
-#   mutate(word = ifelse(word == "bogega", "bodega", word)) %>% 
-#   mutate(word = ifelse(word == "bomberos", "bombero", word)) %>% 
-#   mutate(word = ifelse(word == "boxeadora", "boxeador", word)) %>%
-#   mutate(word = ifelse(word == "brigadas" | word == "brigadista", "brigada", word)) %>%
-#   mutate(word = ifelse(word == "básica" | word == "básicas", "básico", word))
+tidy_prof_21 <-tidy_prof_21 %>%
+  mutate(word = ifelse(word == "bachilleraro" | word == "bachilleres", "bachillerato", word)) %>%
+  mutate(word = ifelse(word == "baja" | word == "bajos", "bajo", word)) %>%
+  mutate(word = ifelse(word == "banamex" | word == "banca" | word == "bancaria" | word == "bancarios" | word == "bancomer" | word == "bank" | word == "banorte" | word == "banquera" | word == "banquero" | word == "bancario" | word == "banrural" | word == "bbva", "banco", word)) %>%
+  mutate(word = ifelse(word == "becario" | word == "becas", "beca", word)) %>%
+  mutate(word = ifelse(word == "bellas" | word == "bellaza", "belleza", word)) %>%
+  mutate(word = ifelse(word == "biologa" | word == "biologo" | word == "bióloga" | word == "bioquímico", "biología", word)) %>%
+  mutate(word = ifelse(word == "bogega", "bodega", word)) %>%
+  mutate(word = ifelse(word == "bomberos", "bombero", word)) %>%
+  mutate(word = ifelse(word == "boxeadora", "boxeador", word)) %>%
+  mutate(word = ifelse(word == "brigadas" | word == "brigadista", "brigada", word)) %>%
+  mutate(word = ifelse(word == "básica" | word == "básicas", "básico", word))
 
 tidy_prof_21 %>%
   count(word, sort = TRUE) %>% 
