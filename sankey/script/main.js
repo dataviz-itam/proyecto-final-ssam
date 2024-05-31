@@ -18,23 +18,23 @@ const linkColorDefault = 'source-target';
 const nodeAlignOptions = ['left', 'right', 'center', 'justify'];
 const nodeAlignDefault = 'justify';
 
-const dropDownSelectLinkColor = d3.select('body').append('div').text('Link color ').append('select');
-dropDownSelectLinkColor.selectAll('option')
-  .data(linkColorOptions)
-  .enter()
-  .append('option')
-  .text(d => d[0])
-  .attr('value', d => d[1])
-  .property('selected', d => d[0] === linkColorDefault);
+// const dropDownSelectLinkColor = d3.select('body').append('div').text('Link color ').append('select');
+// dropDownSelectLinkColor.selectAll('option')
+//   .data(linkColorOptions)
+//   .enter()
+//   .append('option')
+//   .text(d => d[0])
+//   .attr('value', d => d[1])
+//   .property('selected', d => d[0] === linkColorDefault);
 
-const dropDownSelectNodeAlign = d3.select('body').append('div').text('Node alignment ').append('select');
-dropDownSelectNodeAlign.selectAll('option')
-  .data(nodeAlignOptions)
-  .enter()
-  .append('option')
-  .text(d => d)
-  .attr('value', d => d)
-  .property('selected', d => d === nodeAlignDefault);
+// const dropDownSelectNodeAlign = d3.select('body').append('div').text('Node alignment ').append('select');
+// dropDownSelectNodeAlign.selectAll('option')
+//   .data(nodeAlignOptions)
+//   .enter()
+//   .append('option')
+//   .text(d => d)
+//   .attr('value', d => d)
+//   .property('selected', d => d === nodeAlignDefault);
 
 const updateChart = (nodeAlign, linkColor) => {
   d3.select('#sankey-chart').remove();
