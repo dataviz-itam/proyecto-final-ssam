@@ -1,0 +1,7 @@
+"ID","VALUE","MEANING"
+1,"Governor","governmentOfficer"
+2,"Deputy","legislatorLowerBody"
+3,"Mayor","executiveCouncil"
+4,"Senator","legislatorUpperBody"
+5,"Regional deputy","regionalLegislator"
+6,"President","headOfGovernment"

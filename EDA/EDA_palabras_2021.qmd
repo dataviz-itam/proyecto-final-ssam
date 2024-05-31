@@ -1,0 +1,879 @@
+---
+title: "EDA_palabras_2021"
+author: "Sara"
+format: html
+editor: source
+---
+
+## Bibliotecas
+
+```{r message=FALSE}
+library(networkD3)
+library(tidyverse)
+library(patchwork)
+library(tidytext)
+library(udpipe)
+```
+
+## Leer datos
+
+```{r}
+elecciones_2021 <- read.csv("./../data/Elecciones MX 2021 - Captura - TODOS.csv") %>% filter(!is.null(person_id)) %>% filter(person_id!="NA")
+elecciones_2024 <- read.csv("./../data/Elecciones MX 2024 - Captura - Captura.csv") %>% filter(!is.null(person_id)) %>% filter(person_id!="NA")
+elecciones_2022 <- read.csv("./../data/Gobernantes MX 2022 - Captura - TODOS.csv") %>% filter(!is.null(person_id)) %>% filter(person_id!="NA")
+```
+
+# revisar profesion 1
+
+```{r}
+big_paragraph_2021 <- paste(elecciones_2021$profession_1, collapse = " ")
+big_paragraph_2022 <- paste(elecciones_2022$profession_1, collapse = " ")
+big_paragraph_2024 <- paste(elecciones_2024$profession_1, collapse = " ")
+
+# # Load the pre-trained model for Spanish
+# ud_model <- udpipe_download_model(language = "spanish")
+# ud_model <- udpipe_load_model(ud_model$file_model)
+```
+
+
+
+```{r}
+# # Tokenize and lemmatize the text
+# parsed <- udpipe_annotate(ud_model, x = big_paragraph_2021)
+# lemmas <- as.data.frame(parsed)
+# 
+# # Define custom stop words
+# custom_stop_words <- c(
+#   "de", "del", "ex", "s.a", "c.v", "a.c", "ac",
+#   "al", "como", "es", "ha", "se", "más", "fue", "allá", "ala", "así", ",", " ", ".", "s.a.", "(", ")"
+# )
+# 
+# # Combine default and custom stop words
+# stop_words <- tibble(
+#   word = c(stop_words$word, custom_stop_words),
+#   lexicon = rep("spanish", length(stop_words$word) + length(custom_stop_words))
+# )
+# 
+# # Filter out stop words and words starting with digits
+# tidy_prof_21 <- lemmas %>%
+#   filter(!grepl("^\\d", lemma)) %>%  # Remove words starting with a digit
+#   anti_join(stop_words, by = c("lemma" = "word"))  # Remove stop words
+# 
+# word_counts <- tidy_prof_21 %>%
+#   count(lemma, sort = TRUE) %>% 
+#   arrange(lemma)
+```
+
+
+
+
+
+```{r}
+stop_words <- tibble(
+  word = c("a", "ante", "bajo", "con", "contra", "de", "desde", "durante", "en", "entre", 
+           "hacia", "hasta", "mediante", "para", "por", "según", "sin", "sobre", "tras",
+           "el", "la", "los", "las", "un", "una", "unos", "unas",
+           "y", "e", "ni", "o", "u", 
+           "de", "del", "ex", "s.a", "c.v", "a.c", "ac",
+           "al", "como", "es", "ha", "se", "más", "fue", "allá", "ala", "así", "dela"
+           ),
+  lexicon = rep("spanish", 50)
+)
+
+tidy_prof_21 <- tibble(text = big_paragraph_2021) %>%
+    mutate(line = row_number()) %>%
+    unnest_tokens(word, text) %>%
+    filter(!grepl("^\\d", word)) %>% # Remove words starting with a digit
+    anti_join(stop_words)
+
+tidy_prof_21 <-tidy_prof_21 %>% 
+  mutate(word = ifelse(word == "abagada" | word == "abogada" | word == "abogadas" | word == "abogados" | word == "abodado" | word == "abogdo", "abogado", word))%>% 
+  mutate(word = ifelse(word == "abastos" | word == "abastecimiento", "abasto", word)) %>% 
+  mutate(word = ifelse(word == "academica" | word == "catedrática" | word == "académica" | word == "académico" | word == "catedratica" | word == "catedratico" | word == "catedrática" | word == "catedrático" | word == "academia", "docente", word)) %>% 
+  mutate(word = ifelse(word == "acciones", "acción", word)) %>% 
+  mutate(word = ifelse(word == "acentuación" | word == "acentuador", "acentuar", word)) %>% 
+  mutate(word = ifelse(word == "activisa" | word == "activsta" | word == "avtivista", "activista", word)) %>% 
+  mutate(word = ifelse(word == "activos", "activo", word)) %>% 
+  mutate(word = ifelse(word == "actriz", "actor", word))  %>% 
+  mutate(word = ifelse(word == "actuaria", "actuario", word))  %>% 
+  mutate(word = ifelse(word == "acuacultura" | word == "acuicultor", "acuicultura", word))  %>% 
+  mutate(word = ifelse(word == "adiccciones", "adicciones", word))  %>% 
+  mutate(word = ifelse(word == "adjunta", "adjunto", word))  %>% 
+  mutate(word = ifelse(word == "administraciones" | word == "administracion" | word == "administracón" | word == "administrado" | word == "administrador" | word == "administradora" | word == "administradror" | word == "administrativa" | word == "administrativo" | word == "administrativos" | word == "administrstivo" | word == "adminitradora" | word == "adminsitrador" | word == "adminsitradora" | word == "adminstradora" | word == "admistradora", "administración", word)) %>% 
+  mutate(word = ifelse(word == "aduanal" | word == "aduanales", "aduana", word)) %>% 
+  mutate(word = ifelse(word == "agencias" | word == "agente" | word == "agentes", "agencia", word))  %>% 
+  mutate(word = ifelse(word == "agraria" | word == "agrarista", "agrario", word)) %>% 
+  mutate(word = ifelse(word == "agricola" | word == "agricolas" | word == "agricultor" | word == "agricultores" | word == "agrícola" | word == "agrícolas", "agricultura", word)) %>% 
+  mutate(word = ifelse(word == "agroalimentario" | word == "agroempresario" | word == "agroindustrias" | word == "agroinsumos" | word == "agrono" | word == "agronoma" | word == "agronomo" | word == "agronómo" | word == "agroquímicos" | word == "agrónoma" | word == "agrónomo" | word == "agrónomos", "agronomía", word)) %>% 
+  mutate(word = ifelse(word == "agropecuarias" | word == "agropecuarios" | word == "agropecuaria", "agropecuario", word)) %>% 
+  mutate(word = ifelse(word == "agrupaciones", "agrupación", word)) %>% 
+  mutate(word = ifelse(word == "aguas", "agua", word)) %>% 
+  mutate(word = ifelse(word == "aguascalienes" | word == "aguascalientes", "Aguascalientes", word)) %>% 
+  mutate(word = ifelse(word == "alcalde" | word == "alcaldesa" | word == "alcande", "alcaldía", word)) %>% 
+  mutate(word = ifelse(word == "alfabetizadora", "alfabetización", word)) %>% 
+  mutate(word = ifelse(word == "alimentaria" | word == "comedores", "alimentos", word)) %>% 
+  mutate(word = ifelse(word == "alta" | word == "altas" | word == "altos", "alto", word)) %>% 
+  mutate(word = ifelse(word == "altruistas", "altruista", word)) %>% 
+  mutate(word = ifelse(word == "ambientales" | word == "ambientalista" | word == "ambiente" | word == "biosustentable", "ambiental", word)) %>% 
+  mutate(word = ifelse(word == "amiga" | word == "amigos", "amigo", word)) %>% 
+  mutate(word = ifelse(word == "analisitas" | word == "analista", "análisis", word)) %>% 
+  mutate(word = ifelse(word == "animales", "animal", word)) %>% 
+  mutate(word = ifelse(word == "anestesiologa", "anestesiólogo", word)) %>% 
+  mutate(word = ifelse(word == "antropológa", "antropóloga", word)) %>% 
+  mutate(word = ifelse(word == "apicultores", "apicultura", word)) %>% 
+  mutate(word = ifelse(word == "apoyos", "apoyo", word)) %>% 
+  mutate(word = ifelse(word == "aquitecto" | word == "arquitecto" | word == "arquitecta", "arquitectura", word)) %>% 
+  mutate(word = ifelse(word == "artel" | word == "artes" | word == "artista" | word == "artísitca" | word == "artística", "arte", word)) %>% 
+  mutate(word = ifelse(word == "artesana" | word == "artesanales" | word == "artesanas" | word == "artesanias" | word == "artesano", "artesanal", word)) %>% 
+  mutate(word = ifelse(word == "asesora" | word == "asesores" | word == "asesoría", "asesor", word)) %>% 
+  mutate(word = ifelse(word == "asiciación" | word == "asoc" | word == "asociacion" | word == "asociaciones" | word == "asociado" | word == "asociados" | word == "asocider" | word == "asoción", "asociación", word)) %>% 
+  mutate(word = ifelse(word == "atencion", "atención", word)) %>% 
+  mutate(word = ifelse(word == "auditor" | word == "auditora" | word == "auditoria", "auditoría", word)) %>% 
+  mutate(word = ifelse(word == "autora", "autor", word)) %>% 
+  mutate(word = ifelse(word == "auxiliares", "auxiliar", word)) %>% 
+  mutate(word = ifelse(word == "avicultor", "avicola", word)) %>% 
+  mutate(word = ifelse(word == "ayundamiento", "ayuntamiento", word))
+
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word)
+```
+
+```{r}
+tidy_prof_21 <-tidy_prof_21 %>%
+  mutate(word = ifelse(word == "bachilleraro" | word == "bachilleres", "bachillerato", word)) %>%
+  mutate(word = ifelse(word == "baja" | word == "bajos", "bajo", word)) %>%
+  mutate(word = ifelse(word == "banamex" | word == "banca" | word == "bancaria" | word == "bancarios" | word == "bancomer" | word == "bank" | word == "banorte" | word == "banquera" | word == "banquero" | word == "bancario" | word == "banrural" | word == "bbva" | word == "santander", "banco", word)) %>%
+  mutate(word = ifelse(word == "becario" | word == "becas", "beca", word)) %>%
+  mutate(word = ifelse(word == "bellas" | word == "bellaza", "belleza", word)) %>%
+  mutate(word = ifelse(word == "biologa" | word == "biologo" | word == "bióloga" | word == "bioquímico", "biología", word)) %>% 
+  mutate(word = ifelse(word == "bogega", "bodega", word)) %>% 
+  mutate(word = ifelse(word == "bomberos", "bombero", word)) %>% 
+  mutate(word = ifelse(word == "boxeadora", "boxeador", word)) %>%
+  mutate(word = ifelse(word == "brigadas" | word == "brigadista", "brigada", word)) %>%
+  mutate(word = ifelse(word == "básica" | word == "básicas", "básico", word))
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word) %>% 
+  filter(substr(word, 1, 1) == "b")
+
+```
+
+```{r}
+tidy_prof_21 <-tidy_prof_21 %>%
+  mutate(word = ifelse(word == "cafetaleras" | word == "cafe" | word == "cafetalero", "café", word)) %>%
+  mutate(word = ifelse(word == "cajera", "caja", word)) %>%
+  mutate(word = ifelse(word == "caliad", "calidad", word)) %>%
+  mutate(word = ifelse(word == "californa", "california", word)) %>%
+  mutate(word = ifelse(word == "campesina" | word == "campesinas" | word == "campo", "campesino", word)) %>%
+  mutate(word = ifelse(word == "cambiando", "cambio", word)) %>%
+  mutate(word = ifelse(word == "candidata" | word == "candidatos", "candidato", word)) %>%
+  mutate(word = ifelse(word == "cantautor", "cantante", word)) %>%
+  mutate(word = ifelse(word == "campalas" | word == "campañas" | word == "capañas" | word == "ccampaña", "campaña", word)) %>%
+  mutate(word = ifelse(word == "capacitacion" | word == "capacitador" | word == "capacitadora", "capacitación", word)) %>%
+  mutate(word = ifelse(word == "casas", "casa", word)) %>%
+  mutate(word = ifelse(word == "cd" | word == "ciudades", "ciudad", word)) %>%
+  mutate(word = ifelse(word == "central" | word == "centrales" | word == "centros", "centro", word)) %>%
+  mutate(word = ifelse(word == "cientifico" | word == "cientifica" | word == "ciencias" | word == "científica" | word == "científicos", "ciencia", word)) %>%
+  mutate(word = ifelse(word == "cilvil" | word == "civil" | word == "civiles" | word == "civill", "civil", word)) %>%
+  mutate(word = ifelse(word == "cinematográficos" | word == "cinematografía" | word == "cortometrajes", "cine", word)) %>%
+  mutate(word = ifelse(word == "cirugía" | word == "cirujana", "cirujano", word)) %>%
+  mutate(word = ifelse(word == "ciudadana" | word == "ciudadanaas" | word == "ciudadanas" | word == "ciudadania" | word == "ciudadanos", "ciudadano", word)) %>%
+  mutate(word = ifelse(word == "casas", "casa", word))  %>%
+  mutate(word = ifelse(word == "clinico" | word == "clinica"  | word == "clínica" | word == "clínicos", "clínico", word))   %>%
+  mutate(word = ifelse(word == "clues", "club", word)) %>%
+  mutate(word = ifelse(word == "cocinero", "cocina", word))  %>%
+  mutate(word = ifelse(word == "colaboradora", "colaborador", word))   %>%
+  mutate(word = ifelse(word == "colectivos", "colectivo", word)) %>%
+  mutate(word = ifelse(word == "comerciante" | word == "comercializadora"  | word == "comercialización" | word == "comerciales" | word == "comercial"  | word == "comercio.delega" , "comercio", word)) %>%
+  mutate(word = ifelse(word == "comisarias" | word == "comisariado"  | word == "comisaria" , "comisario", word)) %>%
+  mutate(word = ifelse(word == "comision" | word == "comisionada"  | word == "comisionado" , "comisión", word)) %>%
+  mutate(word = ifelse(word == "comités"  | word == "comite"  | word == "cómite", "comité", word)) %>%
+  mutate(word = ifelse(word == "company" | word == "compañias" | word == "corporación" | word == "corporativo" | word == "cía", "compañía", word)) %>%
+  mutate(word = ifelse(word == "compras", "compra", word)) %>%
+  mutate(word = ifelse(word == "computacionales" | word == "computacional" | word == "computacion", "computación", word)) %>%
+  mutate(word = ifelse(word == "cominicóloga" | word == "comunicacidor" | word == "comunicaciones" | word == "comunicador" | word == "comunicadora" | word == "comunicologa" | word == "comunicologo" | word == "comunicóloga" | word == "comunicólogo" | word == "comunicólogoca", "comunicación", word)) %>%
+  mutate(word = ifelse(word == "comunidades" | word == "comunitaria" | word == "comunitario" | word == "comunitarios", "comunidad", word)) %>%
+  mutate(word = ifelse(word == "concentrados" | word == "concentradora", "concentrado", word)) %>%
+  mutate(word = ifelse(word == "condictor" | word == "conducción" | word == "conductora", "conductor", word)) %>%
+  mutate(word = ifelse(word == "consejal" | word == "consejera" | word == "consejeria" | word == "consejero" | word == "consejería", "consejo", word)) %>%
+  mutate(word = ifelse(word == "constitucional" | word == "constitucionalistas" | word == "constituyente", "constitución", word)) %>%
+  mutate(word = ifelse(word == "construcciión" | word == "construccion" | word == "construcciones" | word == "constructor" | word == "constructora" | word == "constructoras" | word == "constructura", "construcción", word)) %>%
+  mutate(word = ifelse(word == "consulta" | word == "consultiva" | word == "consultivo" | word == "consultora" | word == "consultores" | word == "consultoria" | word == "consultorio" | word == "consultoría" | word == "consultorías", "consultor", word)) %>%
+  mutate(word = ifelse(word == "contabilidad" | word == "contable" | word == "contadora" | word == "contaduria" | word == "contaduría" | word == "contrable" | word == "contralor" | word == "contralora", "contador", word)) %>%
+  mutate(word = ifelse(word == "contratistas" | word == "contratos", "contratista", word)) %>%
+  mutate(word = ifelse(word == "controladora", "control", word)) %>%
+  mutate(word = ifelse(word == "coodinadora" | word == "coodinados" | word == "cordinador" | word == "coordinadora" | word == "coodinador" | word == "coordinacion" | word == "coordinador" | word == "coordinados" | word == "coordinarod", "coordinación", word))%>%
+  mutate(word = ifelse(word == "cooltural" | word == "coolturales"  | word == "cultural", "cultura", word))%>%
+  mutate(word = ifelse(word == "cooperativa", "cooperativo", word)) %>%
+  mutate(word = ifelse(word == "cosmetóloga", "cosmetología", word)) %>%
+  mutate(word = ifelse(word == "costurero", "costura", word)) %>%
+  mutate(word = ifelse(word == "cotitular", "titular", word)) %>%
+  mutate(word = ifelse(word == "copropietario", "propietario", word)) %>%
+  mutate(word = ifelse(word == "crea" | word == "creaciones" | word == "creador" | word == "creadora", "creación", word)) %>%
+  mutate(word = ifelse(word == "criminal" | word == "criminalista" | word == "criminalística" | word == "criminaslista" | word == "criminologa" | word == "criminologo" | word == "criminológicas" | word == "criminóloga", "criminología", word)) %>%
+  mutate(word = ifelse(word == "créditos", "crédito", word)) %>%
+  mutate(word = ifelse(word == "cuadros", "cuadro", word)) %>%
+  mutate(word = ifelse(word == "cuauhtemoc", "cuauhtémoc", word)) %>%
+  mutate(word = ifelse(word == "cuentas", "cuenta", word)) %>%
+  mutate(word = ifelse(word == "camara", "cámara", word))
+
+#copropietario
+#cotitular
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word) %>% 
+  filter(substr(word, 1, 1) == "c")
+
+```
+
+```{r}
+tidy_prof_21 <-tidy_prof_21 %>%
+  mutate(word = ifelse(word == "decorativas", "decoración", word)) %>%
+  mutate(word = ifelse(word == "defensora" | word == "defensor" | word == "denfesora", "defensa", word)) %>%
+  mutate(word = ifelse(word == "delegacional" | word == "delegaciones" | word == "delegada" | word == "delegado" | word == "delegadoregional" | word == "delegados", "delegación", word)) %>%
+  mutate(word = ifelse(word == "delito", "delincuencia", word)) %>%
+  mutate(word = ifelse(word == "democrática", "democrático", word)) %>%
+  mutate(word = ifelse(word == "depotista" | word == "deportivo" | word == "deportivas" | word == "deportista", "deporte", word)) %>%
+  mutate(word = ifelse(word == "departamentos", "departamento", word)) %>%
+  mutate(word = ifelse(word == "derechos", "derecho", word)) %>%
+  mutate(word = ifelse(word == "desarrollador" | word == "desarrolladora" | word == "desarollo", "desarrollo", word)) %>%
+  mutate(word = ifelse(word == "desempeñado" | word == "desempeñó", "desempeño", word)) %>%
+  mutate(word = ifelse(word == "dif", "DIF", word)) %>%
+  mutate(word = ifelse(word == "difusion", "difusión", word)) %>%
+  mutate(word = ifelse(word == "digitales", "digital", word)) %>%
+  mutate(word = ifelse(word == "dipitado" | word == "dipotada" | word == "diputación" | word == "diputada" | word == "diputados" | word == "diputala" | word == "dupitado", "diputado", word)) %>%
+  mutate(word = ifelse(word == "direccion" | word == "direccon" | word == "dirección" | word == "directiva" | word == "directivas" | word == "directivo" | word == "directora" | word == "directoria", "director", word)) %>%
+  mutate(word = ifelse(word == "discapacitados", "discapacidad", word)) %>%
+  mutate(word = ifelse(word == "diseño" | word == "diseñadora", "diseñador", word)) %>%
+  mutate(word = ifelse(word == "distribuciones" | word == "distribuidor" | word == "distribuidora", "distribución", word)) %>%
+  mutate(word = ifelse(word == "dirigentes", "dirigente", word)) %>%
+  mutate(word = ifelse(word == "distrital", "distrito", word))  %>%
+  mutate(word = ifelse(word == "diversas" | word == "diverso", "diversos", word)) %>%
+  mutate(word = ifelse(word == "docencia", "docente", word))  %>%
+  mutate(word = ifelse(word == "doctora", "doctorado", word))
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word) %>% 
+  filter(substr(word, 1, 1) == "d")
+
+```
+
+```{r}
+tidy_prof_21 <-tidy_prof_21 %>%
+  mutate(word = ifelse(word == "economia" | word == "economico" | word == "economista" | word == "economistas" | word == "económico" | word == "económicos", "economía", word)) %>%
+  mutate(word = ifelse(word == "editor" | word == "editora" | word == "editorialista", "editorial", word)) %>%
+  mutate(word = ifelse(word == "eduación" | word == "educacion" | word == "educador" | word == "educadora" | word == "educativa" | word == "educativas" | word == "educativo" | word == "educativos", "educación", word)) %>%
+  mutate(word = ifelse(word == "ejecutiva" | word == "ejecutvo", "ejecutivo", word)) %>%
+  mutate(word = ifelse(word == "ejidatario" | word == "ejidales" | word == "ejido", "ejidal", word)) %>%
+  mutate(word = ifelse(word == "elección" | word == "electorales" | word == "electores", "electoral", word)) %>%
+  mutate(word = ifelse(word == "electrisista" | word == "electricista" | word == "eléctrica" | word == "eléctrico" | word == "eléctricas", "eléctrico", word)) %>%
+  mutate(word = ifelse(word == "electromecanico", "electromecánico", word)) %>%
+  mutate(word = ifelse(word == "electronica" | word == "electronico", "electrónica", word)) %>%
+  mutate(word = ifelse(word == "empleabilidad" | word == "empleada" | word == "empleados" | word == "empleado", "empleo", word)) %>%
+  mutate(word = ifelse(word == "emprendedora" | word == "emprende" | word == "emprendedoras" | word == "emprendedores" | word == "emprendimiento", "emprendedor", word)) %>% 
+  mutate(word = ifelse(word == "empresa" | word == "empresara" | word == "empresaria" | word == "empresarial" | word == "empresariales" | word == "empresarias" | word == "empresarios" | word == "empresas", "empresario", word))%>%
+  mutate(word = ifelse(word == "encargada", "encargado", word)) %>%
+  mutate(word = ifelse(word == "energia" | word == "energético", "energía", word)) %>%
+  mutate(word = ifelse(word == "enfermería" | word == "enfermero" | word == "enfermeria" | word == "enfermeras", "enfermera", word)) %>%
+  mutate(word = ifelse(word == "enlances", "enlace", word))
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word) %>% 
+  filter(substr(word, 1, 1) == "e")
+
+```
+
+```{r}
+# tidy_prof_21 <-tidy_prof_21 %>%
+#   mutate(word = ifelse(word == "bachilleraro" | word == "bachilleres", "bachillerato", word)) %>%
+#   mutate(word = ifelse(word == "baja" | word == "bajos", "bajo", word)) %>%
+#   mutate(word = ifelse(word == "banamex" | word == "banca" | word == "bancaria" | word == "bancarios" | word == "bancomer" | word == "bank" | word == "banorte" | word == "banquera" | word == "banquero" | word == "bancario" | word == "banrural" | word == "bbva", "banco", word)) %>%
+#   mutate(word = ifelse(word == "becario" | word == "becas", "beca", word)) %>%
+#   mutate(word = ifelse(word == "bellas" | word == "bellaza", "belleza", word)) %>%
+#   mutate(word = ifelse(word == "biologa" | word == "biologo" | word == "bióloga" | word == "bioquímico", "biología", word)) %>% 
+#   mutate(word = ifelse(word == "bogega", "bodega", word)) %>% 
+#   mutate(word = ifelse(word == "bomberos", "bombero", word)) %>% 
+#   mutate(word = ifelse(word == "boxeadora", "boxeador", word)) %>%
+#   mutate(word = ifelse(word == "brigadas" | word == "brigadista", "brigada", word)) %>%
+#   mutate(word = ifelse(word == "básica" | word == "básicas", "básico", word))
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word) %>% 
+  filter(substr(word, 1, 1) == "f")
+
+```
+
+```{r}
+# tidy_prof_21 <-tidy_prof_21 %>%
+#   mutate(word = ifelse(word == "bachilleraro" | word == "bachilleres", "bachillerato", word)) %>%
+#   mutate(word = ifelse(word == "baja" | word == "bajos", "bajo", word)) %>%
+#   mutate(word = ifelse(word == "banamex" | word == "banca" | word == "bancaria" | word == "bancarios" | word == "bancomer" | word == "bank" | word == "banorte" | word == "banquera" | word == "banquero" | word == "bancario" | word == "banrural" | word == "bbva", "banco", word)) %>%
+#   mutate(word = ifelse(word == "becario" | word == "becas", "beca", word)) %>%
+#   mutate(word = ifelse(word == "bellas" | word == "bellaza", "belleza", word)) %>%
+#   mutate(word = ifelse(word == "biologa" | word == "biologo" | word == "bióloga" | word == "bioquímico", "biología", word)) %>% 
+#   mutate(word = ifelse(word == "bogega", "bodega", word)) %>% 
+#   mutate(word = ifelse(word == "bomberos", "bombero", word)) %>% 
+#   mutate(word = ifelse(word == "boxeadora", "boxeador", word)) %>%
+#   mutate(word = ifelse(word == "brigadas" | word == "brigadista", "brigada", word)) %>%
+#   mutate(word = ifelse(word == "básica" | word == "básicas", "básico", word))
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word) %>% 
+  filter(substr(word, 1, 1) == "g")
+
+```
+
+
+```{r}
+# tidy_prof_21 <-tidy_prof_21 %>%
+#   mutate(word = ifelse(word == "bachilleraro" | word == "bachilleres", "bachillerato", word)) %>%
+#   mutate(word = ifelse(word == "baja" | word == "bajos", "bajo", word)) %>%
+#   mutate(word = ifelse(word == "banamex" | word == "banca" | word == "bancaria" | word == "bancarios" | word == "bancomer" | word == "bank" | word == "banorte" | word == "banquera" | word == "banquero" | word == "bancario" | word == "banrural" | word == "bbva", "banco", word)) %>%
+#   mutate(word = ifelse(word == "becario" | word == "becas", "beca", word)) %>%
+#   mutate(word = ifelse(word == "bellas" | word == "bellaza", "belleza", word)) %>%
+#   mutate(word = ifelse(word == "biologa" | word == "biologo" | word == "bióloga" | word == "bioquímico", "biología", word)) %>% 
+#   mutate(word = ifelse(word == "bogega", "bodega", word)) %>% 
+#   mutate(word = ifelse(word == "bomberos", "bombero", word)) %>% 
+#   mutate(word = ifelse(word == "boxeadora", "boxeador", word)) %>%
+#   mutate(word = ifelse(word == "brigadas" | word == "brigadista", "brigada", word)) %>%
+#   mutate(word = ifelse(word == "básica" | word == "básicas", "básico", word))
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word) %>% 
+  filter(substr(word, 1, 1) == "h")
+
+```
+
+```{r}
+# tidy_prof_21 <-tidy_prof_21 %>%
+#   mutate(word = ifelse(word == "bachilleraro" | word == "bachilleres", "bachillerato", word)) %>%
+#   mutate(word = ifelse(word == "baja" | word == "bajos", "bajo", word)) %>%
+#   mutate(word = ifelse(word == "banamex" | word == "banca" | word == "bancaria" | word == "bancarios" | word == "bancomer" | word == "bank" | word == "banorte" | word == "banquera" | word == "banquero" | word == "bancario" | word == "banrural" | word == "bbva", "banco", word)) %>%
+#   mutate(word = ifelse(word == "becario" | word == "becas", "beca", word)) %>%
+#   mutate(word = ifelse(word == "bellas" | word == "bellaza", "belleza", word)) %>%
+#   mutate(word = ifelse(word == "biologa" | word == "biologo" | word == "bióloga" | word == "bioquímico", "biología", word)) %>% 
+#   mutate(word = ifelse(word == "bogega", "bodega", word)) %>% 
+#   mutate(word = ifelse(word == "bomberos", "bombero", word)) %>% 
+#   mutate(word = ifelse(word == "boxeadora", "boxeador", word)) %>%
+#   mutate(word = ifelse(word == "brigadas" | word == "brigadista", "brigada", word)) %>%
+#   mutate(word = ifelse(word == "básica" | word == "básicas", "básico", word))
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word) %>% 
+  filter(substr(word, 1, 1) == "i")
+
+```
+
+```{r}
+# tidy_prof_21 <-tidy_prof_21 %>%
+#   mutate(word = ifelse(word == "bachilleraro" | word == "bachilleres", "bachillerato", word)) %>%
+#   mutate(word = ifelse(word == "baja" | word == "bajos", "bajo", word)) %>%
+#   mutate(word = ifelse(word == "banamex" | word == "banca" | word == "bancaria" | word == "bancarios" | word == "bancomer" | word == "bank" | word == "banorte" | word == "banquera" | word == "banquero" | word == "bancario" | word == "banrural" | word == "bbva", "banco", word)) %>%
+#   mutate(word = ifelse(word == "becario" | word == "becas", "beca", word)) %>%
+#   mutate(word = ifelse(word == "bellas" | word == "bellaza", "belleza", word)) %>%
+#   mutate(word = ifelse(word == "biologa" | word == "biologo" | word == "bióloga" | word == "bioquímico", "biología", word)) %>% 
+#   mutate(word = ifelse(word == "bogega", "bodega", word)) %>% 
+#   mutate(word = ifelse(word == "bomberos", "bombero", word)) %>% 
+#   mutate(word = ifelse(word == "boxeadora", "boxeador", word)) %>%
+#   mutate(word = ifelse(word == "brigadas" | word == "brigadista", "brigada", word)) %>%
+#   mutate(word = ifelse(word == "básica" | word == "básicas", "básico", word))
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word) %>% 
+  filter(substr(word, 1, 1) == "j")
+
+```
+
+
+```{r}
+# tidy_prof_21 <-tidy_prof_21 %>%
+#   mutate(word = ifelse(word == "bachilleraro" | word == "bachilleres", "bachillerato", word)) %>%
+#   mutate(word = ifelse(word == "baja" | word == "bajos", "bajo", word)) %>%
+#   mutate(word = ifelse(word == "banamex" | word == "banca" | word == "bancaria" | word == "bancarios" | word == "bancomer" | word == "bank" | word == "banorte" | word == "banquera" | word == "banquero" | word == "bancario" | word == "banrural" | word == "bbva", "banco", word)) %>%
+#   mutate(word = ifelse(word == "becario" | word == "becas", "beca", word)) %>%
+#   mutate(word = ifelse(word == "bellas" | word == "bellaza", "belleza", word)) %>%
+#   mutate(word = ifelse(word == "biologa" | word == "biologo" | word == "bióloga" | word == "bioquímico", "biología", word)) %>% 
+#   mutate(word = ifelse(word == "bogega", "bodega", word)) %>% 
+#   mutate(word = ifelse(word == "bomberos", "bombero", word)) %>% 
+#   mutate(word = ifelse(word == "boxeadora", "boxeador", word)) %>%
+#   mutate(word = ifelse(word == "brigadas" | word == "brigadista", "brigada", word)) %>%
+#   mutate(word = ifelse(word == "básica" | word == "básicas", "básico", word))
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word) %>% 
+  filter(substr(word, 1, 1) == "k")
+
+```
+
+
+```{r}
+# tidy_prof_21 <-tidy_prof_21 %>%
+#   mutate(word = ifelse(word == "bachilleraro" | word == "bachilleres", "bachillerato", word)) %>%
+#   mutate(word = ifelse(word == "baja" | word == "bajos", "bajo", word)) %>%
+#   mutate(word = ifelse(word == "banamex" | word == "banca" | word == "bancaria" | word == "bancarios" | word == "bancomer" | word == "bank" | word == "banorte" | word == "banquera" | word == "banquero" | word == "bancario" | word == "banrural" | word == "bbva", "banco", word)) %>%
+#   mutate(word = ifelse(word == "becario" | word == "becas", "beca", word)) %>%
+#   mutate(word = ifelse(word == "bellas" | word == "bellaza", "belleza", word)) %>%
+#   mutate(word = ifelse(word == "biologa" | word == "biologo" | word == "bióloga" | word == "bioquímico", "biología", word)) %>% 
+#   mutate(word = ifelse(word == "bogega", "bodega", word)) %>% 
+#   mutate(word = ifelse(word == "bomberos", "bombero", word)) %>% 
+#   mutate(word = ifelse(word == "boxeadora", "boxeador", word)) %>%
+#   mutate(word = ifelse(word == "brigadas" | word == "brigadista", "brigada", word)) %>%
+#   mutate(word = ifelse(word == "básica" | word == "básicas", "básico", word))
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word) %>% 
+  filter(substr(word, 1, 1) == "l")
+
+```
+
+```{r}
+# tidy_prof_21 <-tidy_prof_21 %>%
+#   mutate(word = ifelse(word == "bachilleraro" | word == "bachilleres", "bachillerato", word)) %>%
+#   mutate(word = ifelse(word == "baja" | word == "bajos", "bajo", word)) %>%
+#   mutate(word = ifelse(word == "banamex" | word == "banca" | word == "bancaria" | word == "bancarios" | word == "bancomer" | word == "bank" | word == "banorte" | word == "banquera" | word == "banquero" | word == "bancario" | word == "banrural" | word == "bbva", "banco", word)) %>%
+#   mutate(word = ifelse(word == "becario" | word == "becas", "beca", word)) %>%
+#   mutate(word = ifelse(word == "bellas" | word == "bellaza", "belleza", word)) %>%
+#   mutate(word = ifelse(word == "biologa" | word == "biologo" | word == "bióloga" | word == "bioquímico", "biología", word)) %>% 
+#   mutate(word = ifelse(word == "bogega", "bodega", word)) %>% 
+#   mutate(word = ifelse(word == "bomberos", "bombero", word)) %>% 
+#   mutate(word = ifelse(word == "boxeadora", "boxeador", word)) %>%
+#   mutate(word = ifelse(word == "brigadas" | word == "brigadista", "brigada", word)) %>%
+#   mutate(word = ifelse(word == "básica" | word == "básicas", "básico", word))
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word) %>% 
+  filter(substr(word, 1, 1) == "m")
+
+```
+
+```{r}
+# tidy_prof_21 <-tidy_prof_21 %>%
+#   mutate(word = ifelse(word == "bachilleraro" | word == "bachilleres", "bachillerato", word)) %>%
+#   mutate(word = ifelse(word == "baja" | word == "bajos", "bajo", word)) %>%
+#   mutate(word = ifelse(word == "banamex" | word == "banca" | word == "bancaria" | word == "bancarios" | word == "bancomer" | word == "bank" | word == "banorte" | word == "banquera" | word == "banquero" | word == "bancario" | word == "banrural" | word == "bbva", "banco", word)) %>%
+#   mutate(word = ifelse(word == "becario" | word == "becas", "beca", word)) %>%
+#   mutate(word = ifelse(word == "bellas" | word == "bellaza", "belleza", word)) %>%
+#   mutate(word = ifelse(word == "biologa" | word == "biologo" | word == "bióloga" | word == "bioquímico", "biología", word)) %>% 
+#   mutate(word = ifelse(word == "bogega", "bodega", word)) %>% 
+#   mutate(word = ifelse(word == "bomberos", "bombero", word)) %>% 
+#   mutate(word = ifelse(word == "boxeadora", "boxeador", word)) %>%
+#   mutate(word = ifelse(word == "brigadas" | word == "brigadista", "brigada", word)) %>%
+#   mutate(word = ifelse(word == "básica" | word == "básicas", "básico", word))
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word) %>% 
+  filter(substr(word, 1, 1) == "n")
+
+```
+
+
+```{r}
+# tidy_prof_21 <-tidy_prof_21 %>%
+#   mutate(word = ifelse(word == "bachilleraro" | word == "bachilleres", "bachillerato", word)) %>%
+#   mutate(word = ifelse(word == "baja" | word == "bajos", "bajo", word)) %>%
+#   mutate(word = ifelse(word == "banamex" | word == "banca" | word == "bancaria" | word == "bancarios" | word == "bancomer" | word == "bank" | word == "banorte" | word == "banquera" | word == "banquero" | word == "bancario" | word == "banrural" | word == "bbva", "banco", word)) %>%
+#   mutate(word = ifelse(word == "becario" | word == "becas", "beca", word)) %>%
+#   mutate(word = ifelse(word == "bellas" | word == "bellaza", "belleza", word)) %>%
+#   mutate(word = ifelse(word == "biologa" | word == "biologo" | word == "bióloga" | word == "bioquímico", "biología", word)) %>% 
+#   mutate(word = ifelse(word == "bogega", "bodega", word)) %>% 
+#   mutate(word = ifelse(word == "bomberos", "bombero", word)) %>% 
+#   mutate(word = ifelse(word == "boxeadora", "boxeador", word)) %>%
+#   mutate(word = ifelse(word == "brigadas" | word == "brigadista", "brigada", word)) %>%
+#   mutate(word = ifelse(word == "básica" | word == "básicas", "básico", word))
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word) %>% 
+  filter(substr(word, 1, 1) == "o")
+
+```
+
+```{r}
+tidy_prof_21 <-tidy_prof_21 %>%
+  mutate(word = ifelse(word == "parlamentaria" | word == "parlamento" | word == "parlamentrio", "parlamentario", word)) %>%
+  mutate(word = ifelse(word == "parroquial", "parroquia", word)) %>%
+  mutate(word = ifelse(word == "participacion" | word == "participante" | word == "participar" | word == "particiáción", "participación", word)) %>%
+  mutate(word = ifelse(word == "partidos", "partido", word)) %>%
+  mutate(word = ifelse(word == "pasantes", "pasante", word)) %>%
+  mutate(word = ifelse(word == "pedagoga" | word == "pedagogico" | word == "pedagogo" | word == "pedagógica" | word == "pedagógico" | word == "psicopedagógica", "pedagogía", word)) %>%
+  mutate(word = ifelse(word == "partero", "partera", word)) %>%
+  mutate(word = ifelse(word == "patrimonial", "patrimonio", word)) %>%
+  mutate(word = ifelse(word == "pediátrica" | word == "pedriata" | word == "pedriatica", "pediatra", word)) %>%
+  mutate(word = ifelse(word == "penalista" | word == "penales", "penal", word)) %>%
+  mutate(word = ifelse(word == "pequeñas", "pequeña", word)) %>%
+  mutate(word = ifelse(word == "periodicos" | word == "periodista" | word == "periódico" | word == "periódicos" | word == "periódistica", "periodismo", word))  %>%
+  mutate(word = ifelse(word == "pescador" | word == "pesca", "pesquera", word))  %>%
+  mutate(word = ifelse(word == "petrobajio" | word == "petroleras" | word == "petrolero" | word == "petróleos", "petróleo", word)) %>%
+  mutate(word = ifelse(word == "planeacion", "planeación", word)) %>%
+  mutate(word = ifelse(word == "plantas", "planta", word)) %>%
+  mutate(word = ifelse(word == "plúrinominal", "plurinominal", word)) %>%
+  mutate(word = ifelse(word == "plúrinominal", "plurinominal", word)) %>%
+  mutate(word = ifelse(word == "policia", "policía", word)) %>%
+  mutate(word = ifelse(word == "politica" | word == "politicas" | word == "politico" | word == "politologa" | word == "politologo" | word == "politóloga" | word == "politólogo" | word == "políticas" | word == "político" | word == "políticos", "política", word)) %>%
+  mutate(word = ifelse(word == "ponencia", "ponente", word)) %>%
+  mutate(word = ifelse(word == "populares", "popular", word)) %>%
+  mutate(word = ifelse(word == "portunidades", "oportunidad", word)) %>%
+  mutate(word = ifelse(word == "prd", "PRD", word)) %>%
+  mutate(word = ifelse(word == "precampaña", "campaña", word)) %>%
+  mutate(word = ifelse(word == "precandidata", "precandidato", word)) %>%
+  mutate(word = ifelse(word == "preisdente" | word == "presidencial" | word == "presidene" | word == "presidenta" | word == "presidente" | word == "presindente", "presidencia", word)) %>%
+  mutate(word = ifelse(word == "preparetoria", "preparatoria", word)) %>%
+  mutate(word = ifelse(word == "prestadora", "prestador", word)) %>%
+  mutate(word = ifelse(word == "prevencion" | word == "preventiva", "prevención", word)) %>%
+  mutate(word = ifelse(word == "pri" | word == "priistas", "PRI", word)) %>%
+  mutate(word = ifelse(word == "primera", "primer", word)) %>%
+  mutate(word = ifelse(word == "privada" | word == "privadas", "privado", word)) %>%
+  mutate(word = ifelse(word == "procesal" | word == "procesos", "proceso", word)) %>%
+  mutate(word = ifelse(word == "procuradoria" | word == "procuradora" | word == "procuraduria" | word == "procuraduría", "procurador", word)) %>%
+  mutate(word = ifelse(word == "produccion" | word == "producción" | word == "produce" | word == "productivos" | word == "producto" | word == "productor" | word == "productora" | word == "productores" | word == "productos", "productor", word)) %>%
+  mutate(word = ifelse(word == "profesional" | word == "profesionales" | word == "profesionista", "profesión", word)) %>%
+  mutate(word = ifelse(word == "profesora", "profesor", word)) %>%
+  mutate(word = ifelse(word == "programacion" | word == "programador", "programación", word)) %>%
+  mutate(word = ifelse(word == "programas", "programa", word)) %>%
+  mutate(word = ifelse(word == "pan", "PAN", word)) %>%
+  mutate(word = ifelse(word == "progresa" | word == "progresistas", "progreso", word)) %>% 
+  mutate(word = ifelse(word == "promoción" | word == "promotora", "promotor", word)) %>% 
+  mutate(word = ifelse(word == "propietario" | word == "propietaria", "propiedad", word)) %>%
+  mutate(word = ifelse(word == "propia", "propio", word)) %>% 
+  mutate(word = ifelse(word == "protectora" | word == "proteción", "protección", word)) %>%
+  mutate(word = ifelse(word == "proyectos", "proyecto", word)) %>%
+  mutate(word = ifelse(word == "psiclogía" | word == "psicologa" | word == "psicologo" | word == "psicológo" | word == "psicoterapeuta" | word == "psicóloga" | word == "psicólogo" | word == "psicólogos", "psicología", word)) %>%
+  mutate(word = ifelse(word == "pt", "PT", word)) %>%
+  mutate(word = ifelse(word == "publica" | word == "publicas" | word == "publico" | word == "publicos" | word == "pùblico" | word == "púbclio" | word == "públcia" | word == "públic" | word == "pública" | word == "públicas" | word == "públicp" | word == "públicos", "público", word)) %>%
+  mutate(word = ifelse(word == "puestos", "puesto", word)) %>% 
+  mutate(word = ifelse(word == "publicista" | word == "publicitaria" | word == "publiscista", "publicidad", word))
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word) %>% 
+  filter(substr(word, 1, 1) == "p")
+
+```
+
+```{r}
+# tidy_prof_21 <-tidy_prof_21 %>%
+#   mutate(word = ifelse(word == "bachilleraro" | word == "bachilleres", "bachillerato", word)) %>%
+#   mutate(word = ifelse(word == "baja" | word == "bajos", "bajo", word)) %>%
+#   mutate(word = ifelse(word == "banamex" | word == "banca" | word == "bancaria" | word == "bancarios" | word == "bancomer" | word == "bank" | word == "banorte" | word == "banquera" | word == "banquero" | word == "bancario" | word == "banrural" | word == "bbva", "banco", word)) %>%
+#   mutate(word = ifelse(word == "becario" | word == "becas", "beca", word)) %>%
+#   mutate(word = ifelse(word == "bellas" | word == "bellaza", "belleza", word)) %>%
+#   mutate(word = ifelse(word == "biologa" | word == "biologo" | word == "bióloga" | word == "bioquímico", "biología", word)) %>% 
+#   mutate(word = ifelse(word == "bogega", "bodega", word)) %>% 
+#   mutate(word = ifelse(word == "bomberos", "bombero", word)) %>% 
+#   mutate(word = ifelse(word == "boxeadora", "boxeador", word)) %>%
+#   mutate(word = ifelse(word == "brigadas" | word == "brigadista", "brigada", word)) %>%
+#   mutate(word = ifelse(word == "básica" | word == "básicas", "básico", word))
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word) %>% 
+  filter(substr(word, 1, 1) == "q")
+
+```
+
+
+```{r}
+tidy_prof_21 <-tidy_prof_21 %>%
+  mutate(word = ifelse(word == "bachilleraro" | word == "bachilleres", "bachillerato", word)) %>%
+  mutate(word = ifelse(word == "baja" | word == "bajos", "bajo", word)) %>%
+  mutate(word = ifelse(word == "banamex" | word == "banca" | word == "bancaria" | word == "bancarios" | word == "bancomer" | word == "bank" | word == "banorte" | word == "banquera" | word == "banquero" | word == "bancario" | word == "banrural" | word == "bbva", "banco", word)) %>%
+  mutate(word = ifelse(word == "becario" | word == "becas", "beca", word)) %>%
+  mutate(word = ifelse(word == "bellas" | word == "bellaza", "belleza", word)) %>%
+  mutate(word = ifelse(word == "biologa" | word == "biologo" | word == "bióloga" | word == "bioquímico", "biología", word)) %>%
+  mutate(word = ifelse(word == "bogega", "bodega", word)) %>%
+  mutate(word = ifelse(word == "bomberos", "bombero", word)) %>%
+  mutate(word = ifelse(word == "boxeadora", "boxeador", word)) %>%
+  mutate(word = ifelse(word == "brigadas" | word == "brigadista", "brigada", word)) %>%
+  mutate(word = ifelse(word == "básica" | word == "básicas", "básico", word))
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word) %>% 
+  filter(substr(word, 1, 1) == "r")
+
+```
+
+```{r}
+tidy_prof_21 <-tidy_prof_21 %>%
+  mutate(word = ifelse(word == "seccional" | word == "seccion" | word == "subsección", "sección", word)) %>%
+  mutate(word = ifelse(word == "secundarias", "secundaria", word)) %>%
+  mutate(word = ifelse(word == "secetaria" | word == "secretaria" | word == "secretario" | word == "secretarios" | word == "secrretario" | word == "seretaria" | word == "subsecretaria" | word == "subsecretario" | word == "subsecretaría" | word == "ecretaria", "secretaría", word)) %>%
+  mutate(word = ifelse(word == "sectores", "sector", word)) %>%
+  mutate(word = ifelse(word == "seguiridad", "seguridad", word)) %>%
+  mutate(word = ifelse(word == "senadora" | word == "senado", "senador", word)) %>%
+  mutate(word = ifelse(word == "servicios", "servicio", word)) %>%
+  mutate(word = ifelse(word == "servidora" | word == "servidores" | word == "servirdor", "servidor", word)) %>%
+  mutate(word = ifelse(word == "sexualidad", "sexual", word)) %>%
+  mutate(word = ifelse(word == "sindicalista" | word == "sindical" | word == "sindicaro" | word == "sindicalizado", "sindicato", word)) %>%
+  mutate(word = ifelse(word == "sistemas", "sistema", word)) %>%
+  mutate(word = ifelse(word == "sitios", "sitio", word)) %>%
+  mutate(word = ifelse(word == "sociales", "social", word)) %>%
+  mutate(word = ifelse(word == "socio" | word == "socia", "sociedad", word)) %>%
+  mutate(word = ifelse(word == "sociologa" | word == "sociologo" | word == "socióloga" | word == "sociólogo", "sociología", word)) %>%
+  mutate(word = ifelse(word == "solidarios" | word == "solidaria", "solidaridad", word)) %>%
+  mutate(word = ifelse(word == "sonorense", "sonora", word)) %>%
+  mutate(word = ifelse(word == "subcoordinador", "sonora", word)) %>%
+  mutate(word = ifelse(word == "subdelegación" | word == "subdelegada" | word == "subdelegado", "delegación", word)) %>%
+  mutate(word = ifelse(word == "subdirector" | word == "subdirectora", "director", word)) %>%
+  mutate(word = ifelse(word == "subgerente", "gerente", word)) %>%
+  mutate(word = ifelse(word == "subjefa", "jefe", word)) %>%
+  mutate(word = ifelse(word == "subprocidadora" | word == "subprocurador", "procurador", word)) %>%
+  mutate(word = ifelse(word == "subtesorero", "tesorero", word)) %>%
+  mutate(word = ifelse(word == "superiores", "superior", word)) %>%
+  mutate(word = ifelse(word == "supervisor" | word == "supervisora", "supervisión", word)) %>%
+  mutate(word = ifelse(word == "síndica" | word == "sindico", "síndico", word)) %>%
+  mutate(word = ifelse(word == "sustentabilidad" | word == "sustentable" | word == "sustentables", "ambiental", word)) 
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word) %>% 
+  filter(substr(word, 1, 1) == "s")
+
+```
+
+```{r}
+# tidy_prof_21 <-tidy_prof_21 %>%
+#   mutate(word = ifelse(word == "bachilleraro" | word == "bachilleres", "bachillerato", word)) %>%
+#   mutate(word = ifelse(word == "baja" | word == "bajos", "bajo", word)) %>%
+#   mutate(word = ifelse(word == "banamex" | word == "banca" | word == "bancaria" | word == "bancarios" | word == "bancomer" | word == "bank" | word == "banorte" | word == "banquera" | word == "banquero" | word == "bancario" | word == "banrural" | word == "bbva", "banco", word)) %>%
+#   mutate(word = ifelse(word == "becario" | word == "becas", "beca", word)) %>%
+#   mutate(word = ifelse(word == "bellas" | word == "bellaza", "belleza", word)) %>%
+#   mutate(word = ifelse(word == "biologa" | word == "biologo" | word == "bióloga" | word == "bioquímico", "biología", word)) %>% 
+#   mutate(word = ifelse(word == "bogega", "bodega", word)) %>% 
+#   mutate(word = ifelse(word == "bomberos", "bombero", word)) %>% 
+#   mutate(word = ifelse(word == "boxeadora", "boxeador", word)) %>%
+#   mutate(word = ifelse(word == "brigadas" | word == "brigadista", "brigada", word)) %>%
+#   mutate(word = ifelse(word == "básica" | word == "básicas", "básico", word))
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word) %>% 
+  filter(substr(word, 1, 1) == "t")
+
+```
+
+```{r}
+# tidy_prof_21 <-tidy_prof_21 %>%
+#   mutate(word = ifelse(word == "bachilleraro" | word == "bachilleres", "bachillerato", word)) %>%
+#   mutate(word = ifelse(word == "baja" | word == "bajos", "bajo", word)) %>%
+#   mutate(word = ifelse(word == "banamex" | word == "banca" | word == "bancaria" | word == "bancarios" | word == "bancomer" | word == "bank" | word == "banorte" | word == "banquera" | word == "banquero" | word == "bancario" | word == "banrural" | word == "bbva", "banco", word)) %>%
+#   mutate(word = ifelse(word == "becario" | word == "becas", "beca", word)) %>%
+#   mutate(word = ifelse(word == "bellas" | word == "bellaza", "belleza", word)) %>%
+#   mutate(word = ifelse(word == "biologa" | word == "biologo" | word == "bióloga" | word == "bioquímico", "biología", word)) %>% 
+#   mutate(word = ifelse(word == "bogega", "bodega", word)) %>% 
+#   mutate(word = ifelse(word == "bomberos", "bombero", word)) %>% 
+#   mutate(word = ifelse(word == "boxeadora", "boxeador", word)) %>%
+#   mutate(word = ifelse(word == "brigadas" | word == "brigadista", "brigada", word)) %>%
+#   mutate(word = ifelse(word == "básica" | word == "básicas", "básico", word))
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word) %>% 
+  filter(substr(word, 1, 1) == "u")
+
+```
+
+
+```{r}
+# tidy_prof_21 <-tidy_prof_21 %>%
+#   mutate(word = ifelse(word == "bachilleraro" | word == "bachilleres", "bachillerato", word)) %>%
+#   mutate(word = ifelse(word == "baja" | word == "bajos", "bajo", word)) %>%
+#   mutate(word = ifelse(word == "banamex" | word == "banca" | word == "bancaria" | word == "bancarios" | word == "bancomer" | word == "bank" | word == "banorte" | word == "banquera" | word == "banquero" | word == "bancario" | word == "banrural" | word == "bbva", "banco", word)) %>%
+#   mutate(word = ifelse(word == "becario" | word == "becas", "beca", word)) %>%
+#   mutate(word = ifelse(word == "bellas" | word == "bellaza", "belleza", word)) %>%
+#   mutate(word = ifelse(word == "biologa" | word == "biologo" | word == "bióloga" | word == "bioquímico", "biología", word)) %>% 
+#   mutate(word = ifelse(word == "bogega", "bodega", word)) %>% 
+#   mutate(word = ifelse(word == "bomberos", "bombero", word)) %>% 
+#   mutate(word = ifelse(word == "boxeadora", "boxeador", word)) %>%
+#   mutate(word = ifelse(word == "brigadas" | word == "brigadista", "brigada", word)) %>%
+#   mutate(word = ifelse(word == "básica" | word == "básicas", "básico", word))
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word) %>% 
+  filter(substr(word, 1, 1) == "v")
+
+```
+
+
+```{r}
+# tidy_prof_21 <-tidy_prof_21 %>%
+#   mutate(word = ifelse(word == "bachilleraro" | word == "bachilleres", "bachillerato", word)) %>%
+#   mutate(word = ifelse(word == "baja" | word == "bajos", "bajo", word)) %>%
+#   mutate(word = ifelse(word == "banamex" | word == "banca" | word == "bancaria" | word == "bancarios" | word == "bancomer" | word == "bank" | word == "banorte" | word == "banquera" | word == "banquero" | word == "bancario" | word == "banrural" | word == "bbva", "banco", word)) %>%
+#   mutate(word = ifelse(word == "becario" | word == "becas", "beca", word)) %>%
+#   mutate(word = ifelse(word == "bellas" | word == "bellaza", "belleza", word)) %>%
+#   mutate(word = ifelse(word == "biologa" | word == "biologo" | word == "bióloga" | word == "bioquímico", "biología", word)) %>% 
+#   mutate(word = ifelse(word == "bogega", "bodega", word)) %>% 
+#   mutate(word = ifelse(word == "bomberos", "bombero", word)) %>% 
+#   mutate(word = ifelse(word == "boxeadora", "boxeador", word)) %>%
+#   mutate(word = ifelse(word == "brigadas" | word == "brigadista", "brigada", word)) %>%
+#   mutate(word = ifelse(word == "básica" | word == "básicas", "básico", word))
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word) %>% 
+  filter(substr(word, 1, 1) == "w")
+
+```
+
+
+
+```{r}
+# tidy_prof_21 <-tidy_prof_21 %>%
+#   mutate(word = ifelse(word == "bachilleraro" | word == "bachilleres", "bachillerato", word)) %>%
+#   mutate(word = ifelse(word == "baja" | word == "bajos", "bajo", word)) %>%
+#   mutate(word = ifelse(word == "banamex" | word == "banca" | word == "bancaria" | word == "bancarios" | word == "bancomer" | word == "bank" | word == "banorte" | word == "banquera" | word == "banquero" | word == "bancario" | word == "banrural" | word == "bbva", "banco", word)) %>%
+#   mutate(word = ifelse(word == "becario" | word == "becas", "beca", word)) %>%
+#   mutate(word = ifelse(word == "bellas" | word == "bellaza", "belleza", word)) %>%
+#   mutate(word = ifelse(word == "biologa" | word == "biologo" | word == "bióloga" | word == "bioquímico", "biología", word)) %>% 
+#   mutate(word = ifelse(word == "bogega", "bodega", word)) %>% 
+#   mutate(word = ifelse(word == "bomberos", "bombero", word)) %>% 
+#   mutate(word = ifelse(word == "boxeadora", "boxeador", word)) %>%
+#   mutate(word = ifelse(word == "brigadas" | word == "brigadista", "brigada", word)) %>%
+#   mutate(word = ifelse(word == "básica" | word == "básicas", "básico", word))
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word) %>% 
+  filter(substr(word, 1, 1) == "x")
+
+```
+
+```{r}
+# tidy_prof_21 <-tidy_prof_21 %>%
+#   mutate(word = ifelse(word == "bachilleraro" | word == "bachilleres", "bachillerato", word)) %>%
+#   mutate(word = ifelse(word == "baja" | word == "bajos", "bajo", word)) %>%
+#   mutate(word = ifelse(word == "banamex" | word == "banca" | word == "bancaria" | word == "bancarios" | word == "bancomer" | word == "bank" | word == "banorte" | word == "banquera" | word == "banquero" | word == "bancario" | word == "banrural" | word == "bbva", "banco", word)) %>%
+#   mutate(word = ifelse(word == "becario" | word == "becas", "beca", word)) %>%
+#   mutate(word = ifelse(word == "bellas" | word == "bellaza", "belleza", word)) %>%
+#   mutate(word = ifelse(word == "biologa" | word == "biologo" | word == "bióloga" | word == "bioquímico", "biología", word)) %>% 
+#   mutate(word = ifelse(word == "bogega", "bodega", word)) %>% 
+#   mutate(word = ifelse(word == "bomberos", "bombero", word)) %>% 
+#   mutate(word = ifelse(word == "boxeadora", "boxeador", word)) %>%
+#   mutate(word = ifelse(word == "brigadas" | word == "brigadista", "brigada", word)) %>%
+#   mutate(word = ifelse(word == "básica" | word == "básicas", "básico", word))
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word) %>% 
+  filter(substr(word, 1, 1) == "y")
+
+```
+
+```{r}
+# tidy_prof_21 <-tidy_prof_21 %>%
+#   mutate(word = ifelse(word == "bachilleraro" | word == "bachilleres", "bachillerato", word)) %>%
+#   mutate(word = ifelse(word == "baja" | word == "bajos", "bajo", word)) %>%
+#   mutate(word = ifelse(word == "banamex" | word == "banca" | word == "bancaria" | word == "bancarios" | word == "bancomer" | word == "bank" | word == "banorte" | word == "banquera" | word == "banquero" | word == "bancario" | word == "banrural" | word == "bbva", "banco", word)) %>%
+#   mutate(word = ifelse(word == "becario" | word == "becas", "beca", word)) %>%
+#   mutate(word = ifelse(word == "bellas" | word == "bellaza", "belleza", word)) %>%
+#   mutate(word = ifelse(word == "biologa" | word == "biologo" | word == "bióloga" | word == "bioquímico", "biología", word)) %>% 
+#   mutate(word = ifelse(word == "bogega", "bodega", word)) %>% 
+#   mutate(word = ifelse(word == "bomberos", "bombero", word)) %>% 
+#   mutate(word = ifelse(word == "boxeadora", "boxeador", word)) %>%
+#   mutate(word = ifelse(word == "brigadas" | word == "brigadista", "brigada", word)) %>%
+#   mutate(word = ifelse(word == "básica" | word == "básicas", "básico", word))
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word) %>% 
+  filter(substr(word, 1, 1) == "z")
+
+```
+
+
+
+```{r}
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  filter(n>9)
+```
+
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(purrr)
+
+# Create the expanded words tibble
+words_expanded <- tidy_prof_21 %>%
+  group_by(word) %>%
+  summarise(n = n()) %>%
+  filter(n > 9) %>%
+  ungroup() %>%
+  mutate(word = map2(word, n, ~rep(.x, .y))) %>%
+  unnest(word) %>%
+  select(word) # Retain only the 'word' column
+
+# Convert the tibble to a character vector
+words_vector <- words_expanded$word
+
+# Concatenate the words with commas
+words_string <- paste(words_vector, collapse = ",")
+
+# Write the concatenated string to a file
+writeLines(words_string, "outfile.txt")
+
+
+```
+
+
+
+
+
+
+
+
+
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(purrr)
+
+# Create the expanded words tibble
+words_expanded <- tidy_prof_21 %>%
+  group_by(word) %>%
+  summarise(n = n()) %>%
+  arrange(desc(n)) %>% 
+  filter(n > 100) %>%
+  ungroup() %>%
+  mutate(word = map2(word, n, ~rep(.x, .y))) %>%
+  unnest(word) %>%
+  select(word) # Retain only the 'word' column
+
+# Convert the tibble to a character vector
+words_vector <- words_expanded$word
+
+# Concatenate the words with commas
+words_string <- paste(words_vector, collapse = ", ")
+
+# Write the concatenated string to a file
+writeLines(words_string, "./../word-cloud/data/palabras2021.txt")
+
+
+```
+
+
+
+
+
+
+
+
+

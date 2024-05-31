@@ -1,0 +1,93 @@
+"party_id","name","abbreviation","colors","area_id","coalition_id"
+,"Compromiso por Puebla","CPP","BLUE', 'ORANGE', 'RED'",267,
+,"Confianza por Quintana Roo","CQRoo","BLUE', 'PURPLE'",288,-1
+,"Frente por México","FM","PINK', 'WHITE'",1,
+,"Futuro Jalisco","FJ","DARK PURPLE'",196,
+5,"Independiente 1","C1","WHITE'",1144,-1
+6,"Independiente 2","C2","WHITE'",1145,-1
+7,"Independiente 3","C3","WHITE'",1146,-1
+8,"Independiente 4","C4","WHITE'",77,-1
+9,"Independiente 5","C5","WHITE'",421,-1
+,"Independiente 6","C6","WHITE'",,
+,"Independiente 7","C7","WHITE'",,
+,"Independiente 8","C8","WHITE'",,
+,"Independiente 9","C9","WHITE'",,
+,"Independiente 10","C10","WHITE'",,
+,"Independiente 11","C11","WHITE'",,
+,"Independiente 12","C12","WHITE'",,
+,"Independiente 13","C13","WHITE'",,
+,"Independiente 14","C14","WHITE'",,
+,"Independiente 15","C15","WHITE'",,
+,"Movimiento Auténtico Social","MAS","PURPLE'",288,
+21,"Movimiento Ciudadano","MC","ORANGE'",1,-1
+22,"Movimiento de Regeneración Nacional","Morena","RED'",1,60
+,"Movimiento Dignidad Zacatecas","MDZ","RED', 'GREEN'",370,
+,"Movimiento Levántate para Nayarit","MLN","PINK', 'YELLOW'",237,
+25,"Nueva Alianza","PANAL","BLUE'",1,-1
+26,"Pacto Social de Integración","PSI","RED', 'ORANGE'",267,-1
+27,"Partido Acción Nacional","PAN","BLUE', 'WHITE'",1,59
+,"Partido Alianza Ciudadana","PAC","GREEN', 'BLUE', 'WHITE'",333,
+,"Partido Armonía","PA","PURPLE'",231,
+,"Partido Baja California Sur Coherente","PBSC","BROWN'",17,
+,"Partido Bienestar Ciudadano","PBC","BLUE', 'PURPLE'",231,
+,"Partido Cardenista","PC","BLACK', 'RED'",343,
+33,"Partido Chiapas Unido","PCU","YELLOW', 'GREEN', 'RED', 'BLUE'",1153,-1
+34,"Partido Conciencia Popular","PCP","ORANGE'",295,-1
+,"Partido de Baja California","PBCal","ORANGE', 'GREEN'",7,
+,"Partido de la Revolución Coahuilense","PRC","PINK', 'ORANGE'",48,
+37,"Partido de la Revolución Democrática","PRD","YELLOW', 'BLACK'",1,59
+,"Partido de Renovación Sudcaliforniana","PRS","RED', 'BLACK'",17,
+39,"Partido del Pueblo","PPu","RED', 'WHITE', 'BLACK'",370,-1
+40,"Partido del Trabajo","PT","RED', 'YELLOW'",1,60
+,"Partido Duranguense","PD","PINK', 'GREEN'",103,
+,"Partido Emiliano Zapata","PEZ","GREEN'",48,
+,"Partido Encuentro Social","PES","BLUE', 'WHITE'",1,
+44,"Partido Encuentro Solidario","PESol","PURPLE', 'WHITE'",1,-1
+,"Partido Equidad, Libertad y Género","PELG","PINK', 'WHITE'",38,
+,"Partido Fuerza Morelos","PFM","RED', 'BLUE', 'YELLOW'",231,
+,"Partido Fuerza Social por México","FxM","RED', 'GREEN', 'BLUE', 'YELLOW'",1,
+,"Partido Futuro","PF","PURPLE'",231,
+,"Partido Hagamos","H","PURPLE', 'WHITE'",196,
+50,"Partido Humanista","PH","PURPLE'",1144,-1
+,"Partido Impacto Social SI","SI","RED'",333,
+,"Partido la Familia Primero","PFP","GREEN', 'RED', 'PURPLE'",370,
+,"Partido Libre de Aguascalientes","PLA","BLUE', 'GREEN'",2,
+54,"Partido Más Apoyo Social","PAS","GREEN', 'YELLOW'",231,-1
+,"Partido Más por Hidalgo","PMH","BLACK', 'PURPLE', 'BLUE'",188,
+,"Partido Morelos Progresa","PMP","PURPLE', 'GREEN', 'PINK'",231,
+,"Partido Movimiento Alternativa Social","PMAS","PINK', 'WHITE'",231,
+,"Partido para Desarrollar Zacatecas","PAZ","PINK', 'WHITE'",370,
+,"Partido Podemos","PP","PURPLE'",103,-1
+60,"Partido Redes Sociales Progresistas","RSP","RED', 'GRAY', 'Gray Black",1,-1
+61,"Partido Revolucionario Institucional","PRI","RED', 'WHITE','GREEN'",1,59
+,"Partido Sinaloense","PAS","PURPLE'",304,
+,"Partido Socialdemócrata de Morelos","PSD","ORANGE'",231,
+,"Partido Socialista","PS","RED'",333,
+,"Partido Somos","PS","YELLOW', 'PINK', 'BLUE'",196,
+66,"Partido Unidad Popular","PUP","GREEN', 'RED'",256,-1
+,"Partido Unido","PU","PURPLE', 'YELLOW',",48,-1
+,"Partido Unidos Podemos Más","UP","YELLOW', 'BLACK', 'BLUE', 'RED'",2,
+69,"Partido Verde Ecologista de México","PVEM","GREEN'",1,60
+70,"Podemos Mover a Chiapas","PMC","PURPLE', 'YELLOW',",1153,-1
+71,"Popular Chiapaneco","PPCH","RED', 'YELLOW'",1153,-1
+,"Querétaro Independiente","QI","PURPLE'",283,
+,"Renovación Política Morelense","RPM","GREEN', 'YELLOW'",231,
+,"Todos por Veracruz","TV","PURPLE', 'PINK'",343,
+,"Unidad Ciudadana","UC","PURPLE', 'PINK'",343,
+,"Unidad Democrática de Coahuila","UDC","ORANGE'",48,
+,"Visión y Valores en Acción","VIVA","YELLOW'",237,
+,"Partido Humanista de Morelos","PH","Purple'",232,
+,"Asociación Parlamentaria Ciudadana","APC","PURPLE'",63,
+80,"Fuerza Por México","FPM",,1,-1
+81,"Vida Nuevo León","Vida NL",,244,-1
+82,"Esperanza Social Nuevo Leon","ESO",,244,-1
+83,"México Avanza","MA",,163,-1
+84,"Movimiento Laborista Guerrero","MLG",,163,-1
+85,"Movimiento Laborista Baja California Sur","MLBCS",,1155,-1
+86,"Partido Querétaro Seguro","PQS",,290,-1
+87,"Tiempo por Mexico","TxM",,219,-1
+88,"Más Michoacán","MM",,219,-1
+89,"Michoacán Primero","MP",,219,-1
+90,"Partido Sonorense","PSon",,315,-1
+91,"México Republicano Chihuahua","MRC",,21,-1
+92,"Partido Mujer","PM",,257,-1

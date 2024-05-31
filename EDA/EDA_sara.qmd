@@ -1,0 +1,1825 @@
+---
+title: "EDA_sara"
+format: html
+editor: source
+---
+
+# EDA
+
+## Bibliotecas
+
+```{r message=FALSE}
+library(networkD3)
+library(tidyverse)
+library(patchwork)
+library(tidytext)
+library(udpipe)
+```
+
+## Leer datos
+
+```{r}
+elecciones_2021 <- read.csv("./../data/Elecciones MX 2021 - Captura - TODOS.csv") %>% filter(!is.null(person_id)) %>% filter(person_id!="NA")
+# elecciones_2024 <- read.csv("./../data/Elecciones MX 2024 - Captura - Captura.csv") %>% filter(!is.null(person_id)) %>% filter(person_id!="NA")
+elecciones_2024 <- read.csv("./../data/24may/Elecciones MX 2024 - Captura - Captura.csv") %>% filter(!is.null(person_id)) %>% filter(person_id!="NA")
+elecciones_2022 <- read.csv("./../data/Gobernantes MX 2022 - Captura - TODOS.csv") %>% filter(!is.null(person_id)) %>% filter(person_id!="NA")
+elecciones_2024 %>% filter(state=="Ciudad de México") %>% select(gender, full_name)
+```
+
+## Revisar variables
+
+```{r}
+glimpse(elecciones_2021)
+# unique(elecciones_2021$role_type)
+# unique(elecciones_2021$contest)
+```
+
+```{r}
+glimpse(elecciones_2022)
+# unique(elecciones_2022$role_type)
+```
+
+
+```{r}
+# elecciones_2021 %>% filter(!is.null(person_id))
+glimpse(elecciones_2024)
+# unique(elecciones_2024$role_type)
+# unique(elecciones_2021$contest)
+```
+
+
+**ojo hay varios person_id y role_type**
+
+# Por genero
+
+```{r}
+elecciones_2021 %>% group_by(gender) %>%  summarise(cantidad=n()) %>% 
+  mutate(porcentaje=cantidad/nrow(elecciones_2021)*100)
+
+elecciones_2022 %>% group_by(gender) %>%  summarise(cantidad=n()) %>% 
+  mutate(porcentaje=cantidad/nrow(elecciones_2022)*100)
+
+elecciones_2024 <- elecciones_2024 %>% 
+  mutate(gender = ifelse(gender == "F ", "F", gender)) %>% 
+  mutate(gender= ifelse(full_name == "Rosalia M. Ortiz Fragoso" , "F", gender)) %>% 
+  mutate(gender= ifelse(full_name == "Guadalupe Armida López Guerrero" , "F", gender)) %>% 
+  mutate(gender= ifelse(full_name == "Alfonso Jesús Martínez Alcázar" , "M", gender)) %>% 
+  mutate(gender= ifelse(full_name == "Carlos Torres Piña" , "M", gender)) %>% 
+  mutate(gender= ifelse(full_name == "Rene Valencia Reyes" , "M", gender)) %>% 
+  mutate(gender= ifelse(full_name == "Hector Ayala Morelos" , "M", gender)) %>% 
+  mutate(gender= ifelse(full_name == "Gisela Vazquez" , "F", gender)) %>% 
+  mutate(gender= ifelse(full_name == "Gilberto Pizarro Hernandez" , "M", gender))
+
+elecciones_2024 %>% group_by(gender) %>%  summarise(cantidad=n()) %>% 
+  mutate(porcentaje=cantidad/nrow(elecciones_2021)*100)
+
+
+elecciones_2024 %>% filter(gender=="")
+```
+
+**Se ha diversificado, hubo alguna ley o cuota de género??**
+
+**Porqué hay pocas mujeres en 2024???**
+
+**Los 8 que están vacío no parecen tener género indefinido, porqué no tienen género???**
+
+
+
+# Vivo o muerto
+
+```{r}
+elecciones_2021 %>% group_by(dead_or_alive) %>%  summarise(n())
+
+elecciones_2022 %>% group_by(dead_or_alive) %>%  summarise(n())
+
+elecciones_2024 <- elecciones_2024 %>% 
+  mutate(dead_or_alive = ifelse(dead_or_alive == "ALIVE" | dead_or_alive == "alive" | dead_or_alive == "Alive" | dead_or_alive == "Alive ", "Vivo", dead_or_alive))
+
+elecciones_2024 %>% group_by(dead_or_alive) %>%  summarise(n())
+```
+
+**Porqué hay tantos sin estatus de Vivo o Muerto??**
+
+# Cargo
+
+```{r}
+elecciones_2021 %>% group_by(role_type) %>%  summarise(n())
+
+elecciones_2022 <- elecciones_2022 %>%
+  mutate(role_type = ifelse(role_type == "governmentOfficer\n", "governmentOfficer", role_type))
+elecciones_2022 %>% group_by(role_type) %>%  summarise(n())
+
+elecciones_2024 <- elecciones_2024 %>%
+  mutate(role_type = ifelse(role_type == "deputyHeadOfGovernment", "headOfGovernment", role_type))
+elecciones_2024 %>% group_by(role_type) %>%  summarise(n())
+
+elecciones_2022 %>% filter(role_type=="headOfGovernment")
+elecciones_2024 %>% filter(role_type=="headOfGovernment")
+
+```
+
+**FALTA CAMBIARLO A ESPAÑOL**
+**Porqué está AMLO en el 2022 para presidente?????**
+
+# cargo completo
+
+```{r}
+# FALTA DIVIDIR ESTA EN VARIAS COLUMNAS DE CARGO Y LUGAR
+
+# unique(elecciones_2022$contest)
+```
+
+# Estado
+
+```{r}
+elecciones_2021 <- elecciones_2021 %>%
+  mutate(state = ifelse(state == "Veracruz", "Veracruz de Ignacio de la Llave", state)) %>%
+  mutate(state = ifelse(state == "Ciudad De México", "Ciudad de México", state))
+elecciones_2021 %>% group_by(state) %>%  summarise(n=n()) %>% arrange(desc(state))
+
+elecciones_2022 <- elecciones_2022 %>%
+  mutate(state = ifelse(state == "Veracruz", "Veracruz de Ignacio de la Llave", state)) %>%
+  mutate(state = ifelse(state == "Ciudad De México", "Ciudad de México", state))
+elecciones_2021 %>% group_by(state) %>%  summarise(n=n()) %>% arrange(desc(state))
+elecciones_2022 %>% group_by(state) %>%  summarise(n=n()) %>% arrange(desc(state))
+
+elecciones_2024 <- elecciones_2024 %>%
+  mutate(state = ifelse(state == "Veracruz", "Veracruz de Ignacio de la Llave", state)) %>%
+  mutate(state = ifelse(state == "Ciudad De México", "Ciudad de México", state))
+elecciones_2021 %>% group_by(state) %>%  summarise(n=n()) %>% arrange(desc(state))
+elecciones_2024 %>% group_by(state) %>%  summarise(n=n()) %>% arrange(desc(state))
+```
+
+
+
+# Partido
+
+**ojo, solo la ultima tabla tiene la variable party**
+```{r}
+elecciones_2021 <- elecciones_2021 %>%
+  mutate(abbreviation = toupper(abbreviation)) %>% 
+  mutate(abbreviation = ifelse(abbreviation %in% c("C1", "C2", "C3", "C4", "C5"), "Candidato Independiente", abbreviation)) %>%
+  mutate(abbreviation = ifelse(!abbreviation %in% c("PVEM", "PT", "PRI", "PRD", "PAN", "PESOL", "MORENA", "MC", "PES", "PELG", "PANAL"), "OTRO", abbreviation))
+elecciones_2021 %>% group_by(abbreviation) %>%  summarise(n=n()) %>% arrange(desc(abbreviation))
+
+elecciones_2022 <- elecciones_2022  %>%
+  mutate(abbreviation = toupper(abbreviation)) %>% 
+  mutate(abbreviation = ifelse(abbreviation %in% c("C1", "C2", "C3", "C4", "C5"), "Candidato Independiente", abbreviation)) %>%
+  mutate(abbreviation = ifelse(!abbreviation %in% c("PVEM", "PT", "PRI", "PRD", "PAN", "PESOL", "MORENA", "MC", "PES", "PELG", "PANAL"), "OTRO", abbreviation))
+elecciones_2022 %>% group_by(abbreviation) %>%  summarise(n=n()) %>% arrange(desc(abbreviation))
+
+elecciones_2024 <- elecciones_2024  %>%
+  mutate(abbreviation = toupper(abbreviation)) %>% 
+  mutate(abbreviation = ifelse(abbreviation %in% c("C1", "C2", "C3", "C4", "C5"), "Candidato Independiente", abbreviation)) %>%
+  mutate(abbreviation = ifelse(!abbreviation %in% c("PVEM", "PT", "PRI", "PRD", "PAN", "PESOL", "MORENA", "MC", "PES", "PELG", "PANAL"), "OTRO", abbreviation))
+elecciones_2024 %>% group_by(abbreviation) %>%  summarise(n=n()) %>% arrange(desc(abbreviation))
+```
+
+**Son muchos partidos pensar cómo agruparlos, y porque son tantos???**
+
+**FALTA MUCHA LIMPIEZA**
+
+
+# Coalición
+
+```{r}
+elecciones_2021 %>% group_by(coalition) %>%  summarise(n=n()) %>% arrange(desc(n))
+
+elecciones_2022 %>% group_by(coalition) %>%  summarise(n=n()) %>% arrange(desc(n))
+
+# elecciones_2024 <- elecciones_2024 %>% 
+#   mutate(dead_or_alive = ifelse(dead_or_alive == "ALIVE" | dead_or_alive == "alive" | dead_or_alive == "Alive" | dead_or_alive == "Alive ", "Vivo", dead_or_alive))
+
+elecciones_2024 %>% group_by(coalition) %>%  summarise(n=n()) %>% arrange(desc(n))
+```
+
+**También muchas de estas se pueden agrupar???? o no??**
+
+# nivel de estudios
+
+```{r}
+elecciones_2021 %>% group_by(last_degree_of_studies) %>%  summarise(n=n()) %>% arrange(desc(n))
+
+elecciones_2022 <- elecciones_2022 %>%
+  mutate(last_degree_of_studies = ifelse(last_degree_of_studies == "master Degree", "Master Degree", last_degree_of_studies))
+elecciones_2022 %>% group_by(last_degree_of_studies) %>%  summarise(n=n()) %>% arrange(desc(n))
+
+elecciones_2024 <- elecciones_2024 %>%
+  mutate(last_degree_of_studies = ifelse(last_degree_of_studies == "MASTER DEGREE", "Master Degree", last_degree_of_studies)) %>% 
+  mutate(last_degree_of_studies = ifelse(last_degree_of_studies == "BACHELOR’S DEGREE", "Bachelor’s Degree", last_degree_of_studies)) %>% 
+  mutate(last_degree_of_studies = ifelse(last_degree_of_studies == "HIGH SCHOOL", "High School", last_degree_of_studies)) %>% 
+  mutate(last_degree_of_studies = ifelse(last_degree_of_studies == "ELEMENTARY", "Elementary", last_degree_of_studies)) %>% 
+  mutate(last_degree_of_studies = ifelse(last_degree_of_studies == "PHD DEGREE", "PhD Degree", last_degree_of_studies)) %>% 
+  mutate(last_degree_of_studies = ifelse(last_degree_of_studies == "ASSOCIATE DEGREE", "Associate Degree", last_degree_of_studies)) %>% 
+  mutate(last_degree_of_studies = ifelse(last_degree_of_studies == "UNIVERSITY 1ST PROFESSIONAL DEGREE", "University 1st Professional Degree", last_degree_of_studies)) 
+elecciones_2024 %>% group_by(last_degree_of_studies) %>%  summarise(n=n()) %>% arrange(desc(n))
+```
+
+**Los vacíos son primaria incompleta??? o no dijeron qué?**
+
+
+
+```{r}
+elecciones_2021 %>%
+  ggplot(aes(x = last_degree_of_studies)) +
+  geom_bar(fill = "skyblue", color = "black") +
+  labs(title = "Distribution of Last Degrees of Studies",
+       x = "Last Degree of Studies",
+       y = "Count")+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+
+```{r}
+elecciones_2022 %>%
+  ggplot(aes(x = last_degree_of_studies)) +
+  geom_bar(fill = "skyblue", color = "black") +
+  labs(title = "Distribution of Last Degrees of Studies",
+       x = "Last Degree of Studies",
+       y = "Count")+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+```{r}
+elecciones_2024 %>%
+  ggplot(aes(x = last_degree_of_studies)) +
+  geom_bar(fill = "skyblue", color = "black") +
+  labs(title = "Distribution of Last Degrees of Studies",
+       x = "Last Degree of Studies",
+       y = "Count")+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+
+
+# profesion
+
+```{r}
+elecciones_2021 %>% group_by(profession_1) %>%  summarise(n=n()) %>% arrange(desc(n))
+
+elecciones_2022 %>% group_by(profession_1) %>%  summarise(n=n()) %>% arrange(desc(n))
+
+elecciones_2024 %>% group_by(profession_1) %>%  summarise(n=n()) %>% arrange(desc(n))
+```
+
+```{r}
+elecciones_2021 %>% group_by(profession_2) %>%  summarise(n=n()) %>% arrange(desc(n))
+
+elecciones_2022 %>% group_by(profession_2) %>%  summarise(n=n()) %>% arrange(desc(n))
+
+elecciones_2024 %>% group_by(profession_2) %>%  summarise(n=n()) %>% arrange(desc(n))
+```
+
+
+```{r}
+elecciones_2021 %>% group_by(profession_3) %>%  summarise(n=n()) %>% arrange(desc(n))
+
+elecciones_2022 %>% group_by(profession_3) %>%  summarise(n=n()) %>% arrange(desc(n))
+
+elecciones_2024 %>% group_by(profession_3) %>%  summarise(n=n()) %>% arrange(desc(n))
+```
+
+```{r}
+elecciones_2021 %>% group_by(profession_4) %>%  summarise(n=n()) %>% arrange(desc(n))
+
+elecciones_2022 %>% group_by(profession_4) %>%  summarise(n=n()) %>% arrange(desc(n))
+
+elecciones_2024 %>% group_by(profession_4) %>%  summarise(n=n()) %>% arrange(desc(n))
+```
+
+```{r}
+elecciones_2021 %>% group_by(profession_5) %>%  summarise(n=n()) %>% arrange(desc(n))
+
+elecciones_2022 %>% group_by(profession_5) %>%  summarise(n=n()) %>% arrange(desc(n))
+
+elecciones_2024 %>% group_by(profession_5) %>%  summarise(n=n()) %>% arrange(desc(n))
+```
+
+```{r}
+elecciones_2021 %>% group_by(profession_6) %>%  summarise(n=n()) %>% arrange(desc(n))
+
+elecciones_2022 %>% group_by(profession_6) %>%  summarise(n=n()) %>% arrange(desc(n))
+
+elecciones_2024 %>% group_by(profession_6) %>%  summarise(n=n()) %>% arrange(desc(n))
+```
+
+**Idealmente pasar todo esto de las profesiones a onehot encoding**
+
+
+
+
+
+
+
+
+
+# Merge todos
+
+
+```{r}
+candidatos_2021_2024 <- 
+  merge(x = elecciones_2021, y = elecciones_2022, by = "person_id", suffixes = c("_2021", "_2022")) %>% 
+  merge(y = elecciones_2024, by = "person_id", suffixes = c("", "_2024"))
+
+#%>% select(full_name.x, abbreviation.x, contest.x, abbreviation.y, contest.y)
+```
+
+
+```{r}
+glimpse(candidatos_2021_2024)
+
+candidatos_2021_2024 %>% 
+  select(person_id, full_name_2021, abbreviation_2021, contest_2021, abbreviation_2022, contest_2022, abbreviation, contest) %>% 
+  arrange(person_id)
+```
+
+
+# Primer sankey
+
+
+
+```{r}
+sankey <- candidatos_2021_2024 %>% 
+  select(person_id, full_name_2021, abbreviation_2021, contest_2021, abbreviation_2022, contest_2022, abbreviation, contest) %>% 
+  mutate(abbreviation_2021=paste0(toupper(abbreviation_2021),"_2021"),
+         abbreviation_2022=paste0(toupper(abbreviation_2022),"_2022"),
+         abbreviation=paste0(toupper(abbreviation),"_2024")) %>% 
+  mutate(brinco2022 = paste(abbreviation_2021, abbreviation_2022),
+         brinco2024 = paste(abbreviation_2022, abbreviation)) %>% 
+  arrange(brinco2022)
+
+unique(sankey$abbreviation_2021)
+unique(sankey$abbreviation_2022)
+
+sankey %>% group_by(brinco2022) %>% summarise(n())
+sankey %>% group_by(brinco2024) %>% summarise(n())
+```
+
+
+```{r}
+links <- data.frame(
+  anio_2021=c("MC_2021", "MORENA_2021", "PAN_2021", "PRD_2021", "PRI_2021", "PT_2021", "PVEM_2021", "MC_2022", "MORENA_2022", "MORENA_2022", "MORENA_2022", "MORENA_2022", "MORENA_2022", "PAN_2022"   , "PAN_2022", "PAN_2022", "PAN_2022", "PRD_2022", "PRD_2022", "PRD_2022", "PRD_2022", "PRI_2022", "PRI_2022", "PRI_2022", "PRI_2022" , "PT_2022"    , "PT_2022", "PT_2022"  , "PVEM_2022", "PVEM_2022"),
+  cambios=  c("MC_2022", "MORENA_2022", "PAN_2022", "PRD_2022", "PRI_2022", "PT_2022", "PVEM_2022", "MC_2024", "C5_2024"    , "MC_2024"    , "MORENA_2024", "PT_2024"    , "PVEM_2024"  , "MORENA_2024", "PAN_2024",    "PRD_2024", "PRI_2024", "MC_2024" , "PAN_2024", "PRD_2024", "PRI_2024", "MC_2024" , "PAN_2024", "PRI_2024", "PVEM_2024", "MORENA_2024", "PT_2024", "PVEM_2024", "PAN_2024",  "PVEM_2024"),
+  num =     c(5,57,38,5,20,13,13,  5,1,1,42,7,6,1,35,1,1,  2,1,1,1,1,1,17,1,5,3,  5,2,11)
+)
+```
+
+
+```{r}
+# A connection data frame is a list of flows with intensity for each flow
+# links <- data.frame(
+#   source=c("group_A","group_A", "group_B", "group_C", "group_C", "group_E"), 
+#   target=c("group_C","group_D", "group_E", "group_F", "group_G", "group_H"), 
+#   value=c(2,3, 2, 3, 1, 3)
+#   )
+ 
+# From these flows we need to create a node data frame: it lists every entities involved in the flow
+nodes <- data.frame(
+  name=c(as.character(links$anio_2021), 
+  as.character(links$cambios)) %>% unique()
+)
+ 
+# With networkD3, connection must be provided using id, not using real name like in the links dataframe.. So we need to reformat it.
+links$IDsource <- match(links$anio_2021, nodes$name)-1 
+links$IDtarget <- match(links$cambios, nodes$name)-1
+ 
+# Make the Network
+p <- sankeyNetwork(Links = links, Nodes = nodes,
+              Source = "IDsource", Target = "IDtarget",
+              Value = "num", NodeID = "name", 
+              sinksRight=FALSE)
+p
+
+```
+
+
+# otro sankey
+
+```{r}
+candidatos_2021y2024 <- 
+  merge(x = elecciones_2021, y = elecciones_2024, by = "person_id", suffixes = c("_2021", "_2024"))
+```
+
+
+
+
+```{r}
+sankey <- candidatos_2021y2024 %>% 
+  select(person_id, full_name_2021, abbreviation_2021, contest_2021, abbreviation_2024, contest_2024) %>% 
+  mutate(abbreviation_2021=paste0(toupper(abbreviation_2021),"_2021"),
+         # abbreviation_2022=paste0(toupper(abbreviation_2022),"_2022"),
+         abbreviation_2024=paste0(toupper(abbreviation_2024),"_2024")) %>% 
+  mutate(brinco2024 = paste(abbreviation_2021, abbreviation_2024)) %>% 
+  arrange(brinco2024)
+
+unique(sankey$abbreviation_2021)
+# unique(sankey$abbreviation_2022)
+
+sankey_bueno<-sankey %>% group_by(brinco2024) %>% summarise(value=n())
+sankey_bueno<-sankey_bueno %>% 
+  separate(col = brinco2024, into = c("source","target"), sep = " ") %>% 
+  separate(col = source, into = c("source","anio_inicio"), sep = "_") %>% 
+  separate(col = target, into = c("target","anio_fin"), sep = "_") %>% 
+  select(source, target, value) %>% 
+  mutate(target=paste0(target," "))
+
+write.csv(sankey_bueno, "./../sankey/data/partidos.csv", row.names=FALSE)
+# source, target, value
+
+sankey_bueno
+```
+
+
+```{r}
+links <- data.frame(
+  anio_2021=c("C1_2021", "FXM_2021", "FXM_2021", "FXM_2021", "FXM_2021", "FXM_2021", "MC_2021", "MC_2021", "MC_2021", "MORENA_2021", 
+              "MORENA_2021", "MORENA_2021", "MORENA_2021", "MORENA_2021", "MORENA_2021", "PANAL_2021", "PAN_2021", "PAN_2021", "PAN_2021", "PAN_2021",
+              "PAN_2021", "PAN_2021", "PESOL_2021", "PRD_2021", "PRD_2021", "PRD_2021", "PRD_2021", "PRD_2021", "PRI_2021", "PRI_2021", 
+              "PRI_2021", "PRI_2021", "PRI_2021", "PRI_2021", "PT_2021", "PT_2021", "PT_2021", "PT_2021", "PVEM_2021", "PVEM_2021", 
+              "PVEM_2021", "RSP_2021", "RSP_2021"),
+  cambios=  c("MC_2024", "MC_2024", "PAN_2024", "PRD_2024", "PT_2024", "PVEM_2024", "MC_2024", "PAN_2024", "PRD_2024", "C5_2024",
+              "MC_2024", "MORENA_2024"    , "PQS_2024"  , "PT_2024", "PVEM_2024",    "MC_2024", "MC_2024", "MORENA_2024" , "PAN_2024", "PRD_2024",
+              "PRI_2024", "PVEM_2024" , "MC_2024", "MC_2024", "PAN_2024", "PRD_2024", "PRI_2024", "PVEM_2024", "MC_2024", "MORENA_2024",  
+              "PAN_2024", "PRD_2024", "PRI_2024", "PVEM_2024", "MC_2024", "MORENA_2024", "PT_2024", "PVEM_2024", "MC_2024", "PAN_2024", 
+              "PVEM_2024", "PAN_2024", "PT_2024"),
+  num =     c(2,1,1,1,2,1,23,6,1,1,     1,58,1,10,10,1,1,2,43,2,     3,1,1,4,1,4,4,1,2,2,     2,1,33,1,1,9,6,5,1,2,    14,1,1)
+)
+```
+
+
+
+```{r}
+# From these flows we need to create a node data frame: it lists every entities involved in the flow
+nodes <- data.frame(
+  name=c(as.character(links$anio_2021), 
+  as.character(links$cambios)) %>% unique()
+)
+ 
+# With networkD3, connection must be provided using id, not using real name like in the links dataframe.. So we need to reformat it.
+links$IDsource <- match(links$anio_2021, nodes$name)-1 
+links$IDtarget <- match(links$cambios, nodes$name)-1
+ 
+# Make the Network
+p <- sankeyNetwork(Links = links, Nodes = nodes,
+              Source = "IDsource", Target = "IDtarget",
+              Value = "num", NodeID = "name", 
+              sinksRight=FALSE)
+p
+
+```
+
+
+# otras ideas
+
+esta relacionado el cargo con el nivel de estudios
+
+
+```{r}
+ggplot(elecciones_2021, aes(x=role_type, fill=last_degree_of_studies)) +
+  geom_bar(position = "dodge")+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+```{r}
+ggplot(elecciones_2022, aes(x=role_type, fill=last_degree_of_studies)) +
+  geom_bar(position = "dodge")+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+```{r}
+ggplot(elecciones_2024, aes(x=role_type, fill=last_degree_of_studies)) +
+  geom_bar(position = "dodge") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+genero vs partido
+
+```{r}
+elecciones_2021 %>% 
+  ggplot(aes(x=gender, fill=abbreviation)) +
+  geom_bar(position = "dodge")+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+```{r}
+elecciones_2022 %>% 
+  ggplot(aes(x=gender, fill=abbreviation)) +
+  geom_bar(position = "dodge")+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+```{r}
+elecciones_2024 %>% 
+  ggplot(aes(x=gender, fill=abbreviation)) +
+  geom_bar(position = "dodge")+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+**Porque esta disparidad en 2024??**
+
+
+esta relacionada el partido con el nivel de estudios
+
+```{r}
+elecciones_2021 %>% 
+  ggplot(aes(x=last_degree_of_studies, fill=abbreviation)) +
+  geom_bar(position = "dodge")+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+sexo con grado
+
+```{r}
+elecciones_2021 %>% 
+  ggplot(aes(x=gender, fill=last_degree_of_studies)) +
+  geom_bar(position = "dodge")+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+```{r}
+elecciones_2021 %>% 
+  ggplot(aes(x=state, fill=abbreviation)) +
+  geom_bar(position = "dodge")+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+lugar con partido
+
+periodico, palabras, candidatos
+
+periodico, palabras, debate
+
+
+# revisar Cargo
+
+```{r}
+cargos_2021 <- elecciones_2021 %>% 
+  mutate(cargo = case_when(
+    startsWith(contest, "Diputación del Distrito Local") ~ "Diputación del Distrito Local",
+    startsWith(contest, "Gubernatura") ~ "Gubernatura",
+    startsWith(contest, "Senaduría") ~ "Senaduría",
+    startsWith(contest, "Alcaldia") ~ "Alcaldia",
+    startsWith(contest, "Presidencia del municipio") ~ "Presidencia del municipio",
+    startsWith(contest, "Diputación del Distrito Federal") ~ "Diputación del Distrito Federal",
+    TRUE ~ contest
+  )) %>% 
+  mutate(nivel = case_when(
+    cargo == "Alcaldia" | cargo == "Presidencia del municipio"  ~ "municipal",
+    cargo == "Diputación del Distrito Federal" | cargo == "Presidencia de la República Mexicana" | cargo == "Senaduría" ~ "federal",
+    TRUE ~ "estatal"
+  ))%>%
+  mutate(lugar = str_extract(contest, "(SINALOA|YUCATÁN|JALISCO|ZACATECAS|BAJA CALIFORNIA|NUEVO LEÓN|BAJA CALIFORNIA SUR|AGUASCALIENTES|VERACRUZ DE IGNACIO DE LA LLAVE|TLAXCALA|TABASCO|SAN LUIS POTOSÍ|QUINTANA ROO|QUERÉTARO|PUEBLA|OAXACA|NAYARIT|MICHOACÁN DE OCAMPO|ESTADO DE MÉXICO|GUERRERO|GUANAJUATO|DURANGO|COLIMA|COAHUILA DE ZARAGOZA|CHIHUAHUA|CHIAPAS|SONORA|TAMAULIPAS|MORELOS|CIUDAD DE MÉXICO|CAMPECHE|COLIMA|NAYARIT|ÁLVARO OBREGÓN|AZCAPOTZALCO|BENITO JUÁREZ|COYOACÁN|CUAUHTÉMOC|GUSTAVO A. MADERO|IZTACALCO|IZTAPALAPA|MIGUEL HIDALGO|MILPA ALTA|TLÁHUAC|TLALPAN|VENUSTIANO CARRANZA|XOCHIMILCO|ACAPULCO DE JUÁREZ|TORREÓN|TUXTLA GUTIÉRREZ|NEZAHUALCÓYOTL|TOLUCA|NAUCALPAN|CHIMALHUACÁN|TLALNEPANTLA DE BAZ|CUAUTITLÁN IZCALLI|TECÁMAC|IXTAPALUCA|ATIZAPÁN DE ZARAGOZA|TULTITLÁN|MONTERREY|TEPIC|CULIACÁN|SAN LUIS POTOSÍ|SALTILLO|MORELIA|TIJUANA|HERMOSILLO|GUADALAJARA|XALAPA|MEXICALI|MÉRIDA|LA PAZ|CUAUTLA|CUERNAVACA|EMILIANO ZAPATA|JIUTEPEC|TEMIXCO|ZAPOPAN|TLAJOMULCO DE ZÚÑIGA|SAN PEDRO TLAQUEPAQUE|CAJEME|NOGALES|SAN LUIS RÍO COLORADO|NAVOJOA|CALPULALPAN|HUAMANTLA|SAN PABLO DEL MONTE|APIZACO|CHIAUTEMPAN|FRESNILLO|RÍO GRANDE|LEÓN|CELAYA|ENSENADA|SALAMANCA|IRAPUATO|MANZANILLO|URUAPAN|GENERAL ENRIQUE ESTRADA|YÉCORA|SANTIAGO MARAVATÍO|SAN JUAN IHUALTEPEC|BOCOYNA|CHETUMAL|PUERTO VALLARTA|TONALÁ|CIUDAD JUÁREZ|ZAMORA|GÓMEZ PALACIO|GUADALUPE VICTORIA|GUAYMAS|LERDO|PUEBLO NUEVO|HIDALGO|TLAQUEPAQUE)$")) %>% 
+  mutate(estado = lugar) %>% 
+  mutate(estado = ifelse(estado == "ACAPULCO DE JUÁREZ", "GUERRERO", estado)) %>%
+  mutate(estado = ifelse(estado == "TORREÓN" | estado == "SALTILLO", "COAHUILA DE ZARAGOZA", estado)) %>%
+  mutate(estado = ifelse(estado == "TUXTLA GUTIÉRREZ", "CHIAPAS", estado)) %>%
+  mutate(estado = ifelse(estado == "NEZAHUALCÓYOTL" | estado == "TOLUCA" | estado == "NAUCALPAN" | estado == "CHIMALHUACÁN" | estado == "TLALNEPANTLA DE BAZ" | estado == "CUAUTITLÁN IZCALLI" | estado == "TECÁMAC" | estado == "IXTAPALUCA" | estado == "ATIZAPÁN DE ZARAGOZA" | estado == "TULTITLÁN", "ESTADO DE MÉXICO", estado)) %>%
+  mutate(estado = ifelse(estado == "TEPIC", "NAYARIT", estado)) %>%
+  mutate(estado = ifelse(estado == "CULIACÁN", "SINALOA", estado)) %>%
+  mutate(estado = ifelse(estado == "MORELIA" | estado == "URUAPAN" | estado == "ZAMORA", "MICHOACÁN DE OCAMPO", estado)) %>%
+  mutate(estado = ifelse(estado == "TIJUANA" | estado == "MEXICALI" | estado == "ENSENADA", "BAJA CALIFORNIA", estado)) %>%
+  mutate(estado = ifelse(estado == "HERMOSILLO" | estado == "CAJEME" | estado == "NOGALES" | estado == "SAN LUIS RÍO COLORADO" | estado == "NAVOJOA" | estado == "GUAYMAS" | estado == "YÉCORA", "SONORA", estado)) %>%
+  mutate(estado = ifelse(estado == "GUADALAJARA" | estado == "ZAPOPAN" | estado == "TLAJOMULCO DE ZÚÑIGA" | estado == "SAN PEDRO TLAQUEPAQUE" | estado == "PUERTO VALLARTA" | estado == "TONALÁ" | estado == "TLAQUEPAQUE", "JALISCO", estado)) %>%
+  mutate(estado = ifelse(estado == "XALAPA" | estado == "EMILIANO ZAPATA", "VERACRUZ DE IGNACIO DE LA LLAVE", estado)) %>%
+  mutate(estado = ifelse(estado == "MÉRIDA", "YUCATÁN", estado)) %>%
+  mutate(estado = ifelse(estado == "LA PAZ", "BAJA CALIFORNIA SUR", estado)) %>%
+  mutate(estado = ifelse(estado == "CUAUTLA" | estado == "CUERNAVACA" | estado == "JIUTEPEC" | estado == "TEMIXCO", "MORELOS", estado)) %>%
+  mutate(estado = ifelse(estado == "CALPULALPAN" | estado == "HUAMANTLA" | estado == "SAN PABLO DEL MONTE" | estado == "APIZACO" | estado == "CHIAUTEMPAN", "TLAXCALA", estado)) %>%
+  mutate(estado = ifelse(estado == "FRESNILLO" | estado == "RÍO GRANDE" | estado == "GENERAL ENRIQUE ESTRADA", "ZACATECAS", estado)) %>%
+  mutate(estado = ifelse(estado == "LEÓN" | estado == "CELAYA" | estado == "SALAMANCA" | estado == "IRAPUATO" | estado == "SANTIAGO MARAVATÍO" | estado == "PUEBLO NUEVO", "GUANAJUATO", estado)) %>%
+  mutate(estado = ifelse(estado == "BENITO JUÁREZ" & cargo=="Presidencia del municipio", "QUINTANA ROO", estado)) %>%
+  mutate(estado = ifelse(estado == "MANZANILLO", "COLIMA", estado)) %>%
+  mutate(estado = ifelse(estado == "SAN JUAN IHUALTEPEC", "OAXACA", estado)) %>%
+  mutate(estado = ifelse(estado == "BOCOYNA" | estado == "CIUDAD JUÁREZ", "CHIHUAHUA", estado)) %>%
+  mutate(estado = ifelse(estado == "CHETUMAL", "QUINTANA ROO", estado)) %>%
+  mutate(estado = ifelse(estado == "GÓMEZ PALACIO" | estado == "LERDO", "DURANGO", estado)) %>%
+  mutate(estado = ifelse(estado == "GUADALUPE VICTORIA", "PUEBLA", estado)) %>%
+  mutate(estado = ifelse(estado == "MONTERREY", "NUEVO LEÓN", estado)) %>%
+  mutate(estado = ifelse(cargo == "Alcaldia", "CIUDAD DE MÉXICO", estado))
+```
+
+```{r}
+cargos_2021 %>% group_by(cargo, nivel) %>% summarise(cantidad=n()) %>% arrange(nivel)
+cargos_2021 %>% group_by(estado, nivel) %>% summarise(n()) %>% pivot_wider(names_from = nivel, values_from = "n()")
+cargos_2021 %>% filter(is.na(estado))
+cargos_2021 %>% filter(cargo=="Gubernatura")
+```
+
+
+```{r}
+cargos_2022 <- elecciones_2022 %>% 
+  mutate(cargo = case_when(
+    startsWith(contest, "Diputación del Distrito Local") ~ "Diputación del Distrito Local",
+    startsWith(contest, "Gubernatura") ~ "Gubernatura",
+    startsWith(contest, "Senaduría") ~ "Senaduría",
+    startsWith(contest, "Alcaldia") ~ "Alcaldia",
+    startsWith(contest, "Presidencia del municipio") ~ "Presidencia del municipio",
+    startsWith(contest, "Diputación del Distrito Federal") ~ "Diputación del Distrito Federal",
+    TRUE ~ contest
+  )) %>% 
+  mutate(nivel = case_when(
+    cargo == "Alcaldia" | cargo == "Presidencia del municipio"  ~ "municipal",
+    cargo == "Diputación del Distrito Federal" | cargo == "Presidencia de la República Mexicana" | cargo == "Senaduría" ~ "federal",
+    TRUE ~ "estatal"
+  ))%>%
+  mutate(lugar = str_extract(contest, "(SINALOA|YUCATÁN|JALISCO|ZACATECAS|BAJA CALIFORNIA|NUEVO LEÓN|BAJA CALIFORNIA SUR|AGUASCALIENTES|VERACRUZ DE IGNACIO DE LA LLAVE|TLAXCALA|TABASCO|SAN LUIS POTOSÍ|QUINTANA ROO|QUERÉTARO|PUEBLA|OAXACA|NAYARIT|MICHOACÁN DE OCAMPO|ESTADO DE MÉXICO|GUERRERO|GUANAJUATO|DURANGO|COLIMA|COAHUILA DE ZARAGOZA|CHIHUAHUA|CHIAPAS|SONORA|TAMAULIPAS|MORELOS|CIUDAD DE MÉXICO|CAMPECHE|COLIMA|NAYARIT|ÁLVARO OBREGÓN|AZCAPOTZALCO|BENITO JUÁREZ|COYOACÁN|CUAUHTÉMOC|GUSTAVO A. MADERO|IZTACALCO|IZTAPALAPA|MIGUEL HIDALGO|MILPA ALTA|TLÁHUAC|TLALPAN|VENUSTIANO CARRANZA|XOCHIMILCO|ACAPULCO DE JUÁREZ|TORREÓN|TUXTLA GUTIÉRREZ|NEZAHUALCÓYOTL|TOLUCA|NAUCALPAN|CHIMALHUACÁN|TLALNEPANTLA DE BAZ|CUAUTITLÁN IZCALLI|TECÁMAC|IXTAPALUCA|ATIZAPÁN DE ZARAGOZA|TULTITLÁN|MONTERREY|TEPIC|CULIACÁN|SAN LUIS POTOSÍ|SALTILLO|MORELIA|TIJUANA|HERMOSILLO|GUADALAJARA|XALAPA|MEXICALI|MÉRIDA|LA PAZ|CUAUTLA|CUERNAVACA|EMILIANO ZAPATA|JIUTEPEC|TEMIXCO|ZAPOPAN|TLAJOMULCO DE ZÚÑIGA|SAN PEDRO TLAQUEPAQUE|CAJEME|NOGALES|SAN LUIS RÍO COLORADO|NAVOJOA|CALPULALPAN|HUAMANTLA|SAN PABLO DEL MONTE|APIZACO|CHIAUTEMPAN|FRESNILLO|RÍO GRANDE|LEÓN|CELAYA|ENSENADA|SALAMANCA|IRAPUATO|MANZANILLO|URUAPAN|GENERAL ENRIQUE ESTRADA|YÉCORA|SANTIAGO MARAVATÍO|SAN JUAN IHUALTEPEC|BOCOYNA|CHETUMAL|PUERTO VALLARTA|TONALÁ|CIUDAD JUÁREZ|ZAMORA|GÓMEZ PALACIO|GUADALUPE VICTORIA|GUAYMAS|LERDO|PUEBLO NUEVO|HIDALGO)$")) %>% 
+  mutate(estado = lugar) %>% 
+  mutate(estado = ifelse(estado == "ACAPULCO DE JUÁREZ", "GUERRERO", estado)) %>%
+  mutate(estado = ifelse(estado == "TORREÓN" | estado == "SALTILLO", "COAHUILA DE ZARAGOZA", estado)) %>%
+  mutate(estado = ifelse(estado == "TUXTLA GUTIÉRREZ", "CHIAPAS", estado)) %>%
+  mutate(estado = ifelse(estado == "NEZAHUALCÓYOTL" | estado == "TOLUCA" | estado == "NAUCALPAN" | estado == "CHIMALHUACÁN" | estado == "TLALNEPANTLA DE BAZ" | estado == "CUAUTITLÁN IZCALLI" | estado == "TECÁMAC" | estado == "IXTAPALUCA" | estado == "ATIZAPÁN DE ZARAGOZA" | estado == "TULTITLÁN", "ESTADO DE MÉXICO", estado)) %>%
+  mutate(estado = ifelse(estado == "TEPIC", "NAYARIT", estado)) %>%
+  mutate(estado = ifelse(estado == "CULIACÁN", "SINALOA", estado)) %>%
+  mutate(estado = ifelse(estado == "MORELIA" | estado == "URUAPAN" | estado == "ZAMORA", "MICHOACÁN DE OCAMPO", estado)) %>%
+  mutate(estado = ifelse(estado == "TIJUANA" | estado == "MEXICALI" | estado == "ENSENADA", "BAJA CALIFORNIA", estado)) %>%
+  mutate(estado = ifelse(estado == "HERMOSILLO" | estado == "CAJEME" | estado == "NOGALES" | estado == "SAN LUIS RÍO COLORADO" | estado == "NAVOJOA" | estado == "GUAYMAS" | estado == "YÉCORA", "SONORA", estado)) %>%
+  mutate(estado = ifelse(estado == "GUADALAJARA" | estado == "ZAPOPAN" | estado == "TLAJOMULCO DE ZÚÑIGA" | estado == "SAN PEDRO TLAQUEPAQUE" | estado == "PUERTO VALLARTA" | estado == "TONALÁ", "JALISCO", estado)) %>%
+  mutate(estado = ifelse(estado == "XALAPA" | estado == "EMILIANO ZAPATA", "VERACRUZ DE IGNACIO DE LA LLAVE", estado)) %>%
+  mutate(estado = ifelse(estado == "MÉRIDA", "YUCATÁN", estado)) %>%
+  mutate(estado = ifelse(estado == "LA PAZ", "BAJA CALIFORNIA SUR", estado)) %>%
+  mutate(estado = ifelse(estado == "CUAUTLA" | estado == "CUERNAVACA" | estado == "JIUTEPEC" | estado == "TEMIXCO", "MORELOS", estado)) %>%
+  mutate(estado = ifelse(estado == "CALPULALPAN" | estado == "HUAMANTLA" | estado == "SAN PABLO DEL MONTE" | estado == "APIZACO" | estado == "CHIAUTEMPAN", "TLAXCALA", estado)) %>%
+  mutate(estado = ifelse(estado == "FRESNILLO" | estado == "RÍO GRANDE" | estado == "GENERAL ENRIQUE ESTRADA", "ZACATECAS", estado)) %>%
+  mutate(estado = ifelse(estado == "LEÓN" | estado == "CELAYA" | estado == "SALAMANCA" | estado == "IRAPUATO" | estado == "SANTIAGO MARAVATÍO" | estado == "PUEBLO NUEVO", "GUANAJUATO", estado)) %>%
+  mutate(estado = ifelse(estado == "BENITO JUÁREZ" & cargo=="Presidencia del municipio", "QUINTANA ROO", estado)) %>%
+  mutate(estado = ifelse(estado == "MANZANILLO", "COLIMA", estado)) %>%
+  mutate(estado = ifelse(estado == "SAN JUAN IHUALTEPEC", "OAXACA", estado)) %>%
+  mutate(estado = ifelse(estado == "BOCOYNA" | estado == "CIUDAD JUÁREZ", "CHIHUAHUA", estado)) %>%
+  mutate(estado = ifelse(estado == "CHETUMAL", "QUINTANA ROO", estado)) %>%
+  mutate(estado = ifelse(estado == "GÓMEZ PALACIO" | estado == "LERDO", "DURANGO", estado)) %>%
+  mutate(estado = ifelse(estado == "GUADALUPE VICTORIA", "PUEBLA", estado)) %>%
+  mutate(estado = ifelse(estado == "MONTERREY", "NUEVO LEÓN", estado)) %>%
+  mutate(estado = ifelse(cargo == "Alcaldia", "CIUDAD DE MÉXICO", estado))
+```
+
+```{r}
+cargos_2022  %>% group_by(cargo, nivel) %>% summarise(cantidad=n()) %>% arrange(nivel)
+cargos_2022 %>% group_by(estado, nivel) %>% summarise(n()) %>% pivot_wider(names_from = nivel, values_from = "n()")
+cargos_2022 %>% filter(is.na(estado))
+```
+
+
+```{r}
+cargos_2024 <- elecciones_2024 %>% 
+  mutate(cargo = case_when(
+    startsWith(contest, "Diputación del Distrito Local") ~ "Diputación del Distrito Local",
+    startsWith(contest, "Gubernatura") ~ "Gubernatura",
+    startsWith(contest, "Senaduría") ~ "Senaduría",
+    startsWith(contest, "Alcaldia") ~ "Alcaldia",
+    startsWith(contest, "Presidencia del municipio") ~ "Presidencia del municipio",
+    startsWith(contest, "Diputación por representación proporcional de la circuscripción") ~ "Diputación plurinominal",
+    startsWith(contest, "Senaduría por representación proporcional") ~ "Senaduría plurinominal",
+    startsWith(contest, "Diputación del Distrito Federal") ~ "Diputación del Distrito Federal",
+    TRUE ~ contest
+  )) %>% 
+  mutate(nivel = case_when(
+    cargo == "Alcaldia" | cargo == "Presidencia del municipio"  ~ "municipal",
+    cargo == "Diputación del Distrito Federal" | cargo == "Presidencia de la República Mexicana" | cargo == "Senaduría" | cargo == "Diputación plurinominal" ~ "federal",
+    TRUE ~ "estatal"
+  ))%>%
+  mutate(lugar = str_extract(contest, "(SINALOA|YUCATÁN|JALISCO|ZACATECAS|BAJA CALIFORNIA|NUEVO LEÓN|BAJA CALIFORNIA SUR|AGUASCALIENTES|VERACRUZ DE IGNACIO DE LA LLAVE|TLAXCALA|TABASCO|SAN LUIS POTOSÍ|QUINTANA ROO|QUERÉTARO|PUEBLA|OAXACA|NAYARIT|MICHOACÁN DE OCAMPO|ESTADO DE MÉXICO|GUERRERO|GUANAJUATO|DURANGO|COLIMA|COAHUILA DE ZARAGOZA|CHIHUAHUA|CHIAPAS|SONORA|TAMAULIPAS|MORELOS|CIUDAD DE MÉXICO|CAMPECHE|COLIMA|NAYARIT|ÁLVARO OBREGÓN|AZCAPOTZALCO|BENITO JUÁREZ|COYOACÁN|CUAUHTÉMOC|GUSTAVO A. MADERO|IZTACALCO|IZTAPALAPA|MIGUEL HIDALGO|MILPA ALTA|TLÁHUAC|TLALPAN|VENUSTIANO CARRANZA|XOCHIMILCO|ACAPULCO DE JUÁREZ|TORREÓN|TUXTLA GUTIÉRREZ|NEZAHUALCÓYOTL|TOLUCA|NAUCALPAN|CHIMALHUACÁN|TLALNEPANTLA DE BAZ|CUAUTITLÁN IZCALLI|TECÁMAC|IXTAPALUCA|ATIZAPÁN DE ZARAGOZA|TULTITLÁN|MONTERREY|TEPIC|CULIACÁN|SAN LUIS POTOSÍ|SALTILLO|MORELIA|TIJUANA|HERMOSILLO|GUADALAJARA|XALAPA|MEXICALI|MÉRIDA|LA PAZ|CUAUTLA|CUERNAVACA|EMILIANO ZAPATA|JIUTEPEC|TEMIXCO|ZAPOPAN|TLAJOMULCO DE ZÚÑIGA|SAN PEDRO TLAQUEPAQUE|CAJEME|NOGALES|SAN LUIS RÍO COLORADO|NAVOJOA|CALPULALPAN|HUAMANTLA|SAN PABLO DEL MONTE|APIZACO|CHIAUTEMPAN|FRESNILLO|RÍO GRANDE|LEÓN|CELAYA|ENSENADA|SALAMANCA|IRAPUATO|MANZANILLO|URUAPAN|GENERAL ENRIQUE ESTRADA|YÉCORA|SANTIAGO MARAVATÍO|SAN JUAN IHUALTEPEC|BOCOYNA|CHETUMAL|PUERTO VALLARTA|TONALÁ|CIUDAD JUÁREZ|ZAMORA|GÓMEZ PALACIO|GUADALUPE VICTORIA|GUAYMAS|LERDO|PUEBLO NUEVO|HIDALGO|TEHUACÁN|VILLAHERMOSA|SANTA CATARINA|SAN NICOLÁS DE LOS GARZA|JUÁREZ|GUADALUPE|GENERAL ESCOBEDO|GARCÍA|APODACA|TAPACHULA|CHILPANCINGO DE LOS BRAVO|CABO SAN LUCAS|PACHUCA DE SOTO|AHOME|MAZATLÁN|REYNOSA|MATAMOROS|NUEVO LAREDO|SOLIDARIDAD|SOLEDAD DE GRACIANO SÁNCHEZ|VICTORIA)$")) %>% 
+  mutate(estado = lugar) %>% 
+  mutate(estado = ifelse(estado == "ACAPULCO DE JUÁREZ" | estado == "CHILPANCINGO DE LOS BRAVO", "GUERRERO", estado)) %>%
+  mutate(estado = ifelse(estado == "TORREÓN" | estado == "SALTILLO", "COAHUILA DE ZARAGOZA", estado)) %>%
+  mutate(estado = ifelse(estado == "TUXTLA GUTIÉRREZ" | estado == "TAPACHULA", "CHIAPAS", estado)) %>%
+  mutate(estado = ifelse(estado == "NEZAHUALCÓYOTL" | estado == "TOLUCA" | estado == "NAUCALPAN" | estado == "CHIMALHUACÁN" | estado == "TLALNEPANTLA DE BAZ" | estado == "CUAUTITLÁN IZCALLI" | estado == "TECÁMAC" | estado == "IXTAPALUCA" | estado == "ATIZAPÁN DE ZARAGOZA" | estado == "TULTITLÁN", "ESTADO DE MÉXICO", estado)) %>%
+  mutate(estado = ifelse(estado == "TEPIC", "NAYARIT", estado)) %>%
+  mutate(estado = ifelse(estado == "CULIACÁN" | estado == "AHOME" | estado == "MAZATLÁN", "SINALOA", estado)) %>%
+  mutate(estado = ifelse(estado == "MORELIA" | estado == "URUAPAN" | estado == "ZAMORA", "MICHOACÁN DE OCAMPO", estado)) %>%
+  mutate(estado = ifelse(estado == "TIJUANA" | estado == "MEXICALI" | estado == "ENSENADA", "BAJA CALIFORNIA", estado)) %>%
+  mutate(estado = ifelse(estado == "HERMOSILLO" | estado == "CAJEME" | estado == "NOGALES" | estado == "SAN LUIS RÍO COLORADO" | estado == "NAVOJOA" | estado == "GUAYMAS" | estado == "YÉCORA", "SONORA", estado)) %>%
+  mutate(estado = ifelse(estado == "GUADALAJARA" | estado == "ZAPOPAN" | estado == "TLAJOMULCO DE ZÚÑIGA" | estado == "SAN PEDRO TLAQUEPAQUE" | estado == "PUERTO VALLARTA" | estado == "TONALÁ", "JALISCO", estado)) %>%
+  mutate(estado = ifelse(estado == "XALAPA" | estado == "EMILIANO ZAPATA", "VERACRUZ DE IGNACIO DE LA LLAVE", estado)) %>%
+  mutate(estado = ifelse(estado == "MÉRIDA", "YUCATÁN", estado)) %>%
+  mutate(estado = ifelse(estado == "LA PAZ" | estado == "CABO SAN LUCAS", "BAJA CALIFORNIA SUR", estado)) %>%
+  mutate(estado = ifelse(estado == "CUAUTLA" | estado == "CUERNAVACA" | estado == "JIUTEPEC" | estado == "TEMIXCO", "MORELOS", estado)) %>%
+  mutate(estado = ifelse(estado == "CALPULALPAN" | estado == "HUAMANTLA" | estado == "SAN PABLO DEL MONTE" | estado == "APIZACO" | estado == "CHIAUTEMPAN", "TLAXCALA", estado)) %>%
+  mutate(estado = ifelse(estado == "FRESNILLO" | estado == "RÍO GRANDE" | estado == "GENERAL ENRIQUE ESTRADA", "ZACATECAS", estado)) %>%
+  mutate(estado = ifelse(estado == "LEÓN" | estado == "CELAYA" | estado == "SALAMANCA" | estado == "IRAPUATO" | estado == "SANTIAGO MARAVATÍO" | estado == "PUEBLO NUEVO", "GUANAJUATO", estado)) %>%
+  mutate(estado = ifelse(estado == "BENITO JUÁREZ" & cargo=="Presidencia del municipio", "QUINTANA ROO", estado)) %>%
+  mutate(estado = ifelse(estado == "MANZANILLO", "COLIMA", estado)) %>%
+  mutate(estado = ifelse(estado == "SAN JUAN IHUALTEPEC", "OAXACA", estado)) %>%
+  mutate(estado = ifelse(estado == "BOCOYNA" | estado == "CIUDAD JUÁREZ", "CHIHUAHUA", estado)) %>%
+  mutate(estado = ifelse(estado == "CHETUMAL" | estado == "SOLIDARIDAD", "QUINTANA ROO", estado)) %>%
+  mutate(estado = ifelse(estado == "GÓMEZ PALACIO" | estado == "LERDO", "DURANGO", estado)) %>%
+  mutate(estado = ifelse(estado == "GUADALUPE VICTORIA" | estado == "TEHUACÁN", "PUEBLA", estado)) %>%
+  mutate(estado = ifelse(estado == "MONTERREY" | estado == "SANTA CATARINA" | estado == "SAN NICOLÁS DE LOS GARZA" | estado == "GUADALUPE" | estado == "GENERAL ESCOBEDO" | estado == "GARCÍA" | estado == "APODACA" | estado == "JUÁREZ", "NUEVO LEÓN", estado)) %>%
+  mutate(estado = ifelse(estado == "VILLAHERMOSA", "TABASCO", estado)) %>%
+  mutate(estado = ifelse(estado == "SOLEDAD DE GRACIANO SÁNCHEZ", "SAN LUIS POTOSÍ", estado)) %>%
+  mutate(estado = ifelse(estado == "PACHUCA DE SOTO", "HIDALGO", estado)) %>%
+  mutate(estado = ifelse(estado == "REYNOSA" | estado == "MATAMOROS" | estado == "NUEVO LAREDO" | estado == "VICTORIA", "TAMAULIPAS", estado)) %>%
+  mutate(estado = ifelse(cargo == "Alcaldia", "CIUDAD DE MÉXICO", estado))
+```
+
+```{r}
+cargos_2024  %>% group_by(cargo, nivel, gender) %>% summarise(cantidad=n()) %>% arrange(nivel)
+cargos_2024 %>% group_by(state, lugar, estado, nivel) %>% summarise(n()) %>% pivot_wider(names_from = nivel, values_from = "n()")
+cargos_2024 %>% filter(is.na(estado)) %>% group_by(contest)%>% summarise(n()) 
+```
+
+```{r message=FALSE}
+NvsG1 <- cargos_2021  %>% group_by(cargo, nivel, gender) %>% summarise(cantidad=n()) %>% arrange(nivel) %>% 
+  ggplot(aes(x = nivel, y = cantidad, fill = gender)) +   
+  geom_bar(position="dodge", stat="identity") +
+  # scale_fill_manual(values = c("#D11141", "#999999")) +  # Blue and gray colors
+  ggtitle(str_wrap("Hombres y Mujeres en los tres niveles (Federal, Estatal, Municipal) 2021", width = 50)) +
+  theme(plot.title = element_text(size = 14)) +
+  # scale_y_continuous(labels = comma) +
+  xlab("Nivel de gobierno") +
+  ylab("candidatos")
+
+NvsG2 <- cargos_2022  %>% group_by(cargo, nivel, gender) %>% summarise(cantidad=n()) %>% arrange(nivel) %>% 
+  ggplot(aes(x = nivel, y = cantidad, fill = gender)) +   
+  geom_bar(position="dodge", stat="identity") +
+  # scale_fill_manual(values = c("#D11141", "#999999")) +  # Blue and gray colors
+  ggtitle(str_wrap("Hombres y Mujeres en los tres niveles (Federal, Estatal, Municipal) 2022", width = 50)) +
+  theme(plot.title = element_text(size = 14)) +
+  # scale_y_continuous(labels = comma) +
+  xlab("Nivel de gobierno") +
+  ylab("candidatos")
+
+NvsG3 <- cargos_2024  %>% group_by(cargo, nivel, gender) %>% summarise(cantidad=n()) %>% arrange(nivel) %>% 
+  ggplot(aes(x = nivel, y = cantidad, fill = gender)) +   
+  geom_bar(position="dodge", stat="identity") +
+  # scale_fill_manual(values = c("#D11141", "#999999")) +  # Blue and gray colors
+  ggtitle(str_wrap("Hombres, Mujeres y NB en los tres niveles (Federal, Estatal, Municipal) 2024", width = 50)) +
+  theme(plot.title = element_text(size = 14)) +
+  # scale_y_continuous(labels = comma) +
+  xlab("Nivel de gobierno") +
+  ylab("candidatos")
+
+NvsG1 + NvsG2 + NvsG3
+```
+
+
+
+
+
+
+```{r message=FALSE}
+CvsG1 <- cargos_2021  %>% group_by(cargo, nivel, gender) %>% summarise(cantidad=n()) %>% arrange(nivel) %>% 
+  ggplot(aes(x = cargo, y = cantidad, fill = gender)) +   
+  geom_bar(position="dodge", stat="identity") +
+  # scale_fill_manual(values = c("#D11141", "#999999")) +  # Blue and gray colors
+  ggtitle(str_wrap("Candidatos en cada cargo 2021", width = 50)) +
+  theme(plot.title = element_text(size = 14),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
+  # scale_y_continuous(labels = comma) +
+  xlab("Cargos") +
+  ylab("candidatos")
+
+CvsG2 <- cargos_2022  %>% group_by(cargo, nivel, gender) %>% summarise(cantidad=n()) %>% arrange(nivel) %>% 
+  ggplot(aes(x = cargo, y = cantidad, fill = gender)) +   
+  geom_bar(position="dodge", stat="identity") +
+  # scale_fill_manual(values = c("#D11141", "#999999")) +  # Blue and gray colors
+  ggtitle(str_wrap("Candidatos en cada cargo 2022", width = 50)) +
+  theme(plot.title = element_text(size = 14),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
+  # scale_y_continuous(labels = comma) +
+  xlab("Cargos") +
+  ylab("candidatos")
+
+CvsG3 <- cargos_2024  %>% group_by(cargo, nivel, gender) %>% summarise(cantidad=n()) %>% arrange(nivel) %>% 
+  ggplot(aes(x = cargo, y = cantidad, fill = gender)) +   
+  geom_bar(position="dodge", stat="identity") +
+  # scale_fill_manual(values = c("#D11141", "#999999")) +  # Blue and gray colors
+  ggtitle(str_wrap("Candidatos en cada cargo 2024", width = 50)) +
+  theme(plot.title = element_text(size = 14),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
+  # scale_y_continuous(labels = comma) +
+  xlab("Cargos") +
+  ylab("candidatos")
+
+CvsG1 + CvsG2 + CvsG3
+```
+
+
+
+
+
+```{r message=FALSE}
+EvsG1 <- cargos_2021  %>% group_by(estado, state, cargo, nivel, gender) %>% 
+  summarise(cantidad=n()) %>% arrange(nivel) %>% 
+  filter(!is.na(estado)) %>% 
+  ggplot(aes(x = state, y = cantidad, fill = gender)) +   
+  geom_bar(position="dodge", stat="identity") +
+  # scale_fill_manual(values = c("#D11141", "#999999")) +  # Blue and gray colors
+  ggtitle(str_wrap("Candidatos por estado 2021", width = 50)) +
+  theme(plot.title = element_text(size = 14),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
+  # scale_y_continuous(labels = comma) +
+  xlab("estado") +
+  ylab("candidatos")
+
+EvsG2 <- cargos_2022  %>% group_by(estado, state, cargo, nivel, gender) %>% 
+  summarise(cantidad=n()) %>% arrange(nivel) %>% 
+  filter(!is.na(estado)) %>% 
+  ggplot(aes(x = state, y = cantidad, fill = gender)) +   
+  geom_bar(position="dodge", stat="identity") +
+  # scale_fill_manual(values = c("#D11141", "#999999")) +  # Blue and gray colors
+  ggtitle(str_wrap("Candidatos por estado 2022", width = 50)) +
+  theme(plot.title = element_text(size = 14),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
+  # scale_y_continuous(labels = comma) +
+  xlab("estado") +
+  ylab("candidatos")
+
+EvsG3 <- cargos_2024  %>% group_by(estado, state, cargo, nivel, gender) %>% 
+  summarise(cantidad=n()) %>% arrange(nivel) %>% 
+  filter(!is.na(estado)) %>% 
+  ggplot(aes(x = state, y = cantidad, fill = gender)) +   
+  geom_bar(position="dodge", stat="identity") +
+  # scale_fill_manual(values = c("#D11141", "#999999")) +  # Blue and gray colors
+  ggtitle(str_wrap("Candidatos por estado 2024", width = 50)) +
+  theme(plot.title = element_text(size = 14),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
+  # scale_y_continuous(labels = comma) +
+  xlab("estado") +
+  ylab("candidatos")
+
+EvsG1 + EvsG2 + EvsG3
+```
+
+```{r message=FALSE}
+EDUvsG1 <- cargos_2021  %>% group_by(last_degree_of_studies, estado, state, cargo, nivel, gender) %>% 
+  summarise(cantidad=n()) %>% arrange(nivel) %>% 
+  # filter(!is.na(estado)) %>% 
+  ggplot(aes(x = last_degree_of_studies, y = cantidad, fill = gender)) +   
+  geom_bar(position="dodge", stat="identity") +
+  # scale_fill_manual(values = c("#D11141", "#999999")) +  # Blue and gray colors
+  ggtitle(str_wrap("Ultimo grado de estudios 2021", width = 50)) +
+  theme(plot.title = element_text(size = 14),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
+  # scale_y_continuous(labels = comma) +
+  xlab("estado") +
+  ylab("candidatos")
+
+EDUvsG2 <- cargos_2022  %>% group_by(last_degree_of_studies, estado, state, cargo, nivel, gender) %>% 
+  summarise(cantidad=n()) %>% arrange(nivel) %>% 
+  # filter(!is.na(estado)) %>% 
+  ggplot(aes(x = last_degree_of_studies, y = cantidad, fill = gender)) +   
+  geom_bar(position="dodge", stat="identity") +
+  # scale_fill_manual(values = c("#D11141", "#999999")) +  # Blue and gray colors
+  ggtitle(str_wrap("Ultimo grado de estudios 2022", width = 50)) +
+  theme(plot.title = element_text(size = 14),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
+  # scale_y_continuous(labels = comma) +
+  xlab("estado") +
+  ylab("candidatos")
+
+EDUvsG3 <- cargos_2024  %>% group_by(last_degree_of_studies, estado, state, cargo, nivel, gender) %>% 
+  summarise(cantidad=n()) %>% arrange(nivel) %>% 
+  # filter(!is.na(estado)) %>% 
+  ggplot(aes(x = last_degree_of_studies, y = cantidad, fill = gender)) +   
+  geom_bar(position="dodge", stat="identity") +
+  # scale_fill_manual(values = c("#D11141", "#999999")) +  # Blue and gray colors
+  ggtitle(str_wrap("Ultimo grado de estudios 2024", width = 50)) +
+  theme(plot.title = element_text(size = 14),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
+  # scale_y_continuous(labels = comma) +
+  xlab("educacion") +
+  ylab("candidatos")
+
+EDUvsG1 + EDUvsG2 + EDUvsG3
+```
+
+```{r message=FALSE}
+EDUvsN1 <- cargos_2021  %>% group_by(last_degree_of_studies, estado, state, cargo, nivel, gender) %>% 
+  summarise(cantidad=n()) %>% arrange(nivel) %>% 
+  # filter(!is.na(estado)) %>% 
+  ggplot(aes(x = nivel, y = cantidad, fill = last_degree_of_studies)) +   
+  geom_bar(position="dodge", stat="identity") +
+  # scale_fill_manual(values = c("#D11141", "#999999")) +  # Blue and gray colors
+  ggtitle(str_wrap("Ultimo grado de estudios 2021", width = 50)) +
+  theme(plot.title = element_text(size = 14),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
+  # scale_y_continuous(labels = comma) +
+  xlab("nivel") +
+  ylab("candidatos")
+
+EDUvsN2 <- cargos_2022  %>% group_by(last_degree_of_studies, estado, state, cargo, nivel, gender) %>% 
+  summarise(cantidad=n()) %>% arrange(nivel) %>% 
+  # filter(!is.na(estado)) %>% 
+  ggplot(aes(x = nivel, y = cantidad, fill = last_degree_of_studies)) +   
+  geom_bar(position="dodge", stat="identity") +
+  # scale_fill_manual(values = c("#D11141", "#999999")) +  # Blue and gray colors
+  ggtitle(str_wrap("Ultimo grado de estudios 2022", width = 50)) +
+  theme(plot.title = element_text(size = 14),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
+  # scale_y_continuous(labels = comma) +
+  xlab("nivel") +
+  ylab("candidatos")
+
+EDUvsN3 <- cargos_2024  %>% group_by(last_degree_of_studies, estado, state, cargo, nivel, gender) %>% 
+  summarise(cantidad=n()) %>% arrange(nivel) %>% 
+  # filter(!is.na(estado)) %>% 
+  ggplot(aes(x = nivel, y = cantidad, fill = last_degree_of_studies)) +   
+  geom_bar(position="dodge", stat="identity") +
+  # scale_fill_manual(values = c("#D11141", "#999999")) +  # Blue and gray colors
+  ggtitle(str_wrap("Ultimo grado de estudios 2024", width = 50)) +
+  theme(plot.title = element_text(size = 14),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
+  # scale_y_continuous(labels = comma) +
+  xlab("nivel") +
+  ylab("candidatos")
+
+EDUvsN1 + EDUvsN2 + EDUvsN3
+```
+
+```{r message=FALSE}
+EDUvsC1 <- cargos_2021  %>% group_by(last_degree_of_studies, estado, state, cargo, nivel, gender) %>% 
+  summarise(cantidad=n()) %>% arrange(nivel) %>% 
+  # filter(!is.na(estado)) %>% 
+  ggplot(aes(x = cargo, y = cantidad, fill = last_degree_of_studies)) +   
+  geom_bar(position="dodge", stat="identity") +
+  # scale_fill_manual(values = c("#D11141", "#999999")) +  # Blue and gray colors
+  ggtitle(str_wrap("Ultimo grado de estudios 2021", width = 50)) +
+  theme(plot.title = element_text(size = 14),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
+  # scale_y_continuous(labels = comma) +
+  xlab("cargo") +
+  ylab("candidatos")
+
+EDUvsC2 <- cargos_2022  %>% group_by(last_degree_of_studies, estado, state, cargo, nivel, gender) %>% 
+  summarise(cantidad=n()) %>% arrange(nivel) %>% 
+  # filter(!is.na(estado)) %>% 
+  ggplot(aes(x = cargo, y = cantidad, fill = last_degree_of_studies)) +   
+  geom_bar(position="dodge", stat="identity") +
+  # scale_fill_manual(values = c("#D11141", "#999999")) +  # Blue and gray colors
+  ggtitle(str_wrap("Ultimo grado de estudios 2022", width = 50)) +
+  theme(plot.title = element_text(size = 14),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
+  # scale_y_continuous(labels = comma) +
+  xlab("cargo") +
+  ylab("candidatos")
+
+EDUvsC3 <- cargos_2024  %>% group_by(last_degree_of_studies, estado, state, cargo, nivel, gender) %>% 
+  summarise(cantidad=n()) %>% arrange(nivel) %>% 
+  # filter(!is.na(estado)) %>% 
+  ggplot(aes(x = cargo, y = cantidad, fill = last_degree_of_studies)) +   
+  geom_bar(position="dodge", stat="identity") +
+  # scale_fill_manual(values = c("#D11141", "#999999")) +  # Blue and gray colors
+  ggtitle(str_wrap("Ultimo grado de estudios 2024", width = 50)) +
+  theme(plot.title = element_text(size = 14),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
+  # scale_y_continuous(labels = comma) +
+  xlab("cargo") +
+  ylab("candidatos")
+
+EDUvsC1 + EDUvsC2 + EDUvsC3
+```
+
+
+
+
+```{r message=FALSE}
+EDUvsP1 <- cargos_2021  %>% group_by(abbreviation, last_degree_of_studies, estado, state, cargo, nivel, gender) %>% 
+  summarise(cantidad=n()) %>% arrange(nivel) %>% 
+  filter(abbreviation!="OTRO") %>%
+  ggplot(aes(x = abbreviation, y = cantidad, fill = last_degree_of_studies)) +   
+  geom_bar(position="dodge", stat="identity") +
+  # scale_fill_manual(values = c("#D11141", "#999999")) +  # Blue and gray colors
+  ggtitle(str_wrap("Ultimo grado de estudios 2021", width = 50)) +
+  theme(plot.title = element_text(size = 14),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
+  # scale_y_continuous(labels = comma) +
+  xlab("partido") +
+  ylab("candidatos")
+
+EDUvsP2 <- cargos_2022  %>% group_by(abbreviation, last_degree_of_studies, estado, state, cargo, nivel, gender) %>% 
+  summarise(cantidad=n()) %>% arrange(nivel) %>% 
+  filter(abbreviation!="OTRO") %>%
+  ggplot(aes(x = abbreviation, y = cantidad, fill = last_degree_of_studies)) +   
+  geom_bar(position="dodge", stat="identity") +
+  # scale_fill_manual(values = c("#D11141", "#999999")) +  # Blue and gray colors
+  ggtitle(str_wrap("Ultimo grado de estudios 2022", width = 50)) +
+  theme(plot.title = element_text(size = 14),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
+  # scale_y_continuous(labels = comma) +
+  xlab("partido") +
+  ylab("candidatos")
+
+EDUvsP3 <- cargos_2024  %>% group_by(abbreviation, last_degree_of_studies, estado, state, cargo, nivel, gender) %>% 
+  summarise(cantidad=n()) %>% arrange(nivel) %>% 
+  filter(abbreviation!="OTRO") %>%
+  ggplot(aes(x = abbreviation, y = cantidad, fill = last_degree_of_studies)) +   
+  geom_bar(position="dodge", stat="identity") +
+  # scale_fill_manual(values = c("#D11141", "#999999")) +  # Blue and gray colors
+  ggtitle(str_wrap("Ultimo grado de estudios 2024", width = 50)) +
+  theme(plot.title = element_text(size = 14),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
+  # scale_y_continuous(labels = comma) +
+  xlab("partido") +
+  ylab("candidatos")
+
+EDUvsP1 + EDUvsP2 + EDUvsP3
+```
+
+```{r message=FALSE}
+PvsN1 <- cargos_2021  %>% group_by(abbreviation, last_degree_of_studies, estado, state, cargo, nivel, gender) %>% 
+  summarise(cantidad=n()) %>% arrange(nivel) %>% 
+  # filter(abbreviation!="OTRO") %>%
+  ggplot(aes(x = abbreviation, y = cantidad, fill = nivel)) +   
+  geom_bar(position="dodge", stat="identity") +
+  # scale_fill_manual(values = c("#D11141", "#999999")) +  # Blue and gray colors
+  ggtitle(str_wrap("Nivel de poder 2021", width = 50)) +
+  theme(plot.title = element_text(size = 14),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
+  # scale_y_continuous(labels = comma) +
+  xlab("partido") +
+  ylab("candidatos")
+
+PvsN2 <- cargos_2022  %>% group_by(abbreviation, last_degree_of_studies, estado, state, cargo, nivel, gender) %>% 
+  summarise(cantidad=n()) %>% arrange(nivel) %>% 
+  # filter(abbreviation!="OTRO") %>%
+  ggplot(aes(x = abbreviation, y = cantidad, fill = nivel)) +   
+  geom_bar(position="dodge", stat="identity") +
+  # scale_fill_manual(values = c("#D11141", "#999999")) +  # Blue and gray colors
+  ggtitle(str_wrap("Nivel de poder 2022", width = 50)) +
+  theme(plot.title = element_text(size = 14),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
+  # scale_y_continuous(labels = comma) +
+  xlab("partido") +
+  ylab("candidatos")
+
+PvsN3 <- cargos_2024  %>% group_by(abbreviation, last_degree_of_studies, estado, state, cargo, nivel, gender) %>% 
+  summarise(cantidad=n()) %>% arrange(nivel) %>% 
+  # filter(abbreviation!="OTRO") %>%
+  ggplot(aes(x = abbreviation, y = cantidad, fill = nivel)) +   
+  geom_bar(position="dodge", stat="identity") +
+  # scale_fill_manual(values = c("#D11141", "#999999")) +  # Blue and gray colors
+  ggtitle(str_wrap("Nivel de poder 2024", width = 50)) +
+  theme(plot.title = element_text(size = 14),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
+  # scale_y_continuous(labels = comma) +
+  xlab("partido") +
+  ylab("candidatos")
+
+PvsN1 + PvsN2 + PvsN3
+```
+
+
+```{r message=FALSE}
+PvsC1 <- cargos_2021  %>% group_by(abbreviation, last_degree_of_studies, estado, state, cargo, nivel, gender) %>% 
+  summarise(cantidad=n()) %>% arrange(nivel) %>% 
+  # filter(abbreviation!="OTRO") %>%
+  ggplot(aes(x = abbreviation, y = cantidad, fill = cargo)) +   
+  geom_bar(position="dodge", stat="identity") +
+  # scale_fill_manual(values = c("#D11141", "#999999")) +  # Blue and gray colors
+  ggtitle(str_wrap("Cargos 2021", width = 50)) +
+  theme(plot.title = element_text(size = 14),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
+  # scale_y_continuous(labels = comma) +
+  xlab("partido") +
+  ylab("candidatos")
+
+PvsC2 <- cargos_2022  %>% group_by(abbreviation, last_degree_of_studies, estado, state, cargo, nivel, gender) %>% 
+  summarise(cantidad=n()) %>% arrange(nivel) %>% 
+  # filter(abbreviation!="OTRO") %>%
+  ggplot(aes(x = abbreviation, y = cantidad, fill = cargo)) +   
+  geom_bar(position="dodge", stat="identity") +
+  # scale_fill_manual(values = c("#D11141", "#999999")) +  # Blue and gray colors
+  ggtitle(str_wrap("Cargos 2021", width = 50)) +
+  theme(plot.title = element_text(size = 14),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
+  # scale_y_continuous(labels = comma) +
+  xlab("partido") +
+  ylab("candidatos")
+
+PvsC3 <- cargos_2024  %>% group_by(abbreviation, last_degree_of_studies, estado, state, cargo, nivel, gender) %>% 
+  summarise(cantidad=n()) %>% arrange(nivel) %>% 
+  # filter(abbreviation!="OTRO") %>%
+  ggplot(aes(x = abbreviation, y = cantidad, fill = cargo)) +   
+  geom_bar(position="dodge", stat="identity") +
+  # scale_fill_manual(values = c("#D11141", "#999999")) +  # Blue and gray colors
+  ggtitle(str_wrap("Cargos 2021", width = 50)) +
+  theme(plot.title = element_text(size = 14),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
+  # scale_y_continuous(labels = comma) +
+  xlab("partido") +
+  ylab("candidatos")
+
+PvsC1 + PvsC2 + PvsC3
+```
+
+```{r message=FALSE}
+PvsG1 <- cargos_2021  %>% group_by(abbreviation, last_degree_of_studies, estado, state, cargo, nivel, gender) %>% 
+  summarise(cantidad=n()) %>% arrange(nivel) %>% 
+  # filter(abbreviation!="OTRO") %>%
+  ggplot(aes(x = abbreviation, y = cantidad, fill = gender)) +   
+  geom_bar(position="dodge", stat="identity") +
+  # scale_fill_manual(values = c("#D11141", "#999999")) +  # Blue and gray colors
+  ggtitle(str_wrap("Genero por Partido 2021", width = 50)) +
+  theme(plot.title = element_text(size = 14),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
+  # scale_y_continuous(labels = comma) +
+  xlab("partido") +
+  ylab("candidatos")
+
+PvsG2 <- cargos_2022  %>% group_by(abbreviation, last_degree_of_studies, estado, state, cargo, nivel, gender) %>% 
+  summarise(cantidad=n()) %>% arrange(nivel) %>% 
+  # filter(abbreviation!="OTRO") %>%
+  ggplot(aes(x = abbreviation, y = cantidad, fill = gender)) +   
+  geom_bar(position="dodge", stat="identity") +
+  # scale_fill_manual(values = c("#D11141", "#999999")) +  # Blue and gray colors
+  ggtitle(str_wrap("Genero por Partido 2022", width = 50)) +
+  theme(plot.title = element_text(size = 14),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
+  # scale_y_continuous(labels = comma) +
+  xlab("partido") +
+  ylab("candidatos")
+
+PvsG3 <- cargos_2024  %>% group_by(abbreviation, last_degree_of_studies, estado, state, cargo, nivel, gender) %>% 
+  summarise(cantidad=n()) %>% arrange(nivel) %>% 
+  # filter(abbreviation!="OTRO") %>%
+  ggplot(aes(x = abbreviation, y = cantidad, fill = gender)) +   
+  geom_bar(position="dodge", stat="identity") +
+  # scale_fill_manual(values = c("#D11141", "#999999")) +  # Blue and gray colors
+  ggtitle(str_wrap("Genero por Partido 2024", width = 50)) +
+  theme(plot.title = element_text(size = 14),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
+  # scale_y_continuous(labels = comma) +
+  xlab("partido") +
+  ylab("candidatos")
+
+PvsG1 + PvsG2 + PvsG3 
+```
+
+```{r message=FALSE}
+PvsG1 <- cargos_2021  %>% group_by(abbreviation, last_degree_of_studies, estado, state, cargo, nivel, gender) %>% 
+  summarise(cantidad=n()) %>% arrange(nivel) %>% 
+  filter(cargo=="Gubernatura") %>%
+  ggplot(aes(x = state, y = cantidad, fill = abbreviation)) +   
+  geom_bar(position="dodge", stat="identity") +
+  # scale_fill_manual(values = c("#D11141", "#999999")) +  # Blue and gray colors
+  ggtitle(str_wrap("Gubernatura por Partido por estado 2021", width = 50)) +
+  theme(plot.title = element_text(size = 14),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
+  # scale_y_continuous(labels = comma) +
+  xlab("estado") +
+  ylab("candidatos")
+```
+
+
+# revisar profesion 1
+
+```{r}
+big_paragraph_2021 <- paste(cargos_2021$profession_1, collapse = " ")
+big_paragraph_2022 <- paste(cargos_2022$profession_1, collapse = " ")
+big_paragraph_2024 <- paste(cargos_2024$profession_1, collapse = " ")
+
+# # Load the pre-trained model for Spanish
+# ud_model <- udpipe_download_model(language = "spanish")
+# ud_model <- udpipe_load_model(ud_model$file_model)
+```
+
+
+
+```{r}
+# # Tokenize and lemmatize the text
+# parsed <- udpipe_annotate(ud_model, x = big_paragraph_2021)
+# lemmas <- as.data.frame(parsed)
+# 
+# # Define custom stop words
+# custom_stop_words <- c(
+#   "de", "del", "ex", "s.a", "c.v", "a.c", "ac",
+#   "al", "como", "es", "ha", "se", "más", "fue", "allá", "ala", "así", ",", " ", ".", "s.a.", "(", ")"
+# )
+# 
+# # Combine default and custom stop words
+# stop_words <- tibble(
+#   word = c(stop_words$word, custom_stop_words),
+#   lexicon = rep("spanish", length(stop_words$word) + length(custom_stop_words))
+# )
+# 
+# # Filter out stop words and words starting with digits
+# tidy_prof_21 <- lemmas %>%
+#   filter(!grepl("^\\d", lemma)) %>%  # Remove words starting with a digit
+#   anti_join(stop_words, by = c("lemma" = "word"))  # Remove stop words
+# 
+# word_counts <- tidy_prof_21 %>%
+#   count(lemma, sort = TRUE) %>% 
+#   arrange(lemma)
+```
+
+
+
+
+
+```{r}
+stop_words <- tibble(
+  word = c("a", "ante", "bajo", "con", "contra", "de", "desde", "durante", "en", "entre", 
+           "hacia", "hasta", "mediante", "para", "por", "según", "sin", "sobre", "tras",
+           "el", "la", "los", "las", "un", "una", "unos", "unas",
+           "y", "e", "ni", "o", "u", 
+           "de", "del", "ex", "s.a", "c.v", "a.c", "ac",
+           "al", "como", "es", "ha", "se", "más", "fue", "allá", "ala", "así", "c"
+           ),
+  lexicon = rep("spanish", 50)
+)
+
+tidy_prof_21 <- tibble(text = big_paragraph_2021) %>%
+    mutate(line = row_number()) %>%
+    unnest_tokens(word, text) %>%
+    filter(!grepl("^\\d", word)) %>% # Remove words starting with a digit
+    anti_join(stop_words)
+
+tidy_prof_21 <-tidy_prof_21 %>% 
+  mutate(word = ifelse(word == "abagada" | word == "abogada" | word == "abogadas" | word == "abogados" | word == "abodado" | word == "abogdo", "abogado", word))%>% 
+  mutate(word = ifelse(word == "abastos" | word == "abastecimiento", "abasto", word)) %>% 
+  mutate(word = ifelse(word == "academica" | word == "academico" | word == "académica" | word == "académico", "academia", word)) %>% 
+  mutate(word = ifelse(word == "acciones", "acción", word)) %>% 
+  mutate(word = ifelse(word == "acentuación" | word == "acentuador", "acentuar", word)) %>% 
+  mutate(word = ifelse(word == "activisa" | word == "activsta" | word == "avtivista", "activista", word)) %>% 
+  mutate(word = ifelse(word == "activos", "activo", word)) %>% 
+  mutate(word = ifelse(word == "actriz", "actor", word))  %>% 
+  mutate(word = ifelse(word == "actuaria", "actuario", word))  %>% 
+  mutate(word = ifelse(word == "acuacultura" | word == "acuicultor", "acuicultura", word))  %>% 
+  mutate(word = ifelse(word == "adiccciones", "adicciones", word))  %>% 
+  mutate(word = ifelse(word == "adjunta", "adjunto", word))  %>% 
+  mutate(word = ifelse(word == "administraciones" | word == "administracion" | word == "administracón" | word == "administrado" | word == "administrador" | word == "administradora" | word == "administradror" | word == "administrativa" | word == "administrativo" | word == "administrativos" | word == "administrstivo" | word == "adminitradora" | word == "adminsitrador" | word == "adminsitradora" | word == "adminstradora" | word == "admistradora", "administración", word)) %>% 
+  mutate(word = ifelse(word == "aduanal" | word == "aduanales", "aduana", word)) %>% 
+  mutate(word = ifelse(word == "agencias" | word == "agente" | word == "agentes", "agencia", word))  %>% 
+  mutate(word = ifelse(word == "agraria" | word == "agrarista", "agrario", word)) %>% 
+  mutate(word = ifelse(word == "agricola" | word == "agricolas" | word == "agricultor" | word == "agricultores" | word == "agrícola" | word == "agrícolas", "agricultura", word)) %>% 
+  mutate(word = ifelse(word == "agroalimentario" | word == "agroempresario" | word == "agroindustrias" | word == "agroinsumos" | word == "agrono" | word == "agronoma" | word == "agronomo" | word == "agronómo" | word == "agroquímicos" | word == "agrónoma" | word == "agrónomo" | word == "agrónomos", "agronomía", word)) %>% 
+  mutate(word = ifelse(word == "agropecuarias" | word == "agropecuarios" | word == "agropecuaria", "agropecuario", word)) %>% 
+  mutate(word = ifelse(word == "agrupaciones", "agrupación", word)) %>% 
+  mutate(word = ifelse(word == "aguas", "agua", word)) %>% 
+  mutate(word = ifelse(word == "aguascalienes" | word == "aguascalientes", "Aguascalientes", word)) %>% 
+  mutate(word = ifelse(word == "alcalde" | word == "alcaldesa" | word == "alcande", "alcaldía", word)) %>% 
+  mutate(word = ifelse(word == "alfabetizadora", "alfabetización", word)) %>% 
+  mutate(word = ifelse(word == "alimentaria", "alimentos", word)) %>% 
+  mutate(word = ifelse(word == "alta" | word == "altas" | word == "altos", "alto", word)) %>% 
+  mutate(word = ifelse(word == "altruistas", "altruista", word)) %>% 
+  mutate(word = ifelse(word == "ambientales" | word == "ambientalista" | word == "ambiente" | word == "biosustentable", "ambiental", word)) %>% 
+  mutate(word = ifelse(word == "amiga" | word == "amigos", "amigo", word)) %>% 
+  mutate(word = ifelse(word == "analisitas" | word == "analista", "análisis", word)) %>% 
+  mutate(word = ifelse(word == "animales", "animal", word)) %>% 
+  mutate(word = ifelse(word == "anestesiologa", "anestesiólogo", word)) %>% 
+  mutate(word = ifelse(word == "antropológa", "antropóloga", word)) %>% 
+  mutate(word = ifelse(word == "apicultores", "apicultura", word)) %>% 
+  mutate(word = ifelse(word == "apoyos", "apoyo", word)) %>% 
+  mutate(word = ifelse(word == "aquitecto" | word == "arquitecto" | word == "arquitecta", "arquitectura", word)) %>% 
+  mutate(word = ifelse(word == "artel" | word == "artes" | word == "artista" | word == "artísitca" | word == "artística", "arte", word)) %>% 
+  mutate(word = ifelse(word == "artesana" | word == "artesanales" | word == "artesanas" | word == "artesanias" | word == "artesano", "artesanal", word)) %>% 
+  mutate(word = ifelse(word == "asesora" | word == "asesores" | word == "asesoría", "asesor", word)) %>% 
+  mutate(word = ifelse(word == "asiciación" | word == "asoc" | word == "asociacion" | word == "asociaciones" | word == "asociado" | word == "asociados" | word == "asocider" | word == "asoción", "asociación", word)) %>% 
+  mutate(word = ifelse(word == "atencion", "atención", word)) %>% 
+  mutate(word = ifelse(word == "auditor" | word == "auditora" | word == "auditoria", "auditoría", word)) %>% 
+  mutate(word = ifelse(word == "autora", "autor", word)) %>% 
+  mutate(word = ifelse(word == "auxiliares", "auxiliar", word)) %>% 
+  mutate(word = ifelse(word == "avicultor", "avicola", word)) %>% 
+  mutate(word = ifelse(word == "ayundamiento", "ayuntamiento", word))
+
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word)
+```
+
+```{r}
+tidy_prof_21 <-tidy_prof_21 %>%
+  mutate(word = ifelse(word == "bachilleraro" | word == "bachilleres", "bachillerato", word)) %>%
+  mutate(word = ifelse(word == "baja" | word == "bajos", "bajo", word)) %>%
+  mutate(word = ifelse(word == "banamex" | word == "banca" | word == "bancaria" | word == "bancarios" | word == "bancomer" | word == "bank" | word == "banorte" | word == "banquera" | word == "banquero" | word == "bancario" | word == "banrural" | word == "bbva", "banco", word)) %>%
+  mutate(word = ifelse(word == "becario" | word == "becas", "beca", word)) %>%
+  mutate(word = ifelse(word == "bellas" | word == "bellaza", "belleza", word)) %>%
+  mutate(word = ifelse(word == "biologa" | word == "biologo" | word == "bióloga" | word == "bioquímico", "biología", word)) %>% 
+  mutate(word = ifelse(word == "bogega", "bodega", word)) %>% 
+  mutate(word = ifelse(word == "bomberos", "bombero", word)) %>% 
+  mutate(word = ifelse(word == "boxeadora", "boxeador", word)) %>%
+  mutate(word = ifelse(word == "brigadas" | word == "brigadista", "brigada", word)) %>%
+  mutate(word = ifelse(word == "básica" | word == "básicas", "básico", word))
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word) %>% 
+  filter(substr(word, 1, 1) == "b")
+
+```
+
+```{r}
+# tidy_prof_21 <-tidy_prof_21 %>%
+#   mutate(word = ifelse(word == "bachilleraro" | word == "bachilleres", "bachillerato", word)) %>%
+#   mutate(word = ifelse(word == "baja" | word == "bajos", "bajo", word)) %>%
+#   mutate(word = ifelse(word == "banamex" | word == "banca" | word == "bancaria" | word == "bancarios" | word == "bancomer" | word == "bank" | word == "banorte" | word == "banquera" | word == "banquero" | word == "bancario" | word == "banrural" | word == "bbva", "banco", word)) %>%
+#   mutate(word = ifelse(word == "becario" | word == "becas", "beca", word)) %>%
+#   mutate(word = ifelse(word == "bellas" | word == "bellaza", "belleza", word)) %>%
+#   mutate(word = ifelse(word == "biologa" | word == "biologo" | word == "bióloga" | word == "bioquímico", "biología", word)) %>% 
+#   mutate(word = ifelse(word == "bogega", "bodega", word)) %>% 
+#   mutate(word = ifelse(word == "bomberos", "bombero", word)) %>% 
+#   mutate(word = ifelse(word == "boxeadora", "boxeador", word)) %>%
+#   mutate(word = ifelse(word == "brigadas" | word == "brigadista", "brigada", word)) %>%
+#   mutate(word = ifelse(word == "básica" | word == "básicas", "básico", word))
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word) %>% 
+  filter(substr(word, 1, 1) == "c")
+
+```
+
+```{r}
+# tidy_prof_21 <-tidy_prof_21 %>%
+#   mutate(word = ifelse(word == "bachilleraro" | word == "bachilleres", "bachillerato", word)) %>%
+#   mutate(word = ifelse(word == "baja" | word == "bajos", "bajo", word)) %>%
+#   mutate(word = ifelse(word == "banamex" | word == "banca" | word == "bancaria" | word == "bancarios" | word == "bancomer" | word == "bank" | word == "banorte" | word == "banquera" | word == "banquero" | word == "bancario" | word == "banrural" | word == "bbva", "banco", word)) %>%
+#   mutate(word = ifelse(word == "becario" | word == "becas", "beca", word)) %>%
+#   mutate(word = ifelse(word == "bellas" | word == "bellaza", "belleza", word)) %>%
+#   mutate(word = ifelse(word == "biologa" | word == "biologo" | word == "bióloga" | word == "bioquímico", "biología", word)) %>% 
+#   mutate(word = ifelse(word == "bogega", "bodega", word)) %>% 
+#   mutate(word = ifelse(word == "bomberos", "bombero", word)) %>% 
+#   mutate(word = ifelse(word == "boxeadora", "boxeador", word)) %>%
+#   mutate(word = ifelse(word == "brigadas" | word == "brigadista", "brigada", word)) %>%
+#   mutate(word = ifelse(word == "básica" | word == "básicas", "básico", word))
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word) %>% 
+  filter(substr(word, 1, 1) == "d")
+
+```
+
+```{r}
+# tidy_prof_21 <-tidy_prof_21 %>%
+#   mutate(word = ifelse(word == "bachilleraro" | word == "bachilleres", "bachillerato", word)) %>%
+#   mutate(word = ifelse(word == "baja" | word == "bajos", "bajo", word)) %>%
+#   mutate(word = ifelse(word == "banamex" | word == "banca" | word == "bancaria" | word == "bancarios" | word == "bancomer" | word == "bank" | word == "banorte" | word == "banquera" | word == "banquero" | word == "bancario" | word == "banrural" | word == "bbva", "banco", word)) %>%
+#   mutate(word = ifelse(word == "becario" | word == "becas", "beca", word)) %>%
+#   mutate(word = ifelse(word == "bellas" | word == "bellaza", "belleza", word)) %>%
+#   mutate(word = ifelse(word == "biologa" | word == "biologo" | word == "bióloga" | word == "bioquímico", "biología", word)) %>% 
+#   mutate(word = ifelse(word == "bogega", "bodega", word)) %>% 
+#   mutate(word = ifelse(word == "bomberos", "bombero", word)) %>% 
+#   mutate(word = ifelse(word == "boxeadora", "boxeador", word)) %>%
+#   mutate(word = ifelse(word == "brigadas" | word == "brigadista", "brigada", word)) %>%
+#   mutate(word = ifelse(word == "básica" | word == "básicas", "básico", word))
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word) %>% 
+  filter(substr(word, 1, 1) == "e")
+
+```
+
+```{r}
+# tidy_prof_21 <-tidy_prof_21 %>%
+#   mutate(word = ifelse(word == "bachilleraro" | word == "bachilleres", "bachillerato", word)) %>%
+#   mutate(word = ifelse(word == "baja" | word == "bajos", "bajo", word)) %>%
+#   mutate(word = ifelse(word == "banamex" | word == "banca" | word == "bancaria" | word == "bancarios" | word == "bancomer" | word == "bank" | word == "banorte" | word == "banquera" | word == "banquero" | word == "bancario" | word == "banrural" | word == "bbva", "banco", word)) %>%
+#   mutate(word = ifelse(word == "becario" | word == "becas", "beca", word)) %>%
+#   mutate(word = ifelse(word == "bellas" | word == "bellaza", "belleza", word)) %>%
+#   mutate(word = ifelse(word == "biologa" | word == "biologo" | word == "bióloga" | word == "bioquímico", "biología", word)) %>% 
+#   mutate(word = ifelse(word == "bogega", "bodega", word)) %>% 
+#   mutate(word = ifelse(word == "bomberos", "bombero", word)) %>% 
+#   mutate(word = ifelse(word == "boxeadora", "boxeador", word)) %>%
+#   mutate(word = ifelse(word == "brigadas" | word == "brigadista", "brigada", word)) %>%
+#   mutate(word = ifelse(word == "básica" | word == "básicas", "básico", word))
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word) %>% 
+  filter(substr(word, 1, 1) == "f")
+
+```
+
+```{r}
+# tidy_prof_21 <-tidy_prof_21 %>%
+#   mutate(word = ifelse(word == "bachilleraro" | word == "bachilleres", "bachillerato", word)) %>%
+#   mutate(word = ifelse(word == "baja" | word == "bajos", "bajo", word)) %>%
+#   mutate(word = ifelse(word == "banamex" | word == "banca" | word == "bancaria" | word == "bancarios" | word == "bancomer" | word == "bank" | word == "banorte" | word == "banquera" | word == "banquero" | word == "bancario" | word == "banrural" | word == "bbva", "banco", word)) %>%
+#   mutate(word = ifelse(word == "becario" | word == "becas", "beca", word)) %>%
+#   mutate(word = ifelse(word == "bellas" | word == "bellaza", "belleza", word)) %>%
+#   mutate(word = ifelse(word == "biologa" | word == "biologo" | word == "bióloga" | word == "bioquímico", "biología", word)) %>% 
+#   mutate(word = ifelse(word == "bogega", "bodega", word)) %>% 
+#   mutate(word = ifelse(word == "bomberos", "bombero", word)) %>% 
+#   mutate(word = ifelse(word == "boxeadora", "boxeador", word)) %>%
+#   mutate(word = ifelse(word == "brigadas" | word == "brigadista", "brigada", word)) %>%
+#   mutate(word = ifelse(word == "básica" | word == "básicas", "básico", word))
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word) %>% 
+  filter(substr(word, 1, 1) == "g")
+
+```
+
+
+```{r}
+# tidy_prof_21 <-tidy_prof_21 %>%
+#   mutate(word = ifelse(word == "bachilleraro" | word == "bachilleres", "bachillerato", word)) %>%
+#   mutate(word = ifelse(word == "baja" | word == "bajos", "bajo", word)) %>%
+#   mutate(word = ifelse(word == "banamex" | word == "banca" | word == "bancaria" | word == "bancarios" | word == "bancomer" | word == "bank" | word == "banorte" | word == "banquera" | word == "banquero" | word == "bancario" | word == "banrural" | word == "bbva", "banco", word)) %>%
+#   mutate(word = ifelse(word == "becario" | word == "becas", "beca", word)) %>%
+#   mutate(word = ifelse(word == "bellas" | word == "bellaza", "belleza", word)) %>%
+#   mutate(word = ifelse(word == "biologa" | word == "biologo" | word == "bióloga" | word == "bioquímico", "biología", word)) %>% 
+#   mutate(word = ifelse(word == "bogega", "bodega", word)) %>% 
+#   mutate(word = ifelse(word == "bomberos", "bombero", word)) %>% 
+#   mutate(word = ifelse(word == "boxeadora", "boxeador", word)) %>%
+#   mutate(word = ifelse(word == "brigadas" | word == "brigadista", "brigada", word)) %>%
+#   mutate(word = ifelse(word == "básica" | word == "básicas", "básico", word))
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word) %>% 
+  filter(substr(word, 1, 1) == "h")
+
+```
+
+```{r}
+# tidy_prof_21 <-tidy_prof_21 %>%
+#   mutate(word = ifelse(word == "bachilleraro" | word == "bachilleres", "bachillerato", word)) %>%
+#   mutate(word = ifelse(word == "baja" | word == "bajos", "bajo", word)) %>%
+#   mutate(word = ifelse(word == "banamex" | word == "banca" | word == "bancaria" | word == "bancarios" | word == "bancomer" | word == "bank" | word == "banorte" | word == "banquera" | word == "banquero" | word == "bancario" | word == "banrural" | word == "bbva", "banco", word)) %>%
+#   mutate(word = ifelse(word == "becario" | word == "becas", "beca", word)) %>%
+#   mutate(word = ifelse(word == "bellas" | word == "bellaza", "belleza", word)) %>%
+#   mutate(word = ifelse(word == "biologa" | word == "biologo" | word == "bióloga" | word == "bioquímico", "biología", word)) %>% 
+#   mutate(word = ifelse(word == "bogega", "bodega", word)) %>% 
+#   mutate(word = ifelse(word == "bomberos", "bombero", word)) %>% 
+#   mutate(word = ifelse(word == "boxeadora", "boxeador", word)) %>%
+#   mutate(word = ifelse(word == "brigadas" | word == "brigadista", "brigada", word)) %>%
+#   mutate(word = ifelse(word == "básica" | word == "básicas", "básico", word))
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word) %>% 
+  filter(substr(word, 1, 1) == "i")
+
+```
+
+```{r}
+# tidy_prof_21 <-tidy_prof_21 %>%
+#   mutate(word = ifelse(word == "bachilleraro" | word == "bachilleres", "bachillerato", word)) %>%
+#   mutate(word = ifelse(word == "baja" | word == "bajos", "bajo", word)) %>%
+#   mutate(word = ifelse(word == "banamex" | word == "banca" | word == "bancaria" | word == "bancarios" | word == "bancomer" | word == "bank" | word == "banorte" | word == "banquera" | word == "banquero" | word == "bancario" | word == "banrural" | word == "bbva", "banco", word)) %>%
+#   mutate(word = ifelse(word == "becario" | word == "becas", "beca", word)) %>%
+#   mutate(word = ifelse(word == "bellas" | word == "bellaza", "belleza", word)) %>%
+#   mutate(word = ifelse(word == "biologa" | word == "biologo" | word == "bióloga" | word == "bioquímico", "biología", word)) %>% 
+#   mutate(word = ifelse(word == "bogega", "bodega", word)) %>% 
+#   mutate(word = ifelse(word == "bomberos", "bombero", word)) %>% 
+#   mutate(word = ifelse(word == "boxeadora", "boxeador", word)) %>%
+#   mutate(word = ifelse(word == "brigadas" | word == "brigadista", "brigada", word)) %>%
+#   mutate(word = ifelse(word == "básica" | word == "básicas", "básico", word))
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word) %>% 
+  filter(substr(word, 1, 1) == "j")
+
+```
+
+
+```{r}
+# tidy_prof_21 <-tidy_prof_21 %>%
+#   mutate(word = ifelse(word == "bachilleraro" | word == "bachilleres", "bachillerato", word)) %>%
+#   mutate(word = ifelse(word == "baja" | word == "bajos", "bajo", word)) %>%
+#   mutate(word = ifelse(word == "banamex" | word == "banca" | word == "bancaria" | word == "bancarios" | word == "bancomer" | word == "bank" | word == "banorte" | word == "banquera" | word == "banquero" | word == "bancario" | word == "banrural" | word == "bbva", "banco", word)) %>%
+#   mutate(word = ifelse(word == "becario" | word == "becas", "beca", word)) %>%
+#   mutate(word = ifelse(word == "bellas" | word == "bellaza", "belleza", word)) %>%
+#   mutate(word = ifelse(word == "biologa" | word == "biologo" | word == "bióloga" | word == "bioquímico", "biología", word)) %>% 
+#   mutate(word = ifelse(word == "bogega", "bodega", word)) %>% 
+#   mutate(word = ifelse(word == "bomberos", "bombero", word)) %>% 
+#   mutate(word = ifelse(word == "boxeadora", "boxeador", word)) %>%
+#   mutate(word = ifelse(word == "brigadas" | word == "brigadista", "brigada", word)) %>%
+#   mutate(word = ifelse(word == "básica" | word == "básicas", "básico", word))
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word) %>% 
+  filter(substr(word, 1, 1) == "k")
+
+```
+
+
+```{r}
+# tidy_prof_21 <-tidy_prof_21 %>%
+#   mutate(word = ifelse(word == "bachilleraro" | word == "bachilleres", "bachillerato", word)) %>%
+#   mutate(word = ifelse(word == "baja" | word == "bajos", "bajo", word)) %>%
+#   mutate(word = ifelse(word == "banamex" | word == "banca" | word == "bancaria" | word == "bancarios" | word == "bancomer" | word == "bank" | word == "banorte" | word == "banquera" | word == "banquero" | word == "bancario" | word == "banrural" | word == "bbva", "banco", word)) %>%
+#   mutate(word = ifelse(word == "becario" | word == "becas", "beca", word)) %>%
+#   mutate(word = ifelse(word == "bellas" | word == "bellaza", "belleza", word)) %>%
+#   mutate(word = ifelse(word == "biologa" | word == "biologo" | word == "bióloga" | word == "bioquímico", "biología", word)) %>% 
+#   mutate(word = ifelse(word == "bogega", "bodega", word)) %>% 
+#   mutate(word = ifelse(word == "bomberos", "bombero", word)) %>% 
+#   mutate(word = ifelse(word == "boxeadora", "boxeador", word)) %>%
+#   mutate(word = ifelse(word == "brigadas" | word == "brigadista", "brigada", word)) %>%
+#   mutate(word = ifelse(word == "básica" | word == "básicas", "básico", word))
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word) %>% 
+  filter(substr(word, 1, 1) == "l")
+
+```
+
+```{r}
+# tidy_prof_21 <-tidy_prof_21 %>%
+#   mutate(word = ifelse(word == "bachilleraro" | word == "bachilleres", "bachillerato", word)) %>%
+#   mutate(word = ifelse(word == "baja" | word == "bajos", "bajo", word)) %>%
+#   mutate(word = ifelse(word == "banamex" | word == "banca" | word == "bancaria" | word == "bancarios" | word == "bancomer" | word == "bank" | word == "banorte" | word == "banquera" | word == "banquero" | word == "bancario" | word == "banrural" | word == "bbva", "banco", word)) %>%
+#   mutate(word = ifelse(word == "becario" | word == "becas", "beca", word)) %>%
+#   mutate(word = ifelse(word == "bellas" | word == "bellaza", "belleza", word)) %>%
+#   mutate(word = ifelse(word == "biologa" | word == "biologo" | word == "bióloga" | word == "bioquímico", "biología", word)) %>% 
+#   mutate(word = ifelse(word == "bogega", "bodega", word)) %>% 
+#   mutate(word = ifelse(word == "bomberos", "bombero", word)) %>% 
+#   mutate(word = ifelse(word == "boxeadora", "boxeador", word)) %>%
+#   mutate(word = ifelse(word == "brigadas" | word == "brigadista", "brigada", word)) %>%
+#   mutate(word = ifelse(word == "básica" | word == "básicas", "básico", word))
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word) %>% 
+  filter(substr(word, 1, 1) == "m")
+
+```
+
+```{r}
+# tidy_prof_21 <-tidy_prof_21 %>%
+#   mutate(word = ifelse(word == "bachilleraro" | word == "bachilleres", "bachillerato", word)) %>%
+#   mutate(word = ifelse(word == "baja" | word == "bajos", "bajo", word)) %>%
+#   mutate(word = ifelse(word == "banamex" | word == "banca" | word == "bancaria" | word == "bancarios" | word == "bancomer" | word == "bank" | word == "banorte" | word == "banquera" | word == "banquero" | word == "bancario" | word == "banrural" | word == "bbva", "banco", word)) %>%
+#   mutate(word = ifelse(word == "becario" | word == "becas", "beca", word)) %>%
+#   mutate(word = ifelse(word == "bellas" | word == "bellaza", "belleza", word)) %>%
+#   mutate(word = ifelse(word == "biologa" | word == "biologo" | word == "bióloga" | word == "bioquímico", "biología", word)) %>% 
+#   mutate(word = ifelse(word == "bogega", "bodega", word)) %>% 
+#   mutate(word = ifelse(word == "bomberos", "bombero", word)) %>% 
+#   mutate(word = ifelse(word == "boxeadora", "boxeador", word)) %>%
+#   mutate(word = ifelse(word == "brigadas" | word == "brigadista", "brigada", word)) %>%
+#   mutate(word = ifelse(word == "básica" | word == "básicas", "básico", word))
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word) %>% 
+  filter(substr(word, 1, 1) == "n")
+
+```
+
+
+```{r}
+# tidy_prof_21 <-tidy_prof_21 %>%
+#   mutate(word = ifelse(word == "bachilleraro" | word == "bachilleres", "bachillerato", word)) %>%
+#   mutate(word = ifelse(word == "baja" | word == "bajos", "bajo", word)) %>%
+#   mutate(word = ifelse(word == "banamex" | word == "banca" | word == "bancaria" | word == "bancarios" | word == "bancomer" | word == "bank" | word == "banorte" | word == "banquera" | word == "banquero" | word == "bancario" | word == "banrural" | word == "bbva", "banco", word)) %>%
+#   mutate(word = ifelse(word == "becario" | word == "becas", "beca", word)) %>%
+#   mutate(word = ifelse(word == "bellas" | word == "bellaza", "belleza", word)) %>%
+#   mutate(word = ifelse(word == "biologa" | word == "biologo" | word == "bióloga" | word == "bioquímico", "biología", word)) %>% 
+#   mutate(word = ifelse(word == "bogega", "bodega", word)) %>% 
+#   mutate(word = ifelse(word == "bomberos", "bombero", word)) %>% 
+#   mutate(word = ifelse(word == "boxeadora", "boxeador", word)) %>%
+#   mutate(word = ifelse(word == "brigadas" | word == "brigadista", "brigada", word)) %>%
+#   mutate(word = ifelse(word == "básica" | word == "básicas", "básico", word))
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word) %>% 
+  filter(substr(word, 1, 1) == "o")
+
+```
+
+```{r}
+# tidy_prof_21 <-tidy_prof_21 %>%
+#   mutate(word = ifelse(word == "bachilleraro" | word == "bachilleres", "bachillerato", word)) %>%
+#   mutate(word = ifelse(word == "baja" | word == "bajos", "bajo", word)) %>%
+#   mutate(word = ifelse(word == "banamex" | word == "banca" | word == "bancaria" | word == "bancarios" | word == "bancomer" | word == "bank" | word == "banorte" | word == "banquera" | word == "banquero" | word == "bancario" | word == "banrural" | word == "bbva", "banco", word)) %>%
+#   mutate(word = ifelse(word == "becario" | word == "becas", "beca", word)) %>%
+#   mutate(word = ifelse(word == "bellas" | word == "bellaza", "belleza", word)) %>%
+#   mutate(word = ifelse(word == "biologa" | word == "biologo" | word == "bióloga" | word == "bioquímico", "biología", word)) %>% 
+#   mutate(word = ifelse(word == "bogega", "bodega", word)) %>% 
+#   mutate(word = ifelse(word == "bomberos", "bombero", word)) %>% 
+#   mutate(word = ifelse(word == "boxeadora", "boxeador", word)) %>%
+#   mutate(word = ifelse(word == "brigadas" | word == "brigadista", "brigada", word)) %>%
+#   mutate(word = ifelse(word == "básica" | word == "básicas", "básico", word))
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word) %>% 
+  filter(substr(word, 1, 1) == "p")
+
+```
+
+```{r}
+# tidy_prof_21 <-tidy_prof_21 %>%
+#   mutate(word = ifelse(word == "bachilleraro" | word == "bachilleres", "bachillerato", word)) %>%
+#   mutate(word = ifelse(word == "baja" | word == "bajos", "bajo", word)) %>%
+#   mutate(word = ifelse(word == "banamex" | word == "banca" | word == "bancaria" | word == "bancarios" | word == "bancomer" | word == "bank" | word == "banorte" | word == "banquera" | word == "banquero" | word == "bancario" | word == "banrural" | word == "bbva", "banco", word)) %>%
+#   mutate(word = ifelse(word == "becario" | word == "becas", "beca", word)) %>%
+#   mutate(word = ifelse(word == "bellas" | word == "bellaza", "belleza", word)) %>%
+#   mutate(word = ifelse(word == "biologa" | word == "biologo" | word == "bióloga" | word == "bioquímico", "biología", word)) %>% 
+#   mutate(word = ifelse(word == "bogega", "bodega", word)) %>% 
+#   mutate(word = ifelse(word == "bomberos", "bombero", word)) %>% 
+#   mutate(word = ifelse(word == "boxeadora", "boxeador", word)) %>%
+#   mutate(word = ifelse(word == "brigadas" | word == "brigadista", "brigada", word)) %>%
+#   mutate(word = ifelse(word == "básica" | word == "básicas", "básico", word))
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word) %>% 
+  filter(substr(word, 1, 1) == "q")
+
+```
+
+
+```{r}
+# tidy_prof_21 <-tidy_prof_21 %>%
+#   mutate(word = ifelse(word == "bachilleraro" | word == "bachilleres", "bachillerato", word)) %>%
+#   mutate(word = ifelse(word == "baja" | word == "bajos", "bajo", word)) %>%
+#   mutate(word = ifelse(word == "banamex" | word == "banca" | word == "bancaria" | word == "bancarios" | word == "bancomer" | word == "bank" | word == "banorte" | word == "banquera" | word == "banquero" | word == "bancario" | word == "banrural" | word == "bbva", "banco", word)) %>%
+#   mutate(word = ifelse(word == "becario" | word == "becas", "beca", word)) %>%
+#   mutate(word = ifelse(word == "bellas" | word == "bellaza", "belleza", word)) %>%
+#   mutate(word = ifelse(word == "biologa" | word == "biologo" | word == "bióloga" | word == "bioquímico", "biología", word)) %>% 
+#   mutate(word = ifelse(word == "bogega", "bodega", word)) %>% 
+#   mutate(word = ifelse(word == "bomberos", "bombero", word)) %>% 
+#   mutate(word = ifelse(word == "boxeadora", "boxeador", word)) %>%
+#   mutate(word = ifelse(word == "brigadas" | word == "brigadista", "brigada", word)) %>%
+#   mutate(word = ifelse(word == "básica" | word == "básicas", "básico", word))
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word) %>% 
+  filter(substr(word, 1, 1) == "r")
+
+```
+
+```{r}
+# tidy_prof_21 <-tidy_prof_21 %>%
+#   mutate(word = ifelse(word == "bachilleraro" | word == "bachilleres", "bachillerato", word)) %>%
+#   mutate(word = ifelse(word == "baja" | word == "bajos", "bajo", word)) %>%
+#   mutate(word = ifelse(word == "banamex" | word == "banca" | word == "bancaria" | word == "bancarios" | word == "bancomer" | word == "bank" | word == "banorte" | word == "banquera" | word == "banquero" | word == "bancario" | word == "banrural" | word == "bbva", "banco", word)) %>%
+#   mutate(word = ifelse(word == "becario" | word == "becas", "beca", word)) %>%
+#   mutate(word = ifelse(word == "bellas" | word == "bellaza", "belleza", word)) %>%
+#   mutate(word = ifelse(word == "biologa" | word == "biologo" | word == "bióloga" | word == "bioquímico", "biología", word)) %>% 
+#   mutate(word = ifelse(word == "bogega", "bodega", word)) %>% 
+#   mutate(word = ifelse(word == "bomberos", "bombero", word)) %>% 
+#   mutate(word = ifelse(word == "boxeadora", "boxeador", word)) %>%
+#   mutate(word = ifelse(word == "brigadas" | word == "brigadista", "brigada", word)) %>%
+#   mutate(word = ifelse(word == "básica" | word == "básicas", "básico", word))
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word) %>% 
+  filter(substr(word, 1, 1) == "s")
+
+```
+
+```{r}
+# tidy_prof_21 <-tidy_prof_21 %>%
+#   mutate(word = ifelse(word == "bachilleraro" | word == "bachilleres", "bachillerato", word)) %>%
+#   mutate(word = ifelse(word == "baja" | word == "bajos", "bajo", word)) %>%
+#   mutate(word = ifelse(word == "banamex" | word == "banca" | word == "bancaria" | word == "bancarios" | word == "bancomer" | word == "bank" | word == "banorte" | word == "banquera" | word == "banquero" | word == "bancario" | word == "banrural" | word == "bbva", "banco", word)) %>%
+#   mutate(word = ifelse(word == "becario" | word == "becas", "beca", word)) %>%
+#   mutate(word = ifelse(word == "bellas" | word == "bellaza", "belleza", word)) %>%
+#   mutate(word = ifelse(word == "biologa" | word == "biologo" | word == "bióloga" | word == "bioquímico", "biología", word)) %>% 
+#   mutate(word = ifelse(word == "bogega", "bodega", word)) %>% 
+#   mutate(word = ifelse(word == "bomberos", "bombero", word)) %>% 
+#   mutate(word = ifelse(word == "boxeadora", "boxeador", word)) %>%
+#   mutate(word = ifelse(word == "brigadas" | word == "brigadista", "brigada", word)) %>%
+#   mutate(word = ifelse(word == "básica" | word == "básicas", "básico", word))
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word) %>% 
+  filter(substr(word, 1, 1) == "t")
+
+```
+
+```{r}
+# tidy_prof_21 <-tidy_prof_21 %>%
+#   mutate(word = ifelse(word == "bachilleraro" | word == "bachilleres", "bachillerato", word)) %>%
+#   mutate(word = ifelse(word == "baja" | word == "bajos", "bajo", word)) %>%
+#   mutate(word = ifelse(word == "banamex" | word == "banca" | word == "bancaria" | word == "bancarios" | word == "bancomer" | word == "bank" | word == "banorte" | word == "banquera" | word == "banquero" | word == "bancario" | word == "banrural" | word == "bbva", "banco", word)) %>%
+#   mutate(word = ifelse(word == "becario" | word == "becas", "beca", word)) %>%
+#   mutate(word = ifelse(word == "bellas" | word == "bellaza", "belleza", word)) %>%
+#   mutate(word = ifelse(word == "biologa" | word == "biologo" | word == "bióloga" | word == "bioquímico", "biología", word)) %>% 
+#   mutate(word = ifelse(word == "bogega", "bodega", word)) %>% 
+#   mutate(word = ifelse(word == "bomberos", "bombero", word)) %>% 
+#   mutate(word = ifelse(word == "boxeadora", "boxeador", word)) %>%
+#   mutate(word = ifelse(word == "brigadas" | word == "brigadista", "brigada", word)) %>%
+#   mutate(word = ifelse(word == "básica" | word == "básicas", "básico", word))
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word) %>% 
+  filter(substr(word, 1, 1) == "u")
+
+```
+
+
+```{r}
+# tidy_prof_21 <-tidy_prof_21 %>%
+#   mutate(word = ifelse(word == "bachilleraro" | word == "bachilleres", "bachillerato", word)) %>%
+#   mutate(word = ifelse(word == "baja" | word == "bajos", "bajo", word)) %>%
+#   mutate(word = ifelse(word == "banamex" | word == "banca" | word == "bancaria" | word == "bancarios" | word == "bancomer" | word == "bank" | word == "banorte" | word == "banquera" | word == "banquero" | word == "bancario" | word == "banrural" | word == "bbva", "banco", word)) %>%
+#   mutate(word = ifelse(word == "becario" | word == "becas", "beca", word)) %>%
+#   mutate(word = ifelse(word == "bellas" | word == "bellaza", "belleza", word)) %>%
+#   mutate(word = ifelse(word == "biologa" | word == "biologo" | word == "bióloga" | word == "bioquímico", "biología", word)) %>% 
+#   mutate(word = ifelse(word == "bogega", "bodega", word)) %>% 
+#   mutate(word = ifelse(word == "bomberos", "bombero", word)) %>% 
+#   mutate(word = ifelse(word == "boxeadora", "boxeador", word)) %>%
+#   mutate(word = ifelse(word == "brigadas" | word == "brigadista", "brigada", word)) %>%
+#   mutate(word = ifelse(word == "básica" | word == "básicas", "básico", word))
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word) %>% 
+  filter(substr(word, 1, 1) == "v")
+
+```
+
+
+```{r}
+# tidy_prof_21 <-tidy_prof_21 %>%
+#   mutate(word = ifelse(word == "bachilleraro" | word == "bachilleres", "bachillerato", word)) %>%
+#   mutate(word = ifelse(word == "baja" | word == "bajos", "bajo", word)) %>%
+#   mutate(word = ifelse(word == "banamex" | word == "banca" | word == "bancaria" | word == "bancarios" | word == "bancomer" | word == "bank" | word == "banorte" | word == "banquera" | word == "banquero" | word == "bancario" | word == "banrural" | word == "bbva", "banco", word)) %>%
+#   mutate(word = ifelse(word == "becario" | word == "becas", "beca", word)) %>%
+#   mutate(word = ifelse(word == "bellas" | word == "bellaza", "belleza", word)) %>%
+#   mutate(word = ifelse(word == "biologa" | word == "biologo" | word == "bióloga" | word == "bioquímico", "biología", word)) %>% 
+#   mutate(word = ifelse(word == "bogega", "bodega", word)) %>% 
+#   mutate(word = ifelse(word == "bomberos", "bombero", word)) %>% 
+#   mutate(word = ifelse(word == "boxeadora", "boxeador", word)) %>%
+#   mutate(word = ifelse(word == "brigadas" | word == "brigadista", "brigada", word)) %>%
+#   mutate(word = ifelse(word == "básica" | word == "básicas", "básico", word))
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word) %>% 
+  filter(substr(word, 1, 1) == "w")
+
+```
+
+
+
+```{r}
+# tidy_prof_21 <-tidy_prof_21 %>%
+#   mutate(word = ifelse(word == "bachilleraro" | word == "bachilleres", "bachillerato", word)) %>%
+#   mutate(word = ifelse(word == "baja" | word == "bajos", "bajo", word)) %>%
+#   mutate(word = ifelse(word == "banamex" | word == "banca" | word == "bancaria" | word == "bancarios" | word == "bancomer" | word == "bank" | word == "banorte" | word == "banquera" | word == "banquero" | word == "bancario" | word == "banrural" | word == "bbva", "banco", word)) %>%
+#   mutate(word = ifelse(word == "becario" | word == "becas", "beca", word)) %>%
+#   mutate(word = ifelse(word == "bellas" | word == "bellaza", "belleza", word)) %>%
+#   mutate(word = ifelse(word == "biologa" | word == "biologo" | word == "bióloga" | word == "bioquímico", "biología", word)) %>% 
+#   mutate(word = ifelse(word == "bogega", "bodega", word)) %>% 
+#   mutate(word = ifelse(word == "bomberos", "bombero", word)) %>% 
+#   mutate(word = ifelse(word == "boxeadora", "boxeador", word)) %>%
+#   mutate(word = ifelse(word == "brigadas" | word == "brigadista", "brigada", word)) %>%
+#   mutate(word = ifelse(word == "básica" | word == "básicas", "básico", word))
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word) %>% 
+  filter(substr(word, 1, 1) == "x")
+
+```
+
+```{r}
+# tidy_prof_21 <-tidy_prof_21 %>%
+#   mutate(word = ifelse(word == "bachilleraro" | word == "bachilleres", "bachillerato", word)) %>%
+#   mutate(word = ifelse(word == "baja" | word == "bajos", "bajo", word)) %>%
+#   mutate(word = ifelse(word == "banamex" | word == "banca" | word == "bancaria" | word == "bancarios" | word == "bancomer" | word == "bank" | word == "banorte" | word == "banquera" | word == "banquero" | word == "bancario" | word == "banrural" | word == "bbva", "banco", word)) %>%
+#   mutate(word = ifelse(word == "becario" | word == "becas", "beca", word)) %>%
+#   mutate(word = ifelse(word == "bellas" | word == "bellaza", "belleza", word)) %>%
+#   mutate(word = ifelse(word == "biologa" | word == "biologo" | word == "bióloga" | word == "bioquímico", "biología", word)) %>% 
+#   mutate(word = ifelse(word == "bogega", "bodega", word)) %>% 
+#   mutate(word = ifelse(word == "bomberos", "bombero", word)) %>% 
+#   mutate(word = ifelse(word == "boxeadora", "boxeador", word)) %>%
+#   mutate(word = ifelse(word == "brigadas" | word == "brigadista", "brigada", word)) %>%
+#   mutate(word = ifelse(word == "básica" | word == "básicas", "básico", word))
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word) %>% 
+  filter(substr(word, 1, 1) == "y")
+
+```
+
+```{r}
+# tidy_prof_21 <-tidy_prof_21 %>%
+#   mutate(word = ifelse(word == "bachilleraro" | word == "bachilleres", "bachillerato", word)) %>%
+#   mutate(word = ifelse(word == "baja" | word == "bajos", "bajo", word)) %>%
+#   mutate(word = ifelse(word == "banamex" | word == "banca" | word == "bancaria" | word == "bancarios" | word == "bancomer" | word == "bank" | word == "banorte" | word == "banquera" | word == "banquero" | word == "bancario" | word == "banrural" | word == "bbva", "banco", word)) %>%
+#   mutate(word = ifelse(word == "becario" | word == "becas", "beca", word)) %>%
+#   mutate(word = ifelse(word == "bellas" | word == "bellaza", "belleza", word)) %>%
+#   mutate(word = ifelse(word == "biologa" | word == "biologo" | word == "bióloga" | word == "bioquímico", "biología", word)) %>% 
+#   mutate(word = ifelse(word == "bogega", "bodega", word)) %>% 
+#   mutate(word = ifelse(word == "bomberos", "bombero", word)) %>% 
+#   mutate(word = ifelse(word == "boxeadora", "boxeador", word)) %>%
+#   mutate(word = ifelse(word == "brigadas" | word == "brigadista", "brigada", word)) %>%
+#   mutate(word = ifelse(word == "básica" | word == "básicas", "básico", word))
+
+tidy_prof_21 %>%
+  count(word, sort = TRUE) %>% 
+  arrange(word) %>% 
+  filter(substr(word, 1, 1) == "z")
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+

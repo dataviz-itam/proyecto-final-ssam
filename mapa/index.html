@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Mexico</title>
+    <style>
+        .boundary {
+            fill: none;
+            stroke: black;
+            stroke-linejoin: round;
+        }
+
+        svg {
+            border-style: solid;
+            border-width: 1px;
+            border-color: grey;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: grey;
+        }
+
+        #tooltip {
+            position: absolute;
+            z-index: 2;
+            background: rgb(63, 63, 63);
+            width: 130px;
+            height: 20px;
+            color: white;
+            font-size: 14px;
+            padding: 5px;
+            top: -150px;
+            left: -150px;
+            font-family: Lucida Grande", sans-serif;
+
+        }
+
+        #map svg {
+            background-color: grey;
+            margin: 0 4vw;
+        }
+
+        div.leyenda {
+  position: absolute;
+  top: 5vh;
+  left: 50vw;
+  z-index: 10;
+
+  height: auto;
+  width: fit-content;
+  padding: 5px 10px;
+
+  border-radius: 10px;
+
+  font-size: 12px;
+  line-height: 20px;
+  display: flex;
+  flex-direction: column;
+
+  background-color: rgba(0, 0, 0, 0.3);
+
+  justify-content: start;
+  align-items: center;
+}
+
+div.leyenda-item {
+  color: white;
+  font-weight: bolder;
+  text-align: left;
+  display: flex;
+  flex-direction: row;
+  justify-content: stretch;
+  align-items: center;
+  width: 100%;
+  margin: 10px 0;
+  height: 0.5rem;
+  text-wrap: nowrap;
+}
+
+div.leyenda-color {
+  width: 20px;
+  height: 20px;
+  margin: 0 10px;
+}
+
+div#leyenda-color1 {
+  background-color: #651D32;
+}
+
+div#leyenda-color2 {
+  background-color: #2E008B;
+}
+div#leyenda-color3 {
+  background-color: #BE3A34;
+}
+
+div#leyenda-color4 {
+  background-color: #FC4C02;
+}
+div#leyenda-color6 {
+  background-color: #C8102E;
+}
+div#leyenda-color7 {
+  background-color: #8EDD65;
+  background-size: 5px 5px;
+}
+
+
+    </style>
+</head>
+
+<body>
+    <!-- <h1>Gubernaturas por Partido Político</h1> -->
+        <div class="leyenda">
+            <div class="leyenda-item">
+                <div class="leyenda-color" id="leyenda-color1"></div>
+                <p id="leyenda-text1">
+                    Morena
+                </p>
+            </div>
+            <div class="leyenda-item">
+                <div class="leyenda-color" id="leyenda-color2"></div>
+                <p id="leyenda-text2">
+                    PAN
+                </p>
+            </div>
+            <div class="leyenda-item">
+                <div class="leyenda-color" id="leyenda-color3"></div>
+                <p id="leyenda-text1">
+                    PRI
+                </p>
+            </div>
+            <div class="leyenda-item">
+                <div class="leyenda-color" id="leyenda-color4"></div>
+                <p id="leyenda-text2">
+                    Movimiento Ciudadano
+                </p>
+            </div>
+            <div class="leyenda-item">
+                <div class="leyenda-color" id="leyenda-color6"></div>
+                <p id="leyenda-text2">
+                    PT
+                </p>
+            </div>
+            <div class="leyenda-item">
+                <div class="leyenda-color" id="leyenda-color7"></div>
+                <p id="leyenda-text1">
+                    PVEM
+                </p>
+            </div>
+        </div>
+
+    <div id="map"></div>
+    <div id="tooltip"></div>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="http://d3js.org/topojson.v1.min.js"></script>
+    <script src="mapa.js"></script>
