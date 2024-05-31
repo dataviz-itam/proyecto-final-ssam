@@ -69,14 +69,31 @@ export const sankeyChart = ({
   if (G && nodeGroups === undefined) nodeGroups = G;
 
   // Define a custom color scale with 21 colors
-  const colorScale = d3.scaleOrdinal()
-    .domain(nodes.map(d => d.id)) // Use node ids as the domain
+  const colorScale = d3
+    .scaleOrdinal()
+    .domain(nodes.map((d) => d.id)) // Use node ids as the domain
     .range([
-      '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd',
-      '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf',
-      '#393b79', '#637939', '#8c6d31', '#843c39', '#7b4173',
-      '#5254a3', '#8ca252', '#bd9e39', '#ad494a', '#a55194',
-      '#6b6ecf'
+      "#fc4c02", // movimiento ciudadano
+      "#651D32", // morena
+      "#9E978E", // otro
+      "#00A7B5", // panal
+      "#2E008B", // pan
+      "#5a257d", // pesol
+      "#ffD100", // prd
+      "#be3a34", // pri
+      "#C8102E", // pt
+      "#8edd65", // pvem
+      "#fc4c02", // movimiento ciudadano
+      "#651D32", // morena
+      "#2E008B", // pan
+      "#ffD100", // prd
+      "#C8102E", // pt
+      "#9E978E", // otro
+      "#8edd65", // pvem
+      "#be3a34", // pri
+      "#ad494a",
+      "#a55194",
+      "#6b6ecf",
     ]); // 21 custom colors
 
   // Compute the Sankey layout.
