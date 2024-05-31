@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Candidatos y partidos en el contexto electoral de México 2024</title>
+    <link rel="stylesheet" href="recursos/css/styles.css">
+</head>
+<body>
+    <div class="banner">
+        <div class="gradient-top">
+            <h1></h1>
+        </div>
+        <div class="gradient-bottom">
+            <h1>Candidatos y partidos en el contexto electoral de México 2024</h1>
+        </div>
+    </div>
+    <div class="contenido">        
+        <p class="bold"> 
+            Contexto
+        </p>
+        <p>
+            Las elecciones del 2 de junio de 2024 en México son cruciales, ya que se votará para cargos importantes como la Presidencia, Senado, Diputados, Gubernaturas y Alcaldías en la CDMX. Este evento representa una oportunidad significativa para evaluar la evolución política y las preferencias del electorado desde las elecciones de 2021. A través de este análisis, se busca documentar el impacto de las políticas implementadas y el clima político actual, proporcionando una línea base para futuras comparaciones electorales.
+        </p>
+
+        <p class="bold"> 
+            Problemática
+        </p>
+        <p>
+            Identificar y comparar los candidatos y partidos políticos para las elecciones de 2024 puede ser desafiante debido a la vasta cantidad de información y la variabilidad en las fuentes de datos. Este proyecto busca centralizar y clarificar esta información para ofrecer un análisis coherente y accesible, superando las barreras de información fragmentada y a veces contradictoria que enfrentan los electores y los analistas.
+        </p>
+
+        <p class="bold"> 
+            Objetivo
+        </p>
+        <p>
+            El objetivo de este proyecto es proporcionar un análisis detallado y comparativo de los candidatos y partidos políticos que participarán en las elecciones de México en 2024. Este análisis incluirá datos actuales e históricos para entender mejor las tendencias y cambios en el panorama político, facilitando así una herramienta informativa para votantes, analistas y medios de comunicación. Mediante visualizaciones interactivas y reportes exhaustivos, buscamos ofrecer una perspectiva amplia y profunda que permita a los ciudadanos tomar decisiones informadas.
+        </p>      
+    </div>
+    <div class="timeline">
+        <div class="timeline-item" style="margin-left: 3%;" onclick="openPopup('pop1')">
+            <div class="timeline-content left">
+                <div class="circle">
+                    <img src="recursos/imagenes/balanza.png" alt="balance">
+                </div>
+                <div class="description">
+                    <p>Descripción 1</p>
+                </div>
+            </div>
+            <div class="timeline-bifurcation" style="margin-left: -3.5%;"></div>
+        </div>
+
+        <div class="timeline-item" style="margin-left: 3%;margin-top: 15%;" onclick="openPopup('pop2')">
+            <div class="timeline-content right" >
+                <div class="circle">
+                    <img src="recursos/imagenes/diversity.png" alt="diversidad">
+                </div>
+                <div class="description">
+                    <p>Descripción 2</p>
+                </div>
+            </div>
+            <div class="timeline-bifurcation timeline-bifurcation-rigth" style="margin-left: -0.6%;"></div>
+        </div>
+
+        <div class="timeline-item"  style="margin-left: -3%;margin-top: 35%;" onclick="openPopup('pop3')">
+            <div class="timeline-content left" >
+                <div class="circle">
+                    <img src="recursos/imagenes/map.png" alt="mapa">
+                </div>
+                <div class="description">
+                    <p>Descripción 1</p>
+                </div>
+            </div>
+            <div class="timeline-bifurcation" style="margin-left: -0.3%;"></div>
+        </div>
+
+        <div class="timeline-item"  style="margin-left: -21%; margin-top: 51%;" onclick="openPopup('pop4')">
+            <div class="timeline-content right" >
+                <div class="circle">
+                    <img src="recursos/imagenes/abandono.png" alt="abandono">
+                </div>
+                <div class="description" style="width: 43%;">
+                    <p>Descripción 2</p>
+                </div>
+            </div>
+            <div class="timeline-bifurcation timeline-bifurcation-rigth" style="margin-left: 9.4%;"></div>
+        </div>
+
+    </div>
+
+    <div id="pop1" class="popup" >
+        <div class="popup-content" >
+            <span class="close" onclick="closePopup('pop1')">&times;</span>
+            <div class="popup-inner">
+                <div class="pop-title">Chapulineo 2021 - 2024</div>
+                <div class="popup-iframe popup-inner-element" style="margin-left: -35px;">
+                    <iframe src="/sankey/index.html" frameborder="0" scrolling="no" ></iframe>
+                    <!--<img src="recursos/imagenes/balanza.png" alt="balance">-->
+                </div>
+                <div class="popup-description popup-inner-element">
+                    <p class="desc-pop-title">Chapulineo 2021 - 2024</p>
+                    <p>
+                        El diagrama de Sankey ilustra los cambios de afiliación partidaria entre los candidatos a lo largo del tiempo. Aquí se destacan algunos puntos importantes:
+                    </p>
+                    <p>
+                        <ul>
+                            <li class="bullet"><span class="bold-text-li">Flujos Principales hacia Morena y MC:</span> Morena y Movimiento Ciudadano (MC) son los principales receptores de candidatos provenientes de otros partidos, lo que indica su creciente atractivo y posible alineación con las tendencias actuales del electorado. Esto puede reflejar la percepción de estos partidos como opciones viables para el cambio y la innovación. La capacidad de atraer candidatos de otros partidos sugiere que Morena y MC están percibidos como partidos en ascenso, con un potencial significativo para influir en la política nacional.</li>
+                            <li class="bullet"><span class="bold-text-li">Movimientos entre PAN, PRI y PRD:</span> Hay un flujo significativo de candidatos entre estos partidos tradicionales, lo cual sugiere una coordinación y colaboración estrecha, posiblemente debido a la formación de coaliciones. Estos movimientos pueden ser indicativos de esfuerzos conjuntos y adaptaciones a las dinámicas políticas cambiantes. Los flujos entre estos partidos tradicionales podrían estar motivados por la búsqueda de fortalecer alianzas estratégicas y maximizar su influencia política.</li>
+                            <li class="bullet"><span class="bold-text-li">Otros Partidos:</span> Los flujos hacia y desde partidos más pequeños como PT, PVEM y PESOL muestran que estos partidos también están involucrados en la dinámica de cambios de lealtades, aunque en menor escala. Esto sugiere que, aunque tienen menos influencia, siguen siendo relevantes en el panorama político y pueden actuar como fuerzas disruptivas o como aliados estratégicos en coaliciones. La capacidad de estos partidos para atraer y perder candidatos muestra su importancia en el ecosistema político, donde pueden influir significativamente en el resultado de las elecciones a través de alianzas y coaliciones.</li>
+                        </ul>
+                    </p> 
+                    <p>
+                        Este diagrama refleja una gran movilidad entre los candidatos, lo que podría estar relacionado con cambios en las plataformas políticas, alianzas estratégicas y la búsqueda de nuevas oportunidades dentro del panorama político mexicano. La fluidez de las afiliaciones partidarias destaca la naturaleza competitiva y en evolución del sistema político en México.
+                    </p>                
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="pop2" class="popup">
+        <div class="popup-content">
+            <span class="close" onclick="closePopup('pop2')">&times;</span>
+            <div class="popup-inner">
+                <div class="pop-title">¿Cómo se describen los candidatos a sí mismos?</div>
+                <div class="popup-iframe popup-inner-element" style="height: 590px;margin-left:-5px;">
+                    <iframe src="/word-cloud/index.html" frameborder="0" scrolling="no" style="left: -50px;"></iframe>
+                </div>
+                <div class="popup-description popup-inner-element">
+                    <p class="desc-pop-title">Nube de Palabras</p>
+                    <p>
+                        La nube de palabras destaca las profesiones más comunes entre los candidatos de las elecciones de 2024. Las palabras más prominentes incluyen:
+                    </p>
+                    <ul>
+                        <li class="bullet"><span class="bold-text-li">Público y Servidor:</span> Indican que muchos candidatos tienen experiencia en el sector público, sugiriendo una orientación hacia la administración gubernamental. Esto refleja una tendencia a valorar la experiencia en la gestión pública y la administración de recursos, crucial en la formulación de políticas y la ejecución de programas gubernamentales.</li>
+                        <li class="bullet"><span class="bold-text-li">Abogado:</span> La prevalencia de esta palabra muestra que el derecho es una profesión común entre los candidatos. Esto no es sorprendente, ya que el conocimiento de las leyes y la capacidad de interpretar y aplicar la normativa legal es fundamental en el ámbito político. La presencia de abogados podría influir en una mayor comprensión y elaboración de leyes y políticas.</li>
+                        <li class="bullet"><span class="bold-text-li">Municipal y Docente:</span> Resaltan la importancia de la experiencia local y educativa, respectivamente. Los candidatos con experiencia en el ámbito municipal pueden tener un mejor entendimiento de las necesidades locales, mientras que los docentes pueden aportar perspectivas valiosas sobre la educación y la formación de políticas educativas.</li>
+                        <li class="bullet"><span class="bold-text-li">Empresario y Director:</span> Sugieren que hay una representación significativa de personas con experiencia en la gestión y negocios. Estos candidatos pueden aportar habilidades en gestión empresarial y liderazgo, esenciales para la eficiencia y eficacia en la administración pública. Esto podría indicar una tendencia hacia políticas que favorezcan el desarrollo económico y la creación de empleos.</li>
+                    </ul>                        
+                    <p>
+                        Este análisis sugiere que los partidos están seleccionando candidatos con una amplia gama de experiencias profesionales, lo cual podría reflejarse en la diversidad de propuestas y enfoques administrativos. La variedad de profesiones también puede indicar un intento de los partidos por conectar con diferentes segmentos del electorado, ofreciendo candidatos que representan una variedad de intereses y antecedentes.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="pop3" class="popup">
+        <div class="popup-content">
+            <span class="close" onclick="closePopup('pop3')">&times;</span>
+            <div class="popup-inner">
+                <div class="pop-title">Gubernaturas por Partido Político</div>
+                <div class="popup-iframe popup-inner-element" style="height: 590px;margin-left:-5px;">
+                    <iframe src="/mapa/index.html" frameborder="0" scrolling="no" style="left: 0px;"></iframe>
+                </div>
+                <div class="popup-description popup-inner-element">
+                    <p class="desc-pop-title">Distribución de Partidos por Estado</p>
+                    <p>
+                        El mapa interactivo presenta la distribución de los partidos políticos por estado en México. A través del análisis de este mapa, podemos observar cómo ciertos partidos tienen fortalezas regionales específicas y cómo se distribuyen geográficamente:
+                    </p>
+                    <ul>
+                        <li class="bullet"><span class="bold-text-li">Dominancia Regional de Morena:</span> Morena muestra una fuerte presencia en varias regiones del país, indicando su capacidad para atraer votantes en diversas áreas geográficas. Esto puede ser resultado de una estrategia efectiva de campaña y una conexión sólida con las necesidades locales.</li>
+                        <li class="bullet"><span class="bold-text-li">Fortalezas de Movimiento Ciudadano:</span> Movimiento Ciudadano parece tener una concentración notable en ciertos estados, lo que sugiere que ha encontrado una base de apoyo regional significativa. Esto podría ser una indicación de éxito en áreas donde su mensaje resuena más fuertemente con el electorado.</li>
+                        <li class="bullet"><span class="bold-text-li">PAN y PRD en Competencia:</span> PAN y PRD mantienen una presencia competitiva en varias regiones, reflejando su persistencia y adaptabilidad en el cambiante panorama político. Su capacidad para mantener apoyo en distintas áreas puede ser indicativa de alianzas estratégicas y una fuerte base de votantes leales.</li>
+                        <li class="bullet"><span class="bold-text-li">Diversidad de Representación:</span>El mapa también muestra la presencia de partidos más pequeños como PT, PVEM y PESOL, indicando una diversidad en la representación política, a pesar de formar parte de las coaliciones. Estos partidos pueden no dominar grandes regiones, pero su presencia es crucial para la formación de coaliciones y la representación de nichos específicos del electorado.</li>
+                    </ul>                        
+                    <p>
+                        Este mapa interactivo no solo proporciona una visión clara de la distribución geográfica de los partidos, sino que también destaca las dinámicas regionales y la diversidad del apoyo partidario en México. La comprensión de estas distribuciones puede ofrecer valiosas perspectivas sobre las estrategias de campaña y las alianzas políticas necesarias para las elecciones de 2024.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="pop4" class="popup">
+        <div class="popup-content">
+            <span class="close" onclick="closePopup('pop4')">&times;</span>
+            <div class="popup-inner">
+                <div class="pop-title">Edades</div>
+                <div class="popup-iframe popup-inner-element" style="height: 650px;">
+                    <img src="recursos/imagenes/distrib_edades.jpeg" alt="balance" style="width: 100%;height: auto;">
+                </div>
+                <div class="popup-description popup-inner-element">
+                    <p class="desc-pop-title">Distribución de edades por partido</p>
+                    <p>
+                        Descripción edad.
+                    </p>
+                                           
+                    <p>            
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="recursos/js/main.js"></script>
+
+</body>
+</html>
