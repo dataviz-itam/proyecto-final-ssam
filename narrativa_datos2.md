@@ -49,7 +49,6 @@ La recopilación y análisis de datos sobre los candidatos es esencial para ente
 
 #### Nube de Palabras: Profesiones de los Candidatos
 
-
 La nube de palabras destaca las profesiones más comunes entre los candidatos de las elecciones de 2024. Las palabras más prominentes incluyen:
 
 - **Público** y **Servidor:** Indican que muchos candidatos tienen experiencia en el sector público, sugiriendo una orientación hacia la administración gubernamental. Esto refleja una tendencia a valorar la experiencia en la gestión pública y la administración de recursos, crucial en la formulación de políticas y la ejecución de programas gubernamentales.
@@ -81,9 +80,20 @@ El diagrama de Sankey ilustra los cambios de afiliación partidaria entre los ca
 
 Este diagrama refleja una gran movilidad entre los candidatos, lo que podría estar relacionado con cambios en las plataformas políticas, alianzas estratégicas y la búsqueda de nuevas oportunidades dentro del panorama político mexicano. La fluidez de las afiliaciones partidarias destaca la naturaleza competitiva y en evolución del sistema político en México.
 
+#### Mapa Interactivo: Distribución de Partidos por Estado
+
+El mapa interactivo presenta la distribución de los partidos políticos por estado en México. A través del análisis de este mapa, podemos observar cómo ciertos partidos tienen fortalezas regionales específicas y cómo se distribuyen geográficamente:
+
+- **Dominancia Regional de Morena:** Morena muestra una fuerte presencia en varias regiones del país, indicando su capacidad para atraer votantes en diversas áreas geográficas. Esto puede ser resultado de una estrategia efectiva de campaña y una conexión sólida con las necesidades locales.
+- **Fortalezas de Movimiento Ciudadano:** Movimiento Ciudadano parece tener una concentración notable en ciertos estados, lo que sugiere que ha encontrado una base de apoyo regional significativa. Esto podría ser una indicación de éxito en áreas donde su mensaje resuena más fuertemente con el electorado.
+- **PAN y PRD en Competencia:** PAN y PRD mantienen una presencia competitiva en varias regiones, reflejando su persistencia y adaptabilidad en el cambiante panorama político. Su capacidad para mantener apoyo en distintas áreas puede ser indicativa de alianzas estratégicas y una fuerte base de votantes leales.
+- **Diversidad de Representación:** El mapa también muestra la presencia de partidos más pequeños como PT, PVEM y PESOL, indicando una diversidad en la representación política, a pesar de formar parte de las coaliciones. Estos partidos pueden no dominar grandes regiones, pero su presencia es crucial para la formación de coaliciones y la representación de nichos específicos del electorado.
+
+Este mapa interactivo no solo proporciona una visión clara de la distribución geográfica de los partidos, sino que también destaca las dinámicas regionales y la diversidad del apoyo partidario en México. La comprensión de estas distribuciones puede ofrecer valiosas perspectivas sobre las estrategias de campaña y las alianzas políticas necesarias para las elecciones de 2024.
+
 ### Relación entre Profesiones, Edad y Dinámica Partidaria
 
-Al combinar estas tres perspectivas, se obtiene una comprensión más completa del perfil de los candidatos:
+Al combinar estas cuatro perspectivas, se obtiene una comprensión más completa del perfil de los candidatos:
 
 - **Experiencia Profesional y Edad:** Candidatos con antecedentes en "servicio público" y "abogado" tienden a ser mayores, lo que se alinea con partidos como Morena y PAN, que muestran una mayor concentración de candidatos experimentados. Esto sugiere una preferencia por la estabilidad y la experiencia en roles críticos, asegurando que los candidatos tengan el conocimiento necesario para manejar responsabilidades complejas. La combinación de experiencia y edad puede ser vista como una garantía de capacidad administrativa y conocimiento profundo del sistema político.
   
